@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ProjectStages</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="task_types">
+        <item>Выполненный</item>
+        <item>В работе</item>
+        <item>В размышлении</item>
+    </string-array>
+</resources>
