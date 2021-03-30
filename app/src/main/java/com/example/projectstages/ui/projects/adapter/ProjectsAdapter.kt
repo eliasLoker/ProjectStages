@@ -3,11 +3,14 @@ package com.example.projectstages.ui.projects.adapter
 import android.util.Log
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import com.example.projectstages.ProgressItem
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
 import com.example.projectstages.databinding.ItemProjectsDefaultBinding
 import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.Constants
+
 
 class ProjectsAdapter(
     private val listener: ProjectsAdapterListener
@@ -21,6 +24,7 @@ class ProjectsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
+//        val backgroundColor = R.color.white
         val backgroundColor = when(viewType) {
             Constants.RED_TYPE -> R.color.pale_red
             Constants.GREEN_TYPE -> R.color.pale_green
@@ -69,6 +73,27 @@ class ProjectsAdapter(
 
     override fun onBindViewHolder(holder: ProjectsHolders.BaseHolder, position: Int) {
         Log.d("DebugAdapter", "$position ${projects[position].countTasksByState[2]}")
+
+        val view = holder.colorsProgressBar
+        view.isVisible = projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2] != 0
+        //TODO(Show if min two task types)
+        Log.d("Projects", "Summ: ${projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2]}")
+        //START
+        val progressItemList = ArrayList<ProgressItem>()
+
+        val mProgressItem = ProgressItem(R.color.bright_green, projects[position].countTasksByState[0].toFloat())
+        progressItemList.add(mProgressItem)
+
+        val mProgressItem2 = ProgressItem(R.color.bright_red, projects[position].countTasksByState[1].toFloat())
+        progressItemList.add(mProgressItem2)
+
+        val mProgressItem3 = ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat())
+        progressItemList.add(mProgressItem3)
+
+        view.initData(progressItemList)
+        view.invalidate()
+        //END
+
         holder.bind(
             projectName = projects[position].name,
             update = projects[position].updateDate,

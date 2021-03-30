@@ -14,10 +14,20 @@
     <color name="green">#85FFA4</color>
     <color name="blue_white">#F0F8FF</color>
 
-    <color name="pale_yellow">#FFFACD</color>
-    <color name="pale_red">#FFA07A</color>
-    <color name="pale_green">#98FB98</color>
-    <color name="pale_blue">#AFEEEE</color>
-    <color name="pale_pink">#D8BFD8</color>
-    <color name="pale_grey">#DCDCDC</color>
+    <color name="pale_yellow">#FDFBEC</color>
+    <color name="pale_red">#FFF4F0</color>
+    <color name="pale_green">#E7FBE7</color>
+    <color name="pale_blue">#E6FBFB</color>
+    <color name="pale_pink">#FDF0FD</color>
+    <color name="pale_grey">#EFECEC</color>
+
+    <!--
+    <color name="bright_red">#ff0000</color>
+    <color name="bright_green">#00bd06</color>
+    <color name="bright_yellow">#ffe700</color>
+    -->
+
+    <color name="bright_red">#D80808</color>
+    <color name="bright_green">#149518</color>
+    <color name="bright_yellow">#ECD609</color>
 </resources>

@@ -4,6 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.example.projectstages.ColorsProgressBar
 import com.example.projectstages.databinding.*
 
 class ProjectsHolders {
@@ -16,11 +17,13 @@ class ProjectsHolders {
 
         abstract val updateTextView: TextView
 
-        abstract val completedTextView: TextView
+//        abstract val completedTextView: TextView
+//
+//        abstract val progressTextView: TextView
+//
+//        abstract val thoughtTextView: TextView
 
-        abstract val progressTextView: TextView
-
-        abstract val thoughtTextView: TextView
+        abstract val colorsProgressBar: ColorsProgressBar
 
         fun bind(
             projectName: String,
@@ -29,11 +32,12 @@ class ProjectsHolders {
             progressTasks: String,
             thoughtTasks: String
         ) {
+            //TODO("delete params from bind signature")
             projectNameTextView.text = projectName
             updateTextView.text = update
-            completedTextView.text = completedTasks
-            progressTextView.text = progressTasks
-            thoughtTextView.text = thoughtTasks
+//            completedTextView.text = completedTasks
+//            progressTextView.text = progressTasks
+//            thoughtTextView.text = thoughtTasks
         }
     }
 
@@ -46,11 +50,13 @@ class ProjectsHolders {
 
         override val updateTextView: TextView = binding.updateTextView
 
-        override val completedTextView: TextView = binding.completedSizeTextView
+//        override val completedTextView: TextView = binding.completedSizeTextView
+//
+//        override val progressTextView: TextView = binding.progressSizeTextView
+//
+//        override val thoughtTextView: TextView = binding.thoughtSizeTextView
 
-        override val progressTextView: TextView = binding.progressSizeTextView
-
-        override val thoughtTextView: TextView = binding.thoughtSizeTextView
+        override val colorsProgressBar: ColorsProgressBar = binding.customProgressBar
     }
 
     /*

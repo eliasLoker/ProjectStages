@@ -2,6 +2,7 @@ package com.example.projectstages.ui.projects
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -30,6 +31,7 @@ import com.example.projectstages.ui.taskslist.TasksListFragment
 import com.example.projectstages.ui.test.TestFragment
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.SpinnerAdapterWithImage
+
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
@@ -68,8 +70,8 @@ class ProjectsFragment(
             layoutManager = LinearLayoutManager(requireContext())
             projectsAdapter = ProjectsAdapter(projectsViewModel)
             adapter = projectsAdapter
-//            val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
-//            addItemDecoration(AdapterItemDecorator(margin))
+            val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
+            addItemDecoration(AdapterItemDecorator(margin))
         }
 
         observeViewState(projectsViewModel.stateLiveData, stateObserver)
@@ -90,7 +92,10 @@ class ProjectsFragment(
                 -> showSimpleDialog("Категория добавлена", "Категория успешно добавлена")
 
                 is ProjectsNavigationEvents.FailureAddDialog
-                -> showErrorDialog("Ошибка добавления категории", "Категория не добавлена, укажите уникальное название")
+                -> showErrorDialog(
+                    "Ошибка добавления категории",
+                    "Категория не добавлена, укажите уникальное название"
+                )
 
                 is ProjectsNavigationEvents.GoToProjectDetails
 //                -> goToProjectDetails(it.projectID)
@@ -197,6 +202,7 @@ class ProjectsFragment(
             hint = "Название проекта"
             layoutParams = marginParams
             textAlignment = View.TEXT_ALIGNMENT_CENTER
+            inputType = (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
         }
 
         val addButton = Button(requireContext()).apply {
@@ -217,7 +223,7 @@ class ProjectsFragment(
             R.drawable.ic_file_blue_mini,
             R.drawable.ic_file_pink_mini,
             R.drawable.ic_file_black_mini
-            )
+        )
         val adapter = SpinnerAdapterWithImage(requireContext(), drawableIds)
         spinner.adapter = adapter
 
