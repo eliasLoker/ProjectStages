@@ -45,12 +45,46 @@ class ColorsProgressBar @JvmOverloads constructor(
         if (mProgressItemsList.size > 0) {
             val progressBarWidth = width
             val progressBarHeight = height
+            val thumbOffset = thumbOffset
+            var lastProgressX = 0
+            var progressItemWidth: Int
+            var progressItemRight: Int
+            var j = 0
+            var sum = 0F
+            for (k in mProgressItemsList) {
+                sum += k.progressItemPercentage
+            }
+            for (i in mProgressItemsList) {
+                val progressPaint = Paint()
+                progressPaint.color = ContextCompat.getColor(context, i.color)
+                progressItemWidth = (progressBarWidth / 100F * ((i.progressItemPercentage / (sum / 100)))).toInt()
+                //TODO("По человечески переписать progressItemWidth")
+                progressItemRight = lastProgressX + progressItemWidth
+
+                val progressRect = Rect()
+                progressRect.set(
+                    lastProgressX, thumbOffset / 2,
+                    progressItemRight, progressBarHeight - thumbOffset / 2
+                )
+                canvas.drawRect(progressRect, progressPaint)
+                lastProgressX = progressItemRight
+            }
+            super.onDraw(canvas)
+        }
+    }
+
+    /*
+    override fun onDraw(canvas: Canvas) {
+        if (mProgressItemsList.size > 0) {
+            val progressBarWidth = width
+            val progressBarHeight = height
             val thumboffset = thumbOffset
             var lastProgressX = 0
             var progressItemWidth: Int
             var progressItemRight: Int
-            for (i in 0 until mProgressItemsList.size) {
-                val progressItem: ProgressItem = mProgressItemsList!![i]
+            for (i in mProgressItemsList.indices) {
+
+                val progressItem: ProgressItem = mProgressItemsList[i]
                 val progressPaint = Paint()
                 progressPaint.color = ContextCompat.getColor(context, progressItem.color)
                 progressItemWidth = (progressItem.progressItemPercentage
@@ -63,6 +97,7 @@ class ColorsProgressBar @JvmOverloads constructor(
                 ) {
                     progressItemRight = progressBarWidth
                 }
+
                 val progressRect = Rect()
                 progressRect.set(
                     lastProgressX, thumboffset / 2,
@@ -74,6 +109,7 @@ class ColorsProgressBar @JvmOverloads constructor(
             super.onDraw(canvas)
         }
     }
+    */
 }
 
 class ProgressItem(

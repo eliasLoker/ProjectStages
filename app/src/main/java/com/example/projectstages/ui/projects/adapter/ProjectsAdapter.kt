@@ -78,16 +78,26 @@ class ProjectsAdapter(
         view.isVisible = projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2] != 0
         //TODO(Show if min two task types)
         Log.d("Projects", "Summ: ${projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2]}")
+
+        Log.d("Projects", "Item 1: ${projects[position].countTasksByState[0]}")
+
+        Log.d("Projects", "Item 2: ${projects[position].countTasksByState[1]}")
+        Log.d("Projects", "Item 3: ${projects[position].countTasksByState[2]}")
         //START
         val progressItemList = ArrayList<ProgressItem>()
 
+        val sum = projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2]
         val mProgressItem = ProgressItem(R.color.bright_green, projects[position].countTasksByState[0].toFloat())
+        Log.d("Projects", "Item 1 det: ${sum.toFloat() / 100 * projects[position].countTasksByState[0].toFloat()}")
+//        val mProgressItem = ProgressItem(R.color.bright_green, sum.toFloat() / 100 * projects[position].countTasksByState[0].toFloat())
         progressItemList.add(mProgressItem)
 
         val mProgressItem2 = ProgressItem(R.color.bright_red, projects[position].countTasksByState[1].toFloat())
+//        val mProgressItem2 = ProgressItem(R.color.bright_red, sum.toFloat() / 100 * projects[position].countTasksByState[1].toFloat())
         progressItemList.add(mProgressItem2)
 
         val mProgressItem3 = ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat())
+//        val mProgressItem3 = ProgressItem(R.color.bright_yellow, sum.toFloat() / 100 * projects[position].countTasksByState[2].toFloat())
         progressItemList.add(mProgressItem3)
 
         view.initData(progressItemList)
