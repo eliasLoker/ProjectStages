@@ -21,6 +21,10 @@ sealed class TasksListNavigationEvents {
         val taskID: Long
     ) : TasksListNavigationEvents()
 
+    class GoToAddTask(
+        val projectID: Long
+    ) : TasksListNavigationEvents()
+
     object SuccessUpdate : TasksListNavigationEvents()
 
     object FailureUpdate : TasksListNavigationEvents()

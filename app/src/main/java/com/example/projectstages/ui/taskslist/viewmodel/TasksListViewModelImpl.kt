@@ -31,7 +31,7 @@ class TasksListViewModelImpl(
 
     override val tasks_list_navigationEvents = SingleLiveEvent<TasksListNavigationEvents>()
 
-    override fun onActivityCreated(isFirstLoading: Boolean) {
+    override fun onViewCreated(isFirstLoading: Boolean) {
         fetchTasks()
     }
 
@@ -86,6 +86,7 @@ class TasksListViewModelImpl(
                 false -> TasksListNavigationEvents.SuccessAddDialog
             }
             tasks_list_navigationEvents.value = event
+            //TODO("Name variable")
         }
     }
 
@@ -135,6 +136,11 @@ class TasksListViewModelImpl(
 
     override fun onTaskClicked(id: Long) {
         tasks_list_navigationEvents.value = TasksListNavigationEvents.GoToTask(id)
+    }
+
+
+    override fun onGoToAddTaskClicked() {
+        tasks_list_navigationEvents.value = TasksListNavigationEvents.GoToAddTask(projectId)
     }
 
     override fun onReduceState(viewAction: Action): ViewState {

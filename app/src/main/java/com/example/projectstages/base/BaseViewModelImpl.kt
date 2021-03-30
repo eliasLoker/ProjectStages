@@ -13,5 +13,5 @@ interface BaseViewModelImpl {
     */
     val stateLiveData: LiveData<out BaseViewState>
 
-    fun onActivityCreated(isFirstLoading: Boolean)
+    fun onViewCreated(isFirstLoading: Boolean)
 }

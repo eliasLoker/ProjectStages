@@ -13,5 +13,7 @@ interface TasksListViewModel : BaseViewModelImpl, TasksListAdapterListener {
 
     fun onAcceptDeleteTask()
 
+    fun onGoToAddTaskClicked()
+
 //    fun onUpdateButtonClicked(description: String, state: Int)
 }

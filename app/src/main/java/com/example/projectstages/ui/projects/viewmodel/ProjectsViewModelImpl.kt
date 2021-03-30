@@ -30,7 +30,7 @@ class ProjectsViewModelImpl(
 
     override val _navigationEvents = SingleLiveEvent<ProjectsNavigationEvents>()
 
-    override fun onActivityCreated(isFirstLoading: Boolean) {
+    override fun onViewCreated(isFirstLoading: Boolean) {
         sendAction(Action.SetToolbar(title, subtitle))
         fetchProjects()
     }

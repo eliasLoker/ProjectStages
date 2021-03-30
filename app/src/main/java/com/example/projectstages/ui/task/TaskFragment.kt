@@ -2,10 +2,12 @@ package com.example.projectstages.ui.task
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
@@ -16,6 +18,9 @@ import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.ui.task.viewmodel.TaskViewModelImpl
 import com.example.projectstages.utils.Constants
+import com.example.projectstages.utils.onItemSelected
+import com.example.projectstages.utils.onTextChanged
+import com.example.projectstages.utils.showToast
 import com.example.projectstages.utils.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.utils.spinnerwithimageandtext.SpinnerItem
 
@@ -47,13 +52,15 @@ class TaskFragment(
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val projectID = arguments?.getLong(PROJECT_ID) ?: 0L
         val taskID = arguments?.getLong(TASK_ID)
         val isEdit = arguments?.getBoolean(IS_EDIT) ?: false
         val interactor = TaskInteractor(requireContext().appComponent.projectDao)
         Log.d("TaskDebug", "onActivityCreated $taskID")
-        val factory = TaskFactory(isEdit, taskID, interactor)
+        val factory = TaskFactory(isEdit, projectID, taskID, interactor)
         taskViewModel = ViewModelProviders
             .of(this, factory)
             .get(TaskViewModelImpl::class.java)
@@ -78,23 +85,50 @@ class TaskFragment(
             adapter = spinnerAdapter
         }
 
-        taskViewModel.onActivityCreated(savedInstanceState == null)
+        taskViewModel.onViewCreated(savedInstanceState == null)
 
         observeViewState(taskViewModel.stateLiveData, stateObserver)
 //        observe(taskViewModel.stateLiveData, stateObserver)
+        binding.saveButton.setOnClickListener {
+            taskViewModel.onSaveButtonClicked()
+        }
+
+        binding.descriptionTextInputEditText.onTextChanged {
+            taskViewModel.onTextChangedDescription(it)
+        }
+
+        binding.stateSpinner.onItemSelected {
+            taskViewModel.onItemSelectedStateSpinner(it)
+        }
+
+        taskViewModel.taskEvents.observe(viewLifecycleOwner, {
+            when(it) {
+                is TaskEvents.SuccessAdd -> {
+                    //TODO("Maybe add toast")
+                    findNavController().popBackStack()
+                }
+                is TaskEvents.FailureAdd -> requireContext().showToast("Не удалось добавить запись")
+            }
+        })
     }
 
     companion object {
 
+        private const val PROJECT_ID = "PROJECT_ID"
         private const val TASK_ID = "TASK_ID"
         private const val IS_EDIT = "IS_EDIT"
 
         @JvmStatic
-        fun getBundle(taskID: Long?, isEdit: Boolean) = Bundle().apply {
+        fun getBundleEditTask(taskID: Long?, isEdit: Boolean) = Bundle().apply {
             putBoolean(IS_EDIT, isEdit)
             taskID?.let {
                 putLong(TASK_ID, taskID)
             }
+        }
+
+        @JvmStatic
+        fun getBundleCreateTask(projectID: Long) = Bundle().apply {
+            putLong(PROJECT_ID, projectID)
         }
     }
 }

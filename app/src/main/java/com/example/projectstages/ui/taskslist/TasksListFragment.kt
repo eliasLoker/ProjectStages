@@ -2,6 +2,7 @@ package com.example.projectstages.ui.taskslist
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -48,8 +49,9 @@ class TasksListFragment(
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val id = arguments?.getLong(TAG_FOR_ID, 0L) ?: 0L
 //        binding.textView.text = "Hello, ${id}"
 
@@ -58,7 +60,7 @@ class TasksListFragment(
         tasksListViewModel = ViewModelProviders
             .of(this, factory)
             .get(TasksListViewModelImpl::class.java)
-        tasksListViewModel.onActivityCreated(savedInstanceState == null)
+        tasksListViewModel.onViewCreated(savedInstanceState == null)
 
         binding.recyclerView.apply {
 //            layoutManager = LinearLayoutManager(requireContext())
@@ -75,7 +77,8 @@ class TasksListFragment(
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             //TODO("Коллбэк в VM")
 //            showAddTaskDialog()
-            goToTask(null, false)
+//            goToTaskEdit(null, false)
+            tasksListViewModel.onGoToAddTaskClicked()
         }
 
         tasksListViewModel.tasks_list_navigationEvents.observe(viewLifecycleOwner, {
@@ -98,7 +101,10 @@ class TasksListFragment(
                 -> requireContext().showToast("Ошибка изменения")
 
                 is TasksListNavigationEvents.GoToTask
-                -> goToTask(it.taskID, true)
+                -> goToTaskEdit(it.taskID, true)
+
+                is TasksListNavigationEvents.GoToAddTask
+                -> goToTaskAdd(it.projectID)
             }
         })
     }
@@ -248,8 +254,13 @@ class TasksListFragment(
         }
     }
 
-    private fun goToTask(id: Long?, isEdit: Boolean) {
-        val bundle = TaskFragment.getBundle(id, isEdit)
+    private fun goToTaskEdit(id: Long?, isEdit: Boolean) {
+        val bundle = TaskFragment.getBundleEditTask(id, isEdit)
+        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
+    }
+
+    private fun goToTaskAdd(projectID: Long) {
+        val bundle = TaskFragment.getBundleCreateTask(projectID)
         findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
     }
 

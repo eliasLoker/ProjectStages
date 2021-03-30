@@ -54,8 +54,8 @@ class ProjectsFragment(
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
         val title = requireContext().resources.getString(R.string.app_name)
@@ -64,7 +64,7 @@ class ProjectsFragment(
         projectsViewModel = ViewModelProviders
             .of(this, projectsFactory)
             .get(ProjectsViewModelImpl::class.java)
-        projectsViewModel.onActivityCreated(savedInstanceState == null)
+        projectsViewModel.onViewCreated(savedInstanceState == null)
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -99,7 +99,8 @@ class ProjectsFragment(
 
                 is ProjectsNavigationEvents.GoToProjectDetails
 //                -> goToProjectDetails(it.projectID)
-                -> showGoToTasksDialog(it.projectID)
+//                -> showGoToTasksDialog(it.projectID)
+                -> goToTasks(it.projectID)
             }
         })
     }
@@ -271,6 +272,7 @@ class ProjectsFragment(
     }
 
     private fun showGoToTasksDialog(id: Long) {
+        //TODO("Maybe delete")
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Какой экран открыть?")
             .setPositiveButton("TasksList") { dialog, _ ->

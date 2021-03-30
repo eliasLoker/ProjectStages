@@ -5,19 +5,28 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.BaseAction
 import com.example.projectstages.base.BaseViewModel
 import com.example.projectstages.base.BaseViewState
+import com.example.projectstages.data.entity.TaskEntity
+import com.example.projectstages.ui.task.TaskEvents
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.utils.Constants
+import com.example.projectstages.utils.SingleLiveEvent
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class TaskViewModelImpl(
     private val isEdit: Boolean,
+    private val projectID: Long,
     private val taskID: Long?,
     private val taskInteractor: TaskInteractor
 ) : BaseViewModel<TaskViewModelImpl.ViewState, TaskViewModelImpl.Action>(ViewState()),
     TaskViewModel{
 
-    override fun onActivityCreated(isFirstLoading: Boolean) {
+    private var taskStringBuilder = StringBuilder()
+    private var taskType = 0
+
+    override val taskEvents = SingleLiveEvent<TaskEvents>()
+
+    override fun onViewCreated(isFirstLoading: Boolean) {
         Log.d("TaskDebug", "VM state: $state")
 //        onReduceState(Action.Loading)
         fetchTask()
@@ -34,13 +43,51 @@ class TaskViewModelImpl(
                 sendAction(Action.SetTitle(Constants.TaskTitleType.EDIT))
                 viewModelScope.launch {
                     Log.d("TaskDebug", "START")
-                    val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskIdNotNull) }
-                    val resultState = async { taskInteractor.getTaskStateByTaskId(taskIdNotNull) }
-                    sendAction(Action.SuccessEdit(resultDescription.await(), resultState.await()))
-                    Log.d("TaskDebug", "RESULT ASYNC: ${resultDescription.await()}, ${resultState.await()}")
+                    val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskIdNotNull) }.await()
+                    val resultState = async { taskInteractor.getTaskStateByTaskId(taskIdNotNull) }.await()
+                    taskType = resultState
+                    sendAction(Action.SuccessEdit(resultDescription, resultState))
+//                    Log.d("TaskDebug", "RESULT ASYNC: ${resultDescription.await()}, ${resultState.await()}")
                 }
             }
         }
+    }
+
+    override fun onSaveButtonClicked() {
+        if (isEdit) {
+
+        } else {
+            viewModelScope.launch {
+                /*
+                val timestamp = System.currentTimeMillis()
+                val task = TaskEntity(projectId, description, taskType, timestamp)
+                val insertResult = listInteractor.insertTask(task)
+                val event = when (insertResult < 0) {
+                    true -> TasksListNavigationEvents.FailureAddDialog
+                    false -> TasksListNavigationEvents.SuccessAddDialog
+                }
+                tasks_list_navigationEvents.value = event
+                */
+                val timestamp = System.currentTimeMillis()
+                Log.d("TaskDebug", "WRITE: $projectID, ${taskStringBuilder.toString()}, $taskType, $timestamp")
+                val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
+                val insertResult = taskInteractor.insertTask(task)
+                val event = when (insertResult < 0) {
+                    true -> TaskEvents.FailureAdd
+                    false -> TaskEvents.SuccessAdd
+                }
+                taskEvents.value = event
+            }
+        }
+    }
+
+    override fun onTextChangedDescription(text: String) {
+        taskStringBuilder.clear()
+        taskStringBuilder.append(text)
+    }
+
+    override fun onItemSelectedStateSpinner(position: Int) {
+        taskType = position
     }
 
     override fun onReduceState(viewAction: Action): ViewState {
