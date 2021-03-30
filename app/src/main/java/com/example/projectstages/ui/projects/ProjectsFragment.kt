@@ -68,8 +68,8 @@ class ProjectsFragment(
             layoutManager = LinearLayoutManager(requireContext())
             projectsAdapter = ProjectsAdapter(projectsViewModel)
             adapter = projectsAdapter
-            val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
-            addItemDecoration(AdapterItemDecorator(margin))
+//            val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
+//            addItemDecoration(AdapterItemDecorator(margin))
         }
 
         observeViewState(projectsViewModel.stateLiveData, stateObserver)

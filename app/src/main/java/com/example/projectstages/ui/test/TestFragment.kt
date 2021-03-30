@@ -14,15 +14,15 @@ import android.widget.ScrollView
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import com.example.projectstages.R
-import kotlinx.android.synthetic.main.fragment_test.*
+//import kotlinx.android.synthetic.main.fragment_test.*
 
 class TestFragment : Fragment(R.layout.fragment_test) {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        open_dialog.setOnClickListener {
-            openDialog()
-        }
+//        open_dialog.setOnClickListener {
+//            openDialog()
+//        }
     }
 
     private fun openDialog() {

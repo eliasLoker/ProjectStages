@@ -2,8 +2,10 @@ package com.example.projectstages.ui.projects.adapter
 
 import android.util.Log
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
-import com.example.projectstages.databinding.*
+import com.example.projectstages.databinding.ItemProjectsDefaultBinding
 import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.Constants
 
@@ -16,6 +18,36 @@ class ProjectsAdapter(
     fun setList(newProjects: List<Project>) {
         projects = newProjects
         notifyDataSetChanged()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
+        val backgroundColor = when(viewType) {
+            Constants.RED_TYPE -> R.color.pale_red
+            Constants.GREEN_TYPE -> R.color.pale_green
+            Constants.BLUE_TYPE -> R.color.pale_blue
+            Constants.PINK_TYPE -> R.color.pale_pink
+            Constants.BLACK_TYPE -> R.color.pale_grey
+            else -> R.color.pale_yellow
+        }
+        val folderView = when(viewType) {
+            Constants.RED_TYPE -> R.drawable.ic_file_red
+            Constants.GREEN_TYPE -> R.drawable.ic_file_green
+            Constants.BLUE_TYPE -> R.drawable.ic_file_blue
+            Constants.PINK_TYPE -> R.drawable.ic_file_pink
+            Constants.BLACK_TYPE -> R.drawable.ic_file_black
+            else -> R.drawable.ic_file_yellow
+        }
+        val view = ProjectsHolders.YellowType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
+        /*
+        view.itemView.apply {
+            setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
+        }
+        */
+        view.folderImageView.setImageDrawable(ContextCompat.getDrawable(parent.context, folderView))
+        view.itemView.rootView.apply {
+            setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
+        }
+        return view
     }
 
     /*
@@ -31,9 +63,9 @@ class ProjectsAdapter(
     }
     */
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
-        return ProjectsHolders.YellowType(parent.inflateBinding(ItemProjectsYellowBinding::inflate))
-    }
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
+//        return ProjectsHolders.YellowType(parent.inflateBinding(ItemProjectsYellowBinding::inflate))
+//    }
 
     override fun onBindViewHolder(holder: ProjectsHolders.BaseHolder, position: Int) {
         Log.d("DebugAdapter", "$position ${projects[position].countTasksByState[2]}")

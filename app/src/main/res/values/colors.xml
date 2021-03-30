@@ -13,4 +13,11 @@
     <color name="red">#FF8585</color>
     <color name="green">#85FFA4</color>
     <color name="blue_white">#F0F8FF</color>
+
+    <color name="pale_yellow">#FFFACD</color>
+    <color name="pale_red">#FFA07A</color>
+    <color name="pale_green">#98FB98</color>
+    <color name="pale_blue">#AFEEEE</color>
+    <color name="pale_pink">#D8BFD8</color>
+    <color name="pale_grey">#DCDCDC</color>
 </resources>

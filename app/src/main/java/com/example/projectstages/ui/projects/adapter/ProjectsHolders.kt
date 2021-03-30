@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.adapter
 
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -8,6 +9,9 @@ import com.example.projectstages.databinding.*
 class ProjectsHolders {
 
     abstract class BaseHolder(private val binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        abstract val folderImageView: ImageView
+
         abstract val projectNameTextView: TextView
 
         abstract val updateTextView: TextView
@@ -33,7 +37,10 @@ class ProjectsHolders {
         }
     }
 
-    class YellowType(binding: ItemProjectsYellowBinding) : BaseHolder(binding) {
+
+    class YellowType(binding: ItemProjectsDefaultBinding) : BaseHolder(binding) {
+
+        override val folderImageView: ImageView = binding.folderImageView
 
         override val projectNameTextView = binding.projectNameTextView
 
@@ -46,6 +53,7 @@ class ProjectsHolders {
         override val thoughtTextView: TextView = binding.thoughtSizeTextView
     }
 
+    /*
     class RedType(binding: ItemProjectsRedBinding) : BaseHolder(binding) {
 
         override val projectNameTextView = binding.projectNameTextView
@@ -110,4 +118,6 @@ class ProjectsHolders {
 
         override val thoughtTextView: TextView = binding.thoughtSizeTextView
     }
+    */
 }
+
