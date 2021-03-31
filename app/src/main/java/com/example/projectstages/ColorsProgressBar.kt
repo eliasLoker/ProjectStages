@@ -69,6 +69,7 @@ class ColorsProgressBar @JvmOverloads constructor(
                 canvas.drawRect(progressRect, progressPaint)
                 lastProgressX = progressItemRight
             }
+            invalidate()
             super.onDraw(canvas)
         }
     }
