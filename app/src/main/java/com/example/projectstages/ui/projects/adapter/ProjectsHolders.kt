@@ -17,27 +17,14 @@ class ProjectsHolders {
 
         abstract val updateTextView: TextView
 
-//        abstract val completedTextView: TextView
-//
-//        abstract val progressTextView: TextView
-//
-//        abstract val thoughtTextView: TextView
-
         abstract val colorsProgressBar: ColorsProgressBar
 
         fun bind(
             projectName: String,
-            update: String,
-            completedTasks: String,
-            progressTasks: String,
-            thoughtTasks: String
+            update: String
         ) {
-            //TODO("delete params from bind signature")
             projectNameTextView.text = projectName
             updateTextView.text = update
-//            completedTextView.text = completedTasks
-//            progressTextView.text = progressTasks
-//            thoughtTextView.text = thoughtTasks
         }
     }
 
@@ -50,80 +37,8 @@ class ProjectsHolders {
 
         override val updateTextView: TextView = binding.updateTextView
 
-//        override val completedTextView: TextView = binding.completedSizeTextView
-//
-//        override val progressTextView: TextView = binding.progressSizeTextView
-//
-//        override val thoughtTextView: TextView = binding.thoughtSizeTextView
-
         override val colorsProgressBar: ColorsProgressBar = binding.customProgressBar
     }
 
-    /*
-    class RedType(binding: ItemProjectsRedBinding) : BaseHolder(binding) {
-
-        override val projectNameTextView = binding.projectNameTextView
-
-        override val updateTextView: TextView = binding.updateTextView
-
-        override val completedTextView: TextView = binding.completedSizeTextView
-
-        override val progressTextView: TextView = binding.progressSizeTextView
-
-        override val thoughtTextView: TextView = binding.thoughtSizeTextView
-    }
-
-    class GreenType(binding: ItemProjectsGreenBinding) : BaseHolder(binding) {
-
-        override val projectNameTextView = binding.projectNameTextView
-
-        override val updateTextView: TextView = binding.updateTextView
-
-        override val completedTextView: TextView = binding.completedSizeTextView
-
-        override val progressTextView: TextView = binding.progressSizeTextView
-
-        override val thoughtTextView: TextView = binding.thoughtSizeTextView
-    }
-
-    class BlueType(binding: ItemProjectsBlueBinding) : BaseHolder(binding) {
-
-        override val projectNameTextView = binding.projectNameTextView
-
-        override val updateTextView: TextView = binding.updateTextView
-
-        override val completedTextView: TextView = binding.completedSizeTextView
-
-        override val progressTextView: TextView = binding.progressSizeTextView
-
-        override val thoughtTextView: TextView = binding.thoughtSizeTextView
-    }
-
-    class PinkType(binding: ItemProjectsPinkBinding) : BaseHolder(binding) {
-
-        override val projectNameTextView = binding.projectNameTextView
-
-        override val updateTextView: TextView = binding.updateTextView
-
-        override val completedTextView: TextView = binding.completedSizeTextView
-
-        override val progressTextView: TextView = binding.progressSizeTextView
-
-        override val thoughtTextView: TextView = binding.thoughtSizeTextView
-    }
-
-    class BlackType(binding: ItemProjectsBlackBinding) : BaseHolder(binding) {
-
-        override val projectNameTextView = binding.projectNameTextView
-
-        override val updateTextView: TextView = binding.updateTextView
-
-        override val completedTextView: TextView = binding.completedSizeTextView
-
-        override val progressTextView: TextView = binding.progressSizeTextView
-
-        override val thoughtTextView: TextView = binding.thoughtSizeTextView
-    }
-    */
 }
 

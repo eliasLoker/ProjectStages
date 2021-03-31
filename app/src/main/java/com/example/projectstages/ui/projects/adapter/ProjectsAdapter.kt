@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.projects.adapter
 
-import android.util.Log
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -24,7 +23,6 @@ class ProjectsAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
-//        val backgroundColor = R.color.white
         val backgroundColor = when(viewType) {
             Constants.RED_TYPE -> R.color.pale_red
             Constants.GREEN_TYPE -> R.color.pale_green
@@ -42,46 +40,25 @@ class ProjectsAdapter(
             else -> R.drawable.ic_file_yellow
         }
         val view = ProjectsHolders.YellowType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
-        /*
-        view.itemView.apply {
-            setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
-        }
-        */
         view.folderImageView.setImageDrawable(ContextCompat.getDrawable(parent.context, folderView))
-        view.itemView.rootView.apply {
-            setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
-        }
+        view.itemView.rootView.setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
         return view
     }
 
     override fun onBindViewHolder(holder: ProjectsHolders.BaseHolder, position: Int) {
-        Log.d("DebugAdapter", "$position ${projects[position].countTasksByState[2]}")
-
+        //TODO("Вероятно, в будущем нужно убрать эту расширяемость, тк излишняя и захардкодить три цвета внутри ColorsProgressBar")
         val colorsProgressBar = holder.colorsProgressBar
         colorsProgressBar.isVisible = projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2] != 0
-
-        //START
-        //TODO("Вероятно, в будущем нужно убрать эту расширяемость, тк не нужна и захардкодить три цвета внутри ColorsProgressBar")
-        val progressItemList = ArrayList<ProgressItem>()
-
-        val mProgressItem = ProgressItem(R.color.bright_green, projects[position].countTasksByState[0].toFloat())
-        progressItemList.add(mProgressItem)
-
-        val mProgressItem2 = ProgressItem(R.color.bright_red, projects[position].countTasksByState[1].toFloat())
-        progressItemList.add(mProgressItem2)
-
-        val mProgressItem3 = ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat())
-        progressItemList.add(mProgressItem3)
-
+        val progressItemList = ArrayList<ProgressItem>().apply {
+            add(ProgressItem(R.color.bright_green, projects[position].countTasksByState[0].toFloat()))
+            add(ProgressItem(R.color.bright_red, projects[position].countTasksByState[1].toFloat()))
+            add(ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat()))
+        }
         colorsProgressBar.initData(progressItemList)
-        //END
 
         holder.bind(
             projectName = projects[position].name,
-            update = projects[position].updateDate,
-            completedTasks = "${projects[position].countTasksByState[0]}",
-            progressTasks = "${projects[position].countTasksByState[1]}",
-            thoughtTasks = "${projects[position].countTasksByState[2]}"
+            update = projects[position].updateDate
         )
         holder.itemView.setOnClickListener {
             listener.onItemClicked(projects[position].id)

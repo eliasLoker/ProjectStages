@@ -43,10 +43,8 @@ class ProjectsFragment(
     private val stateObserver = Observer<ProjectsViewModelImpl.ViewState> {
         binding.apply {
             progressBar.isVisible = it.progressBarVisibility
-
             recyclerView.isVisible = it.projectsAdapterVisibility
             projectsAdapter.setList(it.projects)
-//            Log.d("ProjectsDebug", "State: $it")
             toolbar.toolbar.apply {
                 title = it.title
                 subtitle = it.subtitle
@@ -57,6 +55,7 @@ class ProjectsFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //TODO(string to res)
         val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
         val title = requireContext().resources.getString(R.string.app_name)
         val subtitle = "Список проектов"
@@ -86,6 +85,7 @@ class ProjectsFragment(
             return@setOnLongClickListener true
         }
 
+        //TODO(string to res)
         projectsViewModel._navigationEvents.observe(viewLifecycleOwner, {
             when (it) {
                 is ProjectsNavigationEvents.SuccessAddDialog
@@ -98,8 +98,6 @@ class ProjectsFragment(
                 )
 
                 is ProjectsNavigationEvents.GoToProjectDetails
-//                -> goToProjectDetails(it.projectID)
-//                -> showGoToTasksDialog(it.projectID)
                 -> goToTasks(it.projectID)
             }
         })
@@ -153,8 +151,6 @@ class ProjectsFragment(
         mainVerticalLayout.addView(messageTextView)
 
         val dialog = AlertDialog.Builder(requireContext())
-//            .setTitle(title)
-//            .setMessage(message)
             .setView(mainVerticalLayout)
             .setCancelable(false)
             .setPositiveButton("Ok") { dialog, _ ->
@@ -165,6 +161,7 @@ class ProjectsFragment(
     }
 
     private fun showAddProjectDialog() {
+        //TODO(string to res)
         val messageWithTitle = buildSpannedString {
             bold {
                 append("Добавление категории\n\n")

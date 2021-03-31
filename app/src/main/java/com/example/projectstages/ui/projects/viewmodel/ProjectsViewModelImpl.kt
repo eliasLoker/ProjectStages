@@ -39,7 +39,6 @@ class ProjectsViewModelImpl(
         viewModelScope.launch {
             when (val projects = interactor.getProjects()) {
                 is ResultWrapper.Success -> {
-                    Log.d("ProjectsDebug", "SUCCESS: $projects")
                     projects.data.collectLatest {
                         when(it.isNotEmpty()) {
                             true -> {
@@ -65,10 +64,6 @@ class ProjectsViewModelImpl(
                                         thoughtTasks
                                     )
                                     //TODO(Check queries with incorrect data)
-                                    Log.d("ProjectsDebug", "COUNT: $count")
-                                    Log.d("ProjectsDebug", "TIMESTAMP: $formattedDate")
-
-                                    Log.d("ProjectsDebug", "Completed: $completedTasks")
                                     val project = Project(
                                         projectEntity.id,
                                         projectEntity.name,
@@ -93,40 +88,6 @@ class ProjectsViewModelImpl(
         }
     }
 
-    /*
-    private fun fetchProjects() {
-        viewModelScope.launch {
-            when (val projects = interactor.getProjects()) {
-                is ResultWrapper.Success -> {
-                    Log.d("ProjectsDebug", "SUCCESS: $projects")
-                    projects.data.collectLatest {
-                        when(it.isNotEmpty()) {
-                            true -> {
-                                _projects.clear()
-                                it.forEach{ projectEntity ->
-                                    val project = Project(
-                                        projectEntity.id,
-                                        projectEntity.name,
-                                        projectEntity.type
-                                    )
-                                    _projects.add(project)
-                                }
-                                sendAction(Action.NotEmptyList(_projects))
-                            }
-                            false -> sendAction(Action.EmptyList)
-                        }
-                    }
-                }
-
-                is ResultWrapper.Error -> {
-                    Log.d("ProjectsDebug", "ERROR: ${projects.exception.localizedMessage}")
-                    sendAction(Action.Error)
-                }
-            }
-        }
-    }
-    */
-
     override fun onAddButtonClicked(name: String, type: Int) {
         viewModelScope.launch {
             val timestamp = System.currentTimeMillis()
@@ -141,7 +102,6 @@ class ProjectsViewModelImpl(
     }
 
     override fun onItemClicked(id: Long) {
-//        Log.d("ProjectsDebug", "Clicked: $id")
         //TODO("Подумать, феншуйно ли передавать вот так айдишник")
         _navigationEvents.value = ProjectsNavigationEvents.GoToProjectDetails(id)
     }
