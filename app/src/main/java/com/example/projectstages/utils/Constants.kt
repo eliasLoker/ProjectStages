@@ -10,8 +10,13 @@ class Constants {
         const val BLACK_TYPE = 5
     }
 
+    //TODO("Додумать. Решение с enum-ами не нравится")
     enum class TaskTitleType {
         ADD, EDIT
+    }
+
+    enum class EmptyList {
+        EMPTY, ERROR
     }
 }
 

@@ -7,13 +7,10 @@ import com.example.projectstages.ui.taskslist.event.TasksListNavigationEvents
 
 interface TasksListViewModel : BaseViewModelImpl, TasksListAdapterListener {
 
-    val tasks_list_navigationEvents: LiveData<TasksListNavigationEvents>
+    val tasksListNavigationEvents: LiveData<TasksListNavigationEvents>
 
     fun onAddTaskButtonClicked(description: String, taskType: Int)
 
-    fun onAcceptDeleteTask()
-
     fun onGoToAddTaskClicked()
 
-//    fun onUpdateButtonClicked(description: String, state: Int)
 }
