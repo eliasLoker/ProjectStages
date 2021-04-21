@@ -2,15 +2,12 @@ package com.example.projectstages.ui.projects.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.projectstages.base.BaseAction
-import com.example.projectstages.base.BaseViewModel
-import com.example.projectstages.base.BaseViewState
+import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.ProjectEntity
-import com.example.projectstages.ui.projects.events.ProjectsNavigationEvents
+import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.ResultWrapper
-import com.example.projectstages.utils.SingleLiveEvent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -22,13 +19,18 @@ class ProjectsViewModelImpl(
     private val subtitle: String,
     private val interactor: ProjectsInteractor
 ) :
-    BaseViewModel<ProjectsViewModelImpl.ViewState, ProjectsViewModelImpl.Action>
-        (ViewState()), ProjectsViewModel {
+    BaseViewModel<
+            ProjectsViewModelImpl.ViewState,
+            ProjectsViewModelImpl.Action,
+            ProjectsViewModelImpl.ViewEffect,
+            ProjectsViewModelImpl.ViewEvent
+            >
+        (ViewState()), ProjectsAdapterListener {
 
     private val _projects = ArrayList<Project>()
     private val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm")
 
-    override val _navigationEvents = SingleLiveEvent<ProjectsNavigationEvents>()
+//    override val _navigationEvents = SingleLiveEvent<ProjectsNavigationEvents>()
 
     override fun onViewCreated(isFirstLoading: Boolean) {
         sendAction(Action.SetToolbar(title, subtitle))
@@ -88,23 +90,23 @@ class ProjectsViewModelImpl(
         }
     }
 
-    override fun onAddButtonClicked(name: String, type: Int) {
-        viewModelScope.launch {
-            val timestamp = System.currentTimeMillis()
-            val project = ProjectEntity(name, type, timestamp)
-            val insertResult = interactor.insertProject(project)
-            val event = when (insertResult < 0) {
-                true -> ProjectsNavigationEvents.FailureAddDialog
-                false -> ProjectsNavigationEvents.SuccessAddDialog
-            }
-            _navigationEvents.value = event
-        }
-    }
+//    override fun onAddButtonClicked(name: String, type: Int) {
+//        viewModelScope.launch {
+//            val timestamp = System.currentTimeMillis()
+//            val project = ProjectEntity(name, type, timestamp)
+//            val insertResult = interactor.insertProject(project)
+//            val event = when (insertResult < 0) {
+//                true -> ProjectsNavigationEvents.FailureAddDialog
+//                false -> ProjectsNavigationEvents.SuccessAddDialog
+//            }
+//            _navigationEvents.value = event
+//        }
+//    }
 
-    override fun onItemClicked(id: Long) {
-        //TODO("Подумать, феншуйно ли передавать вот так айдишник")
-        _navigationEvents.value = ProjectsNavigationEvents.GoToProjectDetails(id)
-    }
+//    override fun onItemClicked(id: Long) {
+//        //TODO("Подумать, феншуйно ли передавать вот так айдишник")
+//        _navigationEvents.value = ProjectsNavigationEvents.GoToProjectDetails(id)
+//    }
 
     override fun onReduceState(viewAction: Action): ViewState {
         return when (viewAction) {
@@ -138,6 +140,39 @@ class ProjectsViewModelImpl(
         }
     }
 
+    override fun processViewEvent(viewEvent: ViewEvent) {
+        Log.d("ProjectsDebug", "processViewEvent $viewEvent")
+        when(viewEvent) {
+            is ViewEvent.OnAcceptAddProjectClicked
+            -> onAddProjectClicked(
+                viewEvent.name,
+                viewEvent.type
+            )
+
+            is ViewEvent.OnAddProjectClicked
+            -> viewEffect.value = ViewEffect.ShowAddProjectDialog
+        }
+    }
+
+    private fun onAddProjectClicked(name: String, type: Int) {
+        viewModelScope.launch {
+            val timestamp = System.currentTimeMillis()
+            val project = ProjectEntity(name, type, timestamp)
+            val insertResult = interactor.insertProject(project)
+            val effect = when (insertResult < 0) {
+                true -> ViewEffect.FailureAddDialog
+                false -> ViewEffect.SuccessAddDialog
+            }
+//            _navigationEvents.value = event
+//            viewEffect.setValue(effect)
+            viewEffect.value = effect
+        }
+    }
+
+    override fun onItemClicked(id: Long) {
+        TODO("Not yet implemented")
+    }
+
     data class ViewState(
         val progressBarVisibility: Boolean = true,
         val title: String = "",
@@ -164,5 +199,28 @@ class ProjectsViewModelImpl(
         ) : Action()
 
         object Error : Action()
+    }
+
+    sealed class ViewEffect : BaseViewEffect {
+
+        object SuccessAddDialog : ViewEffect()
+
+        object FailureAddDialog : ViewEffect()
+
+        class GoToProjectDetails(
+            val projectID: Long
+        ) : ViewEffect()
+
+        object ShowAddProjectDialog : ViewEffect()
+    }
+
+    sealed class ViewEvent : BaseViewEvent {
+
+        object OnAddProjectClicked : ViewEvent()
+
+        class OnAcceptAddProjectClicked(
+            val name: String,
+            val type: Int
+        ) : ViewEvent()
     }
 }

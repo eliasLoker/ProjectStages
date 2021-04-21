@@ -3,32 +3,36 @@ package com.example.projectstages.ui.task
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.base.observeViewState
+import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
-import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.ui.task.viewmodel.TaskViewModelImpl
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.onItemSelected
 import com.example.projectstages.utils.onTextChanged
-import com.example.projectstages.utils.showToast
 import com.example.projectstages.utils.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.utils.spinnerwithimageandtext.SpinnerItem
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
-) : BaseFragment<FragmentTaskBinding>(layoutID, FragmentTaskBinding::inflate) {
+) : BaseFragment<
+        FragmentTaskBinding,
+        TaskViewModelImpl.ViewState,
+        TaskViewModelImpl.Action,
+        TaskViewModelImpl.ViewEffect,
+        TaskViewModelImpl.ViewEvent,
+        TaskViewModelImpl
+        >(layoutID, FragmentTaskBinding::inflate) {
 
-    private lateinit var taskViewModel: TaskViewModel
+    private lateinit var taskViewModel: TaskViewModelImpl
 
     private val stateObserver = Observer<TaskViewModelImpl.ViewState> {
 //        Log.d("TaskDebug", "state: $it")
@@ -90,17 +94,22 @@ class TaskFragment(
         observeViewState(taskViewModel.stateLiveData, stateObserver)
 //        observe(taskViewModel.stateLiveData, stateObserver)
         binding.saveButton.setOnClickListener {
-            taskViewModel.onSaveButtonClicked()
+//            taskViewModel.onSaveButtonClicked()
+            //TODO("To viewEvent")
         }
 
         binding.descriptionTextInputEditText.onTextChanged {
-            taskViewModel.onTextChangedDescription(it)
+//            taskViewModel.onTextChangedDescription(it)
+            //TODO("To viewEvent")
         }
 
         binding.stateSpinner.onItemSelected {
-            taskViewModel.onItemSelectedStateSpinner(it)
+//            taskViewModel.onItemSelectedStateSpinner(it)
+            //TODO("To viewEvent")
         }
 
+        /*
+        //TODO("to ViewEffect")
         taskViewModel.taskEvents.observe(viewLifecycleOwner, {
             when(it) {
                 is TaskEvents.SuccessAdd -> {
@@ -110,6 +119,11 @@ class TaskFragment(
                 is TaskEvents.FailureAdd -> requireContext().showToast("Не удалось добавить запись")
             }
         })
+        */
+    }
+
+    override fun processViewEffect(viewEffect: BaseViewEffect) {
+        TODO("Not yet implemented")
     }
 
     companion object {

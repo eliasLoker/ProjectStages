@@ -11,25 +11,30 @@ import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.base.observeViewState
+import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTasksListBinding
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapter
-import com.example.projectstages.ui.taskslist.event.TasksListNavigationEvents
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
 import com.example.projectstages.ui.taskslist.model.Task
 import com.example.projectstages.ui.taskslist.viewmodel.TasksListFactory
-import com.example.projectstages.ui.taskslist.viewmodel.TasksListViewModel
 import com.example.projectstages.ui.taskslist.viewmodel.TasksListViewModelImpl
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.AdapterStickyItemDecorator2
 import com.example.projectstages.utils.Constants
-import com.example.projectstages.utils.showToast
 
 class TasksListFragment(
     layoutID: Int = R.layout.fragment_tasks_list
-) : BaseFragment<FragmentTasksListBinding>(layoutID, FragmentTasksListBinding::inflate) {
+) : BaseFragment<
+        FragmentTasksListBinding,
+        TasksListViewModelImpl.ViewState,
+        TasksListViewModelImpl.Action,
+        TasksListViewModelImpl.ViewEffect,
+        TasksListViewModelImpl.ViewEvent,
+        TasksListViewModelImpl
+        >(layoutID, FragmentTasksListBinding::inflate) {
 
-    private lateinit var tasksListViewModel: TasksListViewModel
+    private lateinit var tasksListViewModel: TasksListViewModelImpl
     private lateinit var tasksListAdapter: TasksListAdapter
 
     private val stateObserver = Observer<TasksListViewModelImpl.ViewState> {
@@ -71,9 +76,12 @@ class TasksListFragment(
         observeViewState(tasksListViewModel.stateLiveData, stateObserver)
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
-            tasksListViewModel.onGoToAddTaskClicked()
+//            tasksListViewModel.onGoToAddTaskClicked()
+            //TODO("To viewEvent")
         }
 
+        /*
+        //TODO("to ViewEffect")
         tasksListViewModel.tasksListNavigationEvents.observe(viewLifecycleOwner, {
             when (it) {
 
@@ -96,6 +104,11 @@ class TasksListFragment(
                 -> goToTaskAdd(it.projectID)
             }
         })
+        */
+    }
+
+    override fun processViewEffect(viewEffect: BaseViewEffect) {
+        TODO("Not yet implemented")
     }
 
     private fun getSectionCallback(tasks: List<Task>): AdapterStickyItemDecorator2.SectionCallback {

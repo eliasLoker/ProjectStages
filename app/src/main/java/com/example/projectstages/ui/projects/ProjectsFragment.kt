@@ -3,6 +3,7 @@ package com.example.projectstages.ui.projects
 import android.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -19,25 +20,31 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.observeViewEffect
 import com.example.projectstages.base.observeViewState
+import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
-import com.example.projectstages.ui.projects.events.ProjectsNavigationEvents
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
-import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModelImpl
 import com.example.projectstages.ui.taskslist.TasksListFragment
-import com.example.projectstages.ui.test.TestFragment
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.SpinnerAdapterWithImage
 
-
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
-) : BaseFragment<FragmentProjectsBinding>(layoutId, FragmentProjectsBinding::inflate) {
+) : BaseFragment<
+        FragmentProjectsBinding,
+        ProjectsViewModelImpl.ViewState,
+        ProjectsViewModelImpl.Action,
+        ProjectsViewModelImpl.ViewEffect,
+        ProjectsViewModelImpl.ViewEvent,
+        ProjectsViewModelImpl
+        >(layoutId, FragmentProjectsBinding::inflate) {
 
-    private lateinit var projectsViewModel: ProjectsViewModel
+
+    private lateinit var projectsViewModel: ProjectsViewModelImpl
     private lateinit var projectsAdapter: ProjectsAdapter
 
     private val stateObserver = Observer<ProjectsViewModelImpl.ViewState> {
@@ -74,33 +81,40 @@ class ProjectsFragment(
         }
 
         observeViewState(projectsViewModel.stateLiveData, stateObserver)
+        observeViewEffect(projectsViewModel.viewEffect, viewEffectObserver)
+        //TODO("Вынести в base вызовы этих observeViewState2 и observeViewEffect")
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
-            //В VM Callback
-            showAddProjectDialog()
+            projectsViewModel.processViewEvent(
+                ProjectsViewModelImpl.ViewEvent.OnAddProjectClicked
+            )
         }
 
-        binding.toolbar.addQuestionMenuButton.setOnLongClickListener {
-            goToTest()
-            return@setOnLongClickListener true
+//        //TODO(string to res)
+//        projectsViewModel._navigationEvents.observe(viewLifecycleOwner, {
+//            when (it) {
+//                is ProjectsNavigationEvents.SuccessAddDialog
+//                -> showSimpleDialog("Категория добавлена", "Категория успешно добавлена")
+//
+//                is ProjectsNavigationEvents.FailureAddDialog
+//                -> showErrorDialog(
+//                    "Ошибка добавления категории",
+//                    "Категория не добавлена, укажите уникальное название"
+//                )
+//
+//                is ProjectsNavigationEvents.GoToProjectDetails
+//                -> goToTasks(it.projectID)
+//            }
+//        })
+    }
+
+
+    override fun processViewEffect(viewEffect: BaseViewEffect) {
+        Log.d("ProjectsDebug", "processViewEffect $viewEffect")
+        when (viewEffect) {
+            is ProjectsViewModelImpl.ViewEffect.ShowAddProjectDialog
+            -> showAddProjectDialog()
         }
-
-        //TODO(string to res)
-        projectsViewModel._navigationEvents.observe(viewLifecycleOwner, {
-            when (it) {
-                is ProjectsNavigationEvents.SuccessAddDialog
-                -> showSimpleDialog("Категория добавлена", "Категория успешно добавлена")
-
-                is ProjectsNavigationEvents.FailureAddDialog
-                -> showErrorDialog(
-                    "Ошибка добавления категории",
-                    "Категория не добавлена, укажите уникальное название"
-                )
-
-                is ProjectsNavigationEvents.GoToProjectDetails
-                -> goToTasks(it.projectID)
-            }
-        })
     }
 
     private fun showSimpleDialog(title: String, message: String) {
@@ -242,9 +256,18 @@ class ProjectsFragment(
             .setView(mainVerticalLayout)
             .create()
         addButton.setOnClickListener {
+            /*
             projectsViewModel.onAddButtonClicked(
                 projectNameEditText.text.toString(),
                 spinner.selectedItemPosition
+            )
+            dialog.dismiss()
+            */
+            projectsViewModel.processViewEvent(
+                ProjectsViewModelImpl.ViewEvent.OnAcceptAddProjectClicked(
+                    projectNameEditText.text.toString(),
+                    spinner.selectedItemPosition
+                )
             )
             dialog.dismiss()
         }
@@ -258,13 +281,6 @@ class ProjectsFragment(
         findNavController().navigate(
             R.id.action_projectsFragment_to_tasksFragment,
             TasksListFragment.getBundle(id)
-        )
-    }
-
-    private fun goToTest() {
-        findNavController().navigate(
-            R.id.action_projectsFragment_to_testFragment,
-            TestFragment.newInstance()
         )
     }
 

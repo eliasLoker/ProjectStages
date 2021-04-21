@@ -1,16 +1,13 @@
 package com.example.projectstages.ui.taskslist.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.example.projectstages.base.BaseAction
-import com.example.projectstages.base.BaseViewModel
-import com.example.projectstages.base.BaseViewState
-import com.example.projectstages.data.entity.TaskEntity
-import com.example.projectstages.ui.taskslist.event.TasksListNavigationEvents
+import com.example.projectstages.base.*
+import com.example.projectstages.base.viewmodel.*
+import com.example.projectstages.ui.taskslist.adapter.TasksListAdapterListener
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
 import com.example.projectstages.ui.taskslist.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
-import com.example.projectstages.utils.SingleLiveEvent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -20,14 +17,19 @@ import kotlin.collections.ArrayList
 class TasksListViewModelImpl(
     private val projectId: Long,
     private val listInteractor: TasksListInteractor
-) : BaseViewModel<TasksListViewModelImpl.ViewState, TasksListViewModelImpl.Action>(ViewState()),
-    TasksListViewModel {
+) : BaseViewModel<
+        TasksListViewModelImpl.ViewState,
+        TasksListViewModelImpl.Action,
+        TasksListViewModelImpl.ViewEffect,
+        TasksListViewModelImpl.ViewEvent
+        >(ViewState()), TasksListAdapterListener {
 
     private val tasks = ArrayList<Task>()
 
     private val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
 
-    override val tasksListNavigationEvents = SingleLiveEvent<TasksListNavigationEvents>()
+//    override val tasksListNavigationEvents = SingleLiveEvent<TasksListNavigationEvents>()
+//TODO("заменить на viewEffect")
 
     override fun onViewCreated(isFirstLoading: Boolean) {
         fetchTasks()
@@ -69,6 +71,12 @@ class TasksListViewModelImpl(
         }
     }
 
+    override fun processViewEvent(viewEvent: ViewEvent) {
+        TODO("Not yet implemented")
+    }
+
+    /*
+    //TODO("Коллбэки в viewEvent")
     override fun onAddTaskButtonClicked(description: String, taskType: Int) {
         viewModelScope.launch {
             val timestamp = System.currentTimeMillis()
@@ -89,6 +97,11 @@ class TasksListViewModelImpl(
 
     override fun onGoToAddTaskClicked() {
         tasksListNavigationEvents.value = TasksListNavigationEvents.GoToAddTask(projectId)
+    }
+    */
+
+    override fun onTaskClicked(id: Long) {
+        TODO("Not yet implemented")
     }
 
     override fun onReduceState(viewAction: Action): ViewState {
@@ -146,5 +159,13 @@ class TasksListViewModelImpl(
         ) : Action()
 
         object Error : Action()
+    }
+
+    sealed class ViewEffect : BaseViewEffect {
+        //TODO("Not yet implemented")
+    }
+
+    sealed class ViewEvent : BaseViewEvent {
+        //TODO("Not yet implemented")
     }
 }

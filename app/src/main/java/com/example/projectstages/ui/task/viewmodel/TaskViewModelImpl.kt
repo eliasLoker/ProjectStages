@@ -2,14 +2,9 @@ package com.example.projectstages.ui.task.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.projectstages.base.BaseAction
-import com.example.projectstages.base.BaseViewModel
-import com.example.projectstages.base.BaseViewState
-import com.example.projectstages.data.entity.TaskEntity
-import com.example.projectstages.ui.task.TaskEvents
+import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.utils.Constants
-import com.example.projectstages.utils.SingleLiveEvent
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
@@ -18,13 +13,18 @@ class TaskViewModelImpl(
     private val projectID: Long,
     private val taskID: Long?,
     private val taskInteractor: TaskInteractor
-) : BaseViewModel<TaskViewModelImpl.ViewState, TaskViewModelImpl.Action>(ViewState()),
-    TaskViewModel{
+) : BaseViewModel<
+        TaskViewModelImpl.ViewState,
+        TaskViewModelImpl.Action,
+        TaskViewModelImpl.ViewEffect,
+        TaskViewModelImpl.ViewEvent
+        >(ViewState()) {
 
     private var taskStringBuilder = StringBuilder()
     private var taskType = 0
 
-    override val taskEvents = SingleLiveEvent<TaskEvents>()
+//    override val taskEvents = SingleLiveEvent<TaskEvents>()
+    //TODO("заменить на viewEffect")
 
     override fun onViewCreated(isFirstLoading: Boolean) {
         Log.d("TaskDebug", "VM state: $state")
@@ -53,21 +53,17 @@ class TaskViewModelImpl(
         }
     }
 
+    override fun processViewEvent(viewEvent: ViewEvent) {
+        TODO("Not yet implemented")
+    }
+
+    /*
+    //TODO("Коллбэки в viewEvent")
     override fun onSaveButtonClicked() {
         if (isEdit) {
 
         } else {
             viewModelScope.launch {
-                /*
-                val timestamp = System.currentTimeMillis()
-                val task = TaskEntity(projectId, description, taskType, timestamp)
-                val insertResult = listInteractor.insertTask(task)
-                val event = when (insertResult < 0) {
-                    true -> TasksListNavigationEvents.FailureAddDialog
-                    false -> TasksListNavigationEvents.SuccessAddDialog
-                }
-                tasks_list_navigationEvents.value = event
-                */
                 val timestamp = System.currentTimeMillis()
                 Log.d("TaskDebug", "WRITE: $projectID, ${taskStringBuilder.toString()}, $taskType, $timestamp")
                 val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
@@ -89,6 +85,7 @@ class TaskViewModelImpl(
     override fun onItemSelectedStateSpinner(position: Int) {
         taskType = position
     }
+    */
 
     override fun onReduceState(viewAction: Action): ViewState {
         return when(viewAction) {
@@ -144,5 +141,13 @@ class TaskViewModelImpl(
         ) : Action()
 
         object SuccessAdd : Action()
+    }
+
+    sealed class ViewEffect : BaseViewEffect {
+        //TODO("Not yet implemented")
+    }
+
+    sealed class ViewEvent : BaseViewEvent {
+        //TODO("Not yet implemented")
     }
 }

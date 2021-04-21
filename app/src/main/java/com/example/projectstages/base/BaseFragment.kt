@@ -10,28 +10,40 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
+import com.example.projectstages.base.viewmodel.*
 
-private typealias FragmentViewBindingInflater<VB> = (
+private typealias FragmentViewBindingInflater2<VB> = (
     inflater: LayoutInflater,
     parent: ViewGroup?,
     attachToParent: Boolean
 ) -> VB
 
-abstract class BaseFragment<VB : ViewBinding>(
+abstract class BaseFragment<
+        VB : ViewBinding,
+        ViewState : BaseViewState,
+        Action : BaseAction,
+        ViewEffect: BaseViewEffect,
+        ViewEvent : BaseViewEvent,
+        ViewModel : BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
+        >(
     @LayoutRes
     private val layoutID: Int,
-    private val bindingInflater: FragmentViewBindingInflater<VB>
+    private val bindingInflater: FragmentViewBindingInflater2<VB>
 ) : Fragment(layoutID) {
 
     private var _binding: VB? = null
 
     protected val binding get() = _binding!!
 
+    protected val viewEffectObserver = Observer<BaseViewEffect> {
+        processViewEffect(it)
+    }
+
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = bindingInflater.invoke(inflater, container, false)
         return binding.root
     }
@@ -40,22 +52,16 @@ abstract class BaseFragment<VB : ViewBinding>(
         super.onDestroyView()
         _binding = null
     }
+
+    abstract fun processViewEffect(viewEffect: BaseViewEffect)
 }
 
-fun <T> LifecycleOwner.observe(liveDate: LiveData<T>, observer: Observer<T>) {
-    liveDate.observe(this, observer)
-}
-
-//fun <T : BaseViewState, U> LifecycleOwner.observeViewState(liveDate: LiveData<T>, observer: Observer<U>) {
-//    liveDate.observe(this, observer as Observer<T>)
-//}
-
-//fun LifecycleOwner.observeViewState(liveDate: LiveData<out BaseViewState>, observer: Observer<in BaseViewState>) {
-//    liveDate.observe(this, observer)
-//}
-
-//fun <T> LifecycleOwner.observeViewState(liveDate: LiveData<T>, observer: Observer<T>) where T : BaseViewState{
 fun <T : BaseViewState, U> LifecycleOwner.observeViewState(liveDate: LiveData<T>, observer: Observer<U>) {
+    liveDate.observe(this, observer as Observer<T>)
+    //TODO("Додумать и переписать реализацию с дженериками")
+}
+
+fun <T : BaseViewEffect, U> LifecycleOwner.observeViewEffect(liveDate: LiveData<T>, observer: Observer<U>) {
     liveDate.observe(this, observer as Observer<T>)
     //TODO("Додумать и переписать реализацию с дженериками")
 }

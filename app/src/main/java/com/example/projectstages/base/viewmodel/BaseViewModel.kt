@@ -1,11 +1,20 @@
-package com.example.projectstages.base
+package com.example.projectstages.base.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.projectstages.utils.SingleLiveEvent
 import kotlin.properties.Delegates
 
-abstract class BaseViewModel<ViewState : BaseViewState, ViewAction : BaseAction>(initialState : ViewState) : ViewModel() {
+abstract class BaseViewModel<
+        ViewState : BaseViewState,
+        Action : BaseAction,
+        ViewEffect: BaseViewEffect,
+        ViewEvent : BaseViewEvent
+        >(initialState : ViewState) : ViewModel() {
+
+    private val _viewEffect: SingleLiveEvent<ViewEffect> = SingleLiveEvent()
+    val viewEffect = _viewEffect
 
     private val stateMutableLiveData = MutableLiveData<ViewState>()
     val stateLiveData = stateMutableLiveData.asLiveData()
@@ -19,7 +28,7 @@ abstract class BaseViewModel<ViewState : BaseViewState, ViewAction : BaseAction>
         }
     }
 
-    protected fun sendAction(viewAction: ViewAction) {
+    protected fun sendAction(viewAction: Action) {
         state = onReduceState(viewAction)
     }
 
@@ -30,8 +39,10 @@ abstract class BaseViewModel<ViewState : BaseViewState, ViewAction : BaseAction>
     abstract fun onViewCreated(isFirstLoading: Boolean)
     //TODO("Проверить, что везде коллбэк именно onViewCreated")
 
-    protected abstract fun onReduceState(viewAction: ViewAction) : ViewState
+    protected abstract fun onReduceState(viewAction: Action) : ViewState
 
+    abstract fun processViewEvent(viewEvent: ViewEvent)
+
+    fun <T> MutableLiveData<T>.asLiveData() = this as LiveData<T>
 }
 
-fun <T> MutableLiveData<T>.asLiveData() = this as LiveData<T>
