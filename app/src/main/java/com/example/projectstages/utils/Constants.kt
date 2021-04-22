@@ -1,5 +1,8 @@
 package com.example.projectstages.utils
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 class Constants {
     companion object {
         const val YELLOW_TYPE = 0
@@ -8,6 +11,14 @@ class Constants {
         const val BLUE_TYPE = 3
         const val PINK_TYPE = 4
         const val BLACK_TYPE = 5
+
+        val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+    }
+
+    enum class TaskStates(val stateID: Int) {
+        COMPLETED(0),
+        IN_PROGRESS(1),
+        IN_THOUGHT(2)
     }
 
     //TODO("Додумать. Решение с enum-ами не нравится")

@@ -10,11 +10,8 @@ class ProjectsInteractor(
 ) {
 
     suspend fun getProjects() : ResultWrapper<Flow<List<ProjectEntity>>> {
-//    suspend fun getProjects() : ResultWrapper<List<ProjectEntity>> {
-//    suspend fun getProjects() : ResultWrapper<List<Project>> {
         return try {
             ResultWrapper.Success(projectDao.getProjects())
-//            ResultWrapper.Success(projectDao.getProjects().toListProject())
         } catch (e: Exception) {
             ResultWrapper.Error(e)
         }
@@ -23,12 +20,6 @@ class ProjectsInteractor(
     suspend fun insertProject(projectEntity: ProjectEntity) : Long {
         return projectDao.insertProject(projectEntity)
     }
-
-//    suspend fun insertProject(projectEntity: ProjectEntity) {
-//
-//    }
-
-    fun getItemType(index: Int) = if (index % 2 == 0) 0 else 1
 
     suspend fun countTasksByProjectId(projectID: Long)
     = projectDao.countTasksByProjectId(projectID)

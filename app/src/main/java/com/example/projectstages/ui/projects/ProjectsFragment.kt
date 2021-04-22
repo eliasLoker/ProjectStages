@@ -25,6 +25,7 @@ import com.example.projectstages.base.observeViewState
 import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
+import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModelImpl
@@ -41,8 +42,7 @@ class ProjectsFragment(
         ProjectsViewModelImpl.ViewEffect,
         ProjectsViewModelImpl.ViewEvent,
         ProjectsViewModelImpl
-        >(layoutId, FragmentProjectsBinding::inflate) {
-
+        >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
     private lateinit var projectsViewModel: ProjectsViewModelImpl
     private lateinit var projectsAdapter: ProjectsAdapter
@@ -74,7 +74,7 @@ class ProjectsFragment(
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            projectsAdapter = ProjectsAdapter(projectsViewModel)
+            projectsAdapter = ProjectsAdapter(this@ProjectsFragment)
             adapter = projectsAdapter
             val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
             addItemDecoration(AdapterItemDecorator(margin))
@@ -110,11 +110,19 @@ class ProjectsFragment(
 
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
-        Log.d("ProjectsDebug", "processViewEffect $viewEffect")
         when (viewEffect) {
             is ProjectsViewModelImpl.ViewEffect.ShowAddProjectDialog
             -> showAddProjectDialog()
+
+            is ProjectsViewModelImpl.ViewEffect.GoToTaskList
+            -> goToTasks(viewEffect.projectID)
         }
+    }
+
+    override fun onItemClicked(id: Long) {
+        projectsViewModel.processViewEvent(
+            ProjectsViewModelImpl.ViewEvent.OnItemClicked(id)
+        )
     }
 
     private fun showSimpleDialog(title: String, message: String) {
@@ -256,13 +264,6 @@ class ProjectsFragment(
             .setView(mainVerticalLayout)
             .create()
         addButton.setOnClickListener {
-            /*
-            projectsViewModel.onAddButtonClicked(
-                projectNameEditText.text.toString(),
-                spinner.selectedItemPosition
-            )
-            dialog.dismiss()
-            */
             projectsViewModel.processViewEvent(
                 ProjectsViewModelImpl.ViewEvent.OnAcceptAddProjectClicked(
                     projectNameEditText.text.toString(),
