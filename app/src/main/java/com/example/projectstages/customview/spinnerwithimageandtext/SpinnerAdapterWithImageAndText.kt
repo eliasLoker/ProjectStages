@@ -1,4 +1,4 @@
-package com.example.projectstages.utils.spinnerwithimageandtext
+package com.example.projectstages.customview.spinnerwithimageandtext
 
 import android.content.Context
 import android.view.LayoutInflater

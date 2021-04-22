@@ -4,7 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.example.projectstages.ColorsProgressBar
+import com.example.projectstages.customview.ColorsProgressBar
 import com.example.projectstages.databinding.*
 
 class ProjectsHolders {

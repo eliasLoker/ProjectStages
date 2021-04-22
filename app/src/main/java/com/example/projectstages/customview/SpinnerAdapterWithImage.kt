@@ -1,4 +1,4 @@
-package com.example.projectstages.utils
+package com.example.projectstages.customview
 
 import android.content.Context
 import android.view.LayoutInflater

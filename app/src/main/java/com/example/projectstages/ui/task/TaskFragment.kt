@@ -18,8 +18,8 @@ import com.example.projectstages.ui.task.viewmodel.TaskViewModelImpl
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.onItemSelected
 import com.example.projectstages.utils.onTextChanged
-import com.example.projectstages.utils.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
-import com.example.projectstages.utils.spinnerwithimageandtext.SpinnerItem
+import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
+import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task

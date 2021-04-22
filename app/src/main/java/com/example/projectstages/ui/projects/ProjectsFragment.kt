@@ -3,7 +3,6 @@ package com.example.projectstages.ui.projects
 import android.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -31,7 +30,7 @@ import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModelImpl
 import com.example.projectstages.ui.taskslist.TasksListFragment
 import com.example.projectstages.utils.AdapterItemDecorator
-import com.example.projectstages.utils.SpinnerAdapterWithImage
+import com.example.projectstages.customview.SpinnerAdapterWithImage
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects

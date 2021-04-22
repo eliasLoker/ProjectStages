@@ -1,4 +1,4 @@
-package com.example.projectstages.utils.spinnerwithimageandtext
+package com.example.projectstages.customview.spinnerwithimageandtext
 
 data class SpinnerItem(
     val description: String,

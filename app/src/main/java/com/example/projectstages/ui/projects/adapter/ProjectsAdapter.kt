@@ -3,7 +3,7 @@ package com.example.projectstages.ui.projects.adapter
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import com.example.projectstages.ProgressItem
+import com.example.projectstages.customview.ProgressItem
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
 import com.example.projectstages.databinding.ItemProjectsDefaultBinding
