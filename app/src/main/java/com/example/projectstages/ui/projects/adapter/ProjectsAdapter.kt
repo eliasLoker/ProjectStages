@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.adapter
 
+import android.util.Log
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -18,7 +19,9 @@ class ProjectsAdapter(
     private var projects = listOf<Project>()
 
     fun setList(newProjects: List<Project>) {
+        Log.d("ProjectsDebug", "Pre ${newProjects.size}")
         projects = newProjects
+        Log.d("ProjectsDebug", "Post ${newProjects.size}")
         notifyDataSetChanged()
     }
 

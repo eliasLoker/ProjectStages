@@ -6,9 +6,11 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.observeViewEffect
 import com.example.projectstages.base.observeViewState
 import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTaskBinding
@@ -35,7 +37,6 @@ class TaskFragment(
     private lateinit var taskViewModel: TaskViewModelImpl
 
     private val stateObserver = Observer<TaskViewModelImpl.ViewState> {
-//        Log.d("TaskDebug", "state: $it")
         binding.apply {
             progressBar.isVisible = it.progressBarVisibility
             stateSpinner.isVisible = it.stateSpinnerVisibility
@@ -76,26 +77,17 @@ class TaskFragment(
             add(SpinnerItem(states[2], R.drawable.ic_thought))
         }
         val spinnerAdapter = SpinnerAdapterWithImageAndText(requireContext().applicationContext, spinnerItems)
-        /*
-        val spinnerAdapter = ArrayAdapter
-            .createFromResource(
-                requireContext(),
-                R.array.task_types,
-                android.R.layout.simple_spinner_item
-            )
-        */
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
         binding.stateSpinner.apply {
             adapter = spinnerAdapter
         }
-
-        taskViewModel.onViewCreated(savedInstanceState == null)
-
         observeViewState(taskViewModel.stateLiveData, stateObserver)
-//        observe(taskViewModel.stateLiveData, stateObserver)
+        observeViewEffect(taskViewModel.viewEffect, viewEffectObserver)
+
         binding.saveButton.setOnClickListener {
-//            taskViewModel.onSaveButtonClicked()
-            //TODO("To viewEvent")
+            taskViewModel.processViewEvent(
+                TaskViewModelImpl.ViewEvent.OnSaveButtonClicked
+            )
         }
 
         binding.descriptionTextInputEditText.onTextChanged {
@@ -123,7 +115,10 @@ class TaskFragment(
     }
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
-        TODO("Not yet implemented")
+        when(viewEffect) {
+            is TaskViewModelImpl.ViewEffect.GoToTaskList
+            -> findNavController().popBackStack()
+        }
     }
 
     companion object {

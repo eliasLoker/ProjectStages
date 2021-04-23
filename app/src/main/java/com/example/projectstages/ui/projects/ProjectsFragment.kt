@@ -3,6 +3,7 @@ package com.example.projectstages.ui.projects
 import android.app.AlertDialog
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -21,6 +22,7 @@ import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.base.observeViewEffect
 import com.example.projectstages.base.observeViewState
+import com.example.projectstages.base.observeViewState2
 import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
@@ -50,6 +52,8 @@ class ProjectsFragment(
         binding.apply {
             progressBar.isVisible = it.progressBarVisibility
             recyclerView.isVisible = it.projectsAdapterVisibility
+            Log.d("ProjectsDebug", "binding ${it.projects.size}")
+            Log.d("StateDebug", "$it")
             projectsAdapter.setList(it.projects)
             toolbar.toolbar.apply {
                 title = it.title
@@ -61,6 +65,7 @@ class ProjectsFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d("ProjectsFragmentDebug", "onViewCreated ${savedInstanceState == null}")
         //TODO(string to res)
         val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
         val title = requireContext().resources.getString(R.string.app_name)
@@ -69,7 +74,6 @@ class ProjectsFragment(
         projectsViewModel = ViewModelProviders
             .of(this, projectsFactory)
             .get(ProjectsViewModelImpl::class.java)
-        projectsViewModel.onViewCreated(savedInstanceState == null)
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -79,9 +83,11 @@ class ProjectsFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        observeViewState(projectsViewModel.stateLiveData, stateObserver)
+
+        projectsViewModel.stateLiveData.observe(viewLifecycleOwner, stateObserver)
         observeViewEffect(projectsViewModel.viewEffect, viewEffectObserver)
-        //TODO("Вынести в base вызовы этих observeViewState2 и observeViewEffect")
+        //TODO(Понять, почему observeViewState отрабатывает, как я написал, а не как я задумывал
+        // изначально")
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             projectsViewModel.processViewEvent(
@@ -107,7 +113,6 @@ class ProjectsFragment(
 //        })
     }
 
-
     override fun processViewEffect(viewEffect: BaseViewEffect) {
         when (viewEffect) {
             is ProjectsViewModelImpl.ViewEffect.ShowAddProjectDialog
@@ -115,6 +120,15 @@ class ProjectsFragment(
 
             is ProjectsViewModelImpl.ViewEffect.GoToTaskList
             -> goToTasks(viewEffect.projectID)
+
+            is ProjectsViewModelImpl.ViewEffect.SuccessAddDialog
+            -> showSimpleDialog("Категория добавлена", "Категория успешно добавлена")
+
+            is ProjectsViewModelImpl.ViewEffect.FailureAddDialog
+            -> showErrorDialog(
+                    "Ошибка добавления категории",
+                    "Категория не добавлена, укажите уникальное название"
+                )
         }
     }
 

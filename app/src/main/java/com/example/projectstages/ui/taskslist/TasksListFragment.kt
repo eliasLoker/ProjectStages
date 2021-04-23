@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.observeViewEffect
 import com.example.projectstages.base.observeViewState
+import com.example.projectstages.base.observeViewState2
 import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTasksListBinding
 import com.example.projectstages.ui.task.TaskFragment
@@ -61,23 +63,25 @@ class TasksListFragment(
         tasksListViewModel = ViewModelProviders
             .of(this, factory)
             .get(TasksListViewModelImpl::class.java)
-        tasksListViewModel.onViewCreated(savedInstanceState == null)
 
         binding.recyclerView.apply {
-//            layoutManager = LinearLayoutManager(requireContext())
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-//            layoutManager = GridLayoutManager(requireContext(), 2)
             tasksListAdapter = TasksListAdapter(tasksListViewModel)
             adapter = tasksListAdapter
             val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        observeViewState(tasksListViewModel.stateLiveData, stateObserver)
+//        observeViewState2(tasksListViewModel.stateLiveData, stateObserver)
+        tasksListViewModel.stateLiveData.observe(viewLifecycleOwner, stateObserver)
+        observeViewEffect(tasksListViewModel.viewEffect, viewEffectObserver)
+        //TODO(Понять, почему observeViewState отрабатывает, как я написал, а не как я задумывал
+        // изначально")
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
-//            tasksListViewModel.onGoToAddTaskClicked()
-            //TODO("To viewEvent")
+            tasksListViewModel.processViewEvent(
+                TasksListViewModelImpl.ViewEvent.OnGoToAddTaskClicked
+            )
         }
 
         /*
@@ -108,7 +112,10 @@ class TasksListFragment(
     }
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
-        TODO("Not yet implemented")
+        when(viewEffect) {
+            is TasksListViewModelImpl.ViewEffect.GoToAddTask
+            -> goToTaskAdd(viewEffect.projectId)
+        }
     }
 
     private fun getSectionCallback(tasks: List<Task>): AdapterStickyItemDecorator2.SectionCallback {

@@ -3,6 +3,7 @@ package com.example.projectstages.ui.task.viewmodel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
+import com.example.projectstages.data.entity.TaskEntity
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.utils.Constants
 import kotlinx.coroutines.async
@@ -26,12 +27,16 @@ class TaskViewModelImpl(
 //    override val taskEvents = SingleLiveEvent<TaskEvents>()
     //TODO("заменить на viewEffect")
 
-    override fun onViewCreated(isFirstLoading: Boolean) {
-        Log.d("TaskDebug", "VM state: $state")
-//        onReduceState(Action.Loading)
+    init {
         fetchTask()
-        Log.d("TaskDebug", "VM state2: $state")
     }
+
+//    override fun onViewCreated(isFirstLoading: Boolean) {
+//        Log.d("TaskDebug", "VM state: $state")
+////        onReduceState(Action.Loading)
+//        fetchTask()
+//        Log.d("TaskDebug", "VM state2: $state")
+//    }
 
     private fun fetchTask() {
         Log.d("TaskDebug", "fetchTask $taskID")
@@ -54,7 +59,33 @@ class TaskViewModelImpl(
     }
 
     override fun processViewEvent(viewEvent: ViewEvent) {
-        TODO("Not yet implemented")
+        when(viewEvent) {
+            is ViewEvent.OnSaveButtonClicked
+            -> onSaveButtonClicked()
+        }
+    }
+
+    fun onSaveButtonClicked() {
+        if (isEdit) {
+
+        } else {
+            viewModelScope.launch {
+                val timestamp = System.currentTimeMillis()
+                Log.d("TaskDebug", "WRITE: $projectID, ${taskStringBuilder.toString()}, $taskType, $timestamp")
+                //TODO("Исправить запись")
+//                val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
+                val task = TaskEntity(projectID, "taskStringBuilder.toString()", 1, timestamp)
+                val insertResult = taskInteractor.insertTask(task)
+                viewEffect.value = ViewEffect.GoToTaskList
+                /*
+                val event = when (insertResult < 0) {
+                    true -> TaskEvents.FailureAdd
+                    false -> TaskEvents.SuccessAdd
+                }
+                taskEvents.value = event
+                */
+            }
+        }
     }
 
     /*
@@ -144,10 +175,12 @@ class TaskViewModelImpl(
     }
 
     sealed class ViewEffect : BaseViewEffect {
-        //TODO("Not yet implemented")
+
+        object GoToTaskList : ViewEffect()
     }
 
     sealed class ViewEvent : BaseViewEvent {
-        //TODO("Not yet implemented")
+
+        object OnSaveButtonClicked : ViewEvent()
     }
 }

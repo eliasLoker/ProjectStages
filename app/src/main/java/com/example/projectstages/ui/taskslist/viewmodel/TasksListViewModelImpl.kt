@@ -3,6 +3,7 @@ package com.example.projectstages.ui.taskslist.viewmodel
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
+import com.example.projectstages.data.entity.TaskEntity
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapterListener
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
 import com.example.projectstages.ui.taskslist.model.Task
@@ -28,12 +29,15 @@ class TasksListViewModelImpl(
 
     private val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
 
+    init {
+        fetchTasks()
+    }
 //    override val tasksListNavigationEvents = SingleLiveEvent<TasksListNavigationEvents>()
 //TODO("заменить на viewEffect")
 
-    override fun onViewCreated(isFirstLoading: Boolean) {
-        fetchTasks()
-    }
+//    override fun onViewCreated(isFirstLoading: Boolean) {
+//        fetchTasks()
+//    }
 
     private fun fetchTasks() {
         viewModelScope.launch {
@@ -72,7 +76,10 @@ class TasksListViewModelImpl(
     }
 
     override fun processViewEvent(viewEvent: ViewEvent) {
-        TODO("Not yet implemented")
+        when(viewEvent) {
+            is ViewEvent.OnGoToAddTaskClicked
+            -> viewEffect.value = ViewEffect.GoToAddTask(projectId)
+        }
     }
 
     /*
@@ -162,10 +169,13 @@ class TasksListViewModelImpl(
     }
 
     sealed class ViewEffect : BaseViewEffect {
-        //TODO("Not yet implemented")
+
+        class GoToAddTask(
+            val projectId: Long
+        ) : ViewEffect()
     }
 
     sealed class ViewEvent : BaseViewEvent {
-        //TODO("Not yet implemented")
+        object OnGoToAddTaskClicked : ViewEvent()
     }
 }

@@ -61,6 +61,10 @@ fun <T : BaseViewState, U> LifecycleOwner.observeViewState(liveDate: LiveData<T>
     //TODO("Додумать и переписать реализацию с дженериками")
 }
 
+fun <T> LifecycleOwner.observeViewState2(liveData: LiveData<T>, observer: Observer<T>) {
+    liveData.observe(this, observer)
+}
+
 fun <T : BaseViewEffect, U> LifecycleOwner.observeViewEffect(liveDate: LiveData<T>, observer: Observer<U>) {
     liveDate.observe(this, observer as Observer<T>)
     //TODO("Додумать и переписать реализацию с дженериками")

@@ -36,7 +36,7 @@ abstract class BaseViewModel<
 //        onLoadData()
 //    }
 
-    abstract fun onViewCreated(isFirstLoading: Boolean)
+//    abstract fun onViewCreated(isFirstLoading: Boolean)
     //TODO("Проверить, что везде коллбэк именно onViewCreated")
 
     protected abstract fun onReduceState(viewAction: Action) : ViewState

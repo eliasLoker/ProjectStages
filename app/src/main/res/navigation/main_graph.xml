@@ -13,9 +13,6 @@
         <action
             android:id="@+id/action_projectsFragment_to_tasksFragment"
             app:destination="@id/tasksFragment" />
-        <action
-            android:id="@+id/action_projectsFragment_to_testFragment"
-            app:destination="@id/testFragment" />
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"
