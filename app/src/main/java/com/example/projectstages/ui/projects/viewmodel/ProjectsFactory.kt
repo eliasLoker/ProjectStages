@@ -11,6 +11,6 @@ class ProjectsFactory(
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ProjectsViewModelImpl(title, subtitle, interactor) as T
+        return ProjectsViewModel(title, subtitle, interactor) as T
     }
 }

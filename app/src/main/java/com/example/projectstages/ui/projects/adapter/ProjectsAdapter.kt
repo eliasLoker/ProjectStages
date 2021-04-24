@@ -19,9 +19,7 @@ class ProjectsAdapter(
     private var projects = listOf<Project>()
 
     fun setList(newProjects: List<Project>) {
-        Log.d("ProjectsDebug", "Pre ${newProjects.size}")
         projects = newProjects
-        Log.d("ProjectsDebug", "Post ${newProjects.size}")
         notifyDataSetChanged()
     }
 

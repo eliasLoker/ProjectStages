@@ -7,4 +7,19 @@
         <item>В работе</item>
         <item>В размышлении</item>
     </string-array>
+
+    <string name="ok">Ok</string>
+    <string name="add">Добавить</string>
+    <string name="cancel">Отмена</string>
+
+    <string name="project_subtitle">Список проектов</string>
+    <string name="project_success_add_title">Проект добавлен</string>
+    <string name="project_success_add_message">Успешного выполнения задач!</string>
+    <string name="project_error_add_title">Ошибка добавления проекта</string>
+    <string name="project_error_add_message">"Возможно было указано неуникальное название"</string>
+    <string name="project_add_category_title">Добавление категории\n\n</string>
+    <string name="project_add_category_message">Введите новое уникальное название проекта</string>
+    <string name="project_name">Название проекта</string>
+
+
 </resources>
