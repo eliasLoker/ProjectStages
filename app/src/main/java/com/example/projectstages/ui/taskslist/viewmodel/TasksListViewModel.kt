@@ -3,31 +3,28 @@ package com.example.projectstages.ui.taskslist.viewmodel
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
-import com.example.projectstages.data.entity.TaskEntity
-import com.example.projectstages.ui.taskslist.adapter.TasksListAdapterListener
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
 import com.example.projectstages.ui.taskslist.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class TasksListViewModelImpl(
+class TasksListViewModel(
     private val projectId: Long,
     private val listInteractor: TasksListInteractor
 ) : BaseViewModel<
-        TasksListViewModelImpl.ViewState,
-        TasksListViewModelImpl.Action,
-        TasksListViewModelImpl.ViewEffect,
-        TasksListViewModelImpl.ViewEvent
-        >(ViewState()), TasksListAdapterListener {
+        TasksListViewModel.ViewState,
+        TasksListViewModel.Action,
+        TasksListViewModel.ViewEffect,
+        TasksListViewModel.ViewEvent
+        >(ViewState()) {
 
     private val tasks = ArrayList<Task>()
 
-    private val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+//    private val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
 
     init {
         fetchTasks()
@@ -48,19 +45,19 @@ class TasksListViewModelImpl(
                     tasks.data.collectLatest {
                         when (it.isNotEmpty()) {
                             true -> {
-                                this@TasksListViewModelImpl.tasks.clear()
+                                this@TasksListViewModel.tasks.clear()
                                 it.forEachIndexed { index, taskEntity ->
                                     val task = Task(
                                         taskEntity.id,
                                         taskEntity.description,
-                                        userFormat.format(Date(taskEntity.createdTimestamp)),
+                                        Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
                                         listInteractor.getItemType(index),
                                         taskEntity.state
                                     )
-                                    this@TasksListViewModelImpl.tasks.add(task)
+                                    this@TasksListViewModel.tasks.add(task)
                                 }
-                                this@TasksListViewModelImpl.tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(this@TasksListViewModelImpl.tasks))
+                                this@TasksListViewModel.tasks.sortBy { i -> i.state }
+                                sendAction(Action.NotEmptyList(this@TasksListViewModel.tasks))
                             }
                             false -> {
                                 sendAction(Action.EmptyList)
@@ -77,8 +74,11 @@ class TasksListViewModelImpl(
 
     override fun processViewEvent(viewEvent: ViewEvent) {
         when(viewEvent) {
-            is ViewEvent.OnGoToAddTaskClicked
+            is ViewEvent.OnAddTaskClicked
             -> viewEffect.value = ViewEffect.GoToAddTask(projectId)
+
+            is ViewEvent.OnTaskClicked
+            -> viewEffect.value = ViewEffect.GoToTask(viewEvent.taskId)
         }
     }
 
@@ -106,10 +106,6 @@ class TasksListViewModelImpl(
         tasksListNavigationEvents.value = TasksListNavigationEvents.GoToAddTask(projectId)
     }
     */
-
-    override fun onTaskClicked(id: Long) {
-        TODO("Not yet implemented")
-    }
 
     override fun onReduceState(viewAction: Action): ViewState {
         return when (viewAction) {
@@ -173,9 +169,18 @@ class TasksListViewModelImpl(
         class GoToAddTask(
             val projectId: Long
         ) : ViewEffect()
+
+        class GoToTask(
+            val taskID: Long
+        ) : ViewEffect()
     }
 
     sealed class ViewEvent : BaseViewEvent {
-        object OnGoToAddTaskClicked : ViewEvent()
+
+        object OnAddTaskClicked : ViewEvent()
+
+        class OnTaskClicked(
+            val taskId: Long
+        ) : ViewEvent()
     }
 }

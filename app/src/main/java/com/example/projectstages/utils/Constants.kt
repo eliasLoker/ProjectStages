@@ -12,7 +12,8 @@ class Constants {
         const val PINK_TYPE = 4
         const val BLACK_TYPE = 5
 
-        val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+        val userFormatProjects = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+        val userFormatTasks = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
     }
 
     enum class TaskStates(val stateID: Int) {

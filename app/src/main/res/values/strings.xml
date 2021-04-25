@@ -8,7 +8,7 @@
         <item>В размышлении</item>
     </string-array>
 
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="add">Добавить</string>
     <string name="cancel">Отмена</string>
 
@@ -21,5 +21,11 @@
     <string name="project_add_category_message">Введите новое уникальное название проекта</string>
     <string name="project_name">Название проекта</string>
 
+    <string name="tasks_list_empty">Список задач пуст</string>
+    <string name="tasks_list_error">Ошибка получения списка задач</string>
 
+    <string name="task_add">Добавить задачу</string>
+    <string name="task_edit">Редактировать задачу</string>
+    <string name="task_save_task">Сохранить задачу</string>
+    <string name="task_save_changes">Сохранить изменения</string>
 </resources>

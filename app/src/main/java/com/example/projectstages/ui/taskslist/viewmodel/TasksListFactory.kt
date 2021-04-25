@@ -10,6 +10,6 @@ class TasksListFactory(
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return TasksListViewModelImpl(projectId, listInteractor) as T
+        return TasksListViewModel(projectId, listInteractor) as T
     }
 }

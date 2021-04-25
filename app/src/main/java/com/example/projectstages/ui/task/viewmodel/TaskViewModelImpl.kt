@@ -31,15 +31,7 @@ class TaskViewModelImpl(
         fetchTask()
     }
 
-//    override fun onViewCreated(isFirstLoading: Boolean) {
-//        Log.d("TaskDebug", "VM state: $state")
-////        onReduceState(Action.Loading)
-//        fetchTask()
-//        Log.d("TaskDebug", "VM state2: $state")
-//    }
-
     private fun fetchTask() {
-        Log.d("TaskDebug", "fetchTask $taskID")
         if (!isEdit) {
             sendAction(Action.SetTitle(Constants.TaskTitleType.ADD))
             sendAction(Action.SuccessAdd)
@@ -47,12 +39,10 @@ class TaskViewModelImpl(
             taskID?.let { taskIdNotNull ->
                 sendAction(Action.SetTitle(Constants.TaskTitleType.EDIT))
                 viewModelScope.launch {
-                    Log.d("TaskDebug", "START")
-                    val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskIdNotNull) }.await()
-                    val resultState = async { taskInteractor.getTaskStateByTaskId(taskIdNotNull) }.await()
-                    taskType = resultState
-                    sendAction(Action.SuccessEdit(resultDescription, resultState))
-//                    Log.d("TaskDebug", "RESULT ASYNC: ${resultDescription.await()}, ${resultState.await()}")
+                    val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskIdNotNull) }
+                    val resultState = async { taskInteractor.getTaskStateByTaskId(taskIdNotNull) }
+                    taskType = resultState.await()
+                    sendAction(Action.SuccessEdit(resultDescription.await(), taskType))
                 }
             }
         }
@@ -62,10 +52,16 @@ class TaskViewModelImpl(
         when(viewEvent) {
             is ViewEvent.OnSaveButtonClicked
             -> onSaveButtonClicked()
+
+            is ViewEvent.OnTextChangedDescription
+            -> {
+                taskStringBuilder.clear()
+                taskStringBuilder.append(viewEvent.text)
+            }
         }
     }
 
-    fun onSaveButtonClicked() {
+    private fun onSaveButtonClicked() {
         if (isEdit) {
 
         } else {
@@ -182,5 +178,9 @@ class TaskViewModelImpl(
     sealed class ViewEvent : BaseViewEvent {
 
         object OnSaveButtonClicked : ViewEvent()
+
+        class OnTextChangedDescription(
+            val text: String
+        ) : ViewEvent()
     }
 }

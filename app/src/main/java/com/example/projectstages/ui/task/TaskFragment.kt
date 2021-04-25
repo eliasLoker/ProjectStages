@@ -46,12 +46,12 @@ class TaskFragment(
             stateSpinner.setSelection(it.stateSpinnerPosition)
             when(it.taskTitleType) {
                 Constants.TaskTitleType.ADD -> {
-                    toolbar.toolbar.subtitle = "Добавить задачу"
-                    saveButton.text = "Сохранить задачу"
+                    toolbar.toolbar.subtitle = requireContext().getString(R.string.task_add)
+                    saveButton.text = requireContext().getString(R.string.task_save_task)
                 }
                 Constants.TaskTitleType.EDIT -> {
-                    toolbar.toolbar.subtitle = "Редактировать задачу"
-                    saveButton.text = "Сохранить изменения"
+                    toolbar.toolbar.subtitle = requireContext().getString(R.string.task_edit)
+                    saveButton.text = requireContext().getString(R.string.task_save_changes)
                 }
             }
         }
@@ -64,7 +64,6 @@ class TaskFragment(
         val taskID = arguments?.getLong(TASK_ID)
         val isEdit = arguments?.getBoolean(IS_EDIT) ?: false
         val interactor = TaskInteractor(requireContext().appComponent.projectDao)
-        Log.d("TaskDebug", "onActivityCreated $taskID")
         val factory = TaskFactory(isEdit, projectID, taskID, interactor)
         taskViewModel = ViewModelProviders
             .of(this, factory)
@@ -93,6 +92,9 @@ class TaskFragment(
         binding.descriptionTextInputEditText.onTextChanged {
 //            taskViewModel.onTextChangedDescription(it)
             //TODO("To viewEvent")
+            taskViewModel.processViewEvent(
+                TaskViewModelImpl.ViewEvent.OnTextChangedDescription(it)
+            )
         }
 
         binding.stateSpinner.onItemSelected {

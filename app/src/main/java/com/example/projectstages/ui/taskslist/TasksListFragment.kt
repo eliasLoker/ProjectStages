@@ -11,16 +11,16 @@ import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.base.observeViewEffect
-import com.example.projectstages.base.observeViewState
-import com.example.projectstages.base.observeViewState2
 import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTasksListBinding
 import com.example.projectstages.ui.task.TaskFragment
+import com.example.projectstages.ui.task.viewmodel.TaskViewModelImpl
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapter
+import com.example.projectstages.ui.taskslist.adapter.TasksListAdapterListener
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
 import com.example.projectstages.ui.taskslist.model.Task
 import com.example.projectstages.ui.taskslist.viewmodel.TasksListFactory
-import com.example.projectstages.ui.taskslist.viewmodel.TasksListViewModelImpl
+import com.example.projectstages.ui.taskslist.viewmodel.TasksListViewModel
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.AdapterStickyItemDecorator2
 import com.example.projectstages.utils.Constants
@@ -29,27 +29,29 @@ class TasksListFragment(
     layoutID: Int = R.layout.fragment_tasks_list
 ) : BaseFragment<
         FragmentTasksListBinding,
-        TasksListViewModelImpl.ViewState,
-        TasksListViewModelImpl.Action,
-        TasksListViewModelImpl.ViewEffect,
-        TasksListViewModelImpl.ViewEvent,
-        TasksListViewModelImpl
-        >(layoutID, FragmentTasksListBinding::inflate) {
+        TasksListViewModel.ViewState,
+        TasksListViewModel.Action,
+        TasksListViewModel.ViewEffect,
+        TasksListViewModel.ViewEvent,
+        TasksListViewModel
+        >(layoutID, FragmentTasksListBinding::inflate), TasksListAdapterListener {
 
-    private lateinit var tasksListViewModel: TasksListViewModelImpl
+    private lateinit var tasksListViewModel: TasksListViewModel
     private lateinit var tasksListAdapter: TasksListAdapter
 
-    private val stateObserver = Observer<TasksListViewModelImpl.ViewState> {
+    private val stateObserver = Observer<TasksListViewModel.ViewState> {
         binding.apply {
             progressBar.isVisible = it.progressBarVisibility
             recyclerView.isVisible = it.taskRecyclerVisibility
             tasksListAdapter.setList(it.tasks)
             val errorText = when(it.errorMessageTextViewType) {
-                Constants.EmptyList.EMPTY -> "Список задач пуст"
-                Constants.EmptyList.ERROR -> "Ошибка получения списка задач"
+                Constants.EmptyList.EMPTY -> requireContext().getString(R.string.tasks_list_empty)
+                Constants.EmptyList.ERROR -> requireContext().getString(R.string.tasks_list_error)
             }
-            errorTextView.text = errorText
-            binding.errorTextView.isVisible = it.errorMessageTextViewVisibility
+            errorTextView.apply {
+                text = errorText
+                isVisible = it.errorMessageTextViewVisibility
+            }
         }
     }
 
@@ -62,11 +64,11 @@ class TasksListFragment(
         val factory = TasksListFactory(id, interactor)
         tasksListViewModel = ViewModelProviders
             .of(this, factory)
-            .get(TasksListViewModelImpl::class.java)
+            .get(TasksListViewModel::class.java)
 
         binding.recyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-            tasksListAdapter = TasksListAdapter(tasksListViewModel)
+            tasksListAdapter = TasksListAdapter(this@TasksListFragment)
             adapter = tasksListAdapter
             val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
             addItemDecoration(AdapterItemDecorator(margin))
@@ -80,7 +82,7 @@ class TasksListFragment(
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             tasksListViewModel.processViewEvent(
-                TasksListViewModelImpl.ViewEvent.OnGoToAddTaskClicked
+                TasksListViewModel.ViewEvent.OnAddTaskClicked
             )
         }
 
@@ -113,9 +115,28 @@ class TasksListFragment(
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
         when(viewEffect) {
-            is TasksListViewModelImpl.ViewEffect.GoToAddTask
+            is TasksListViewModel.ViewEffect.GoToAddTask
             -> goToTaskAdd(viewEffect.projectId)
+
+            is TasksListViewModel.ViewEffect.GoToTask
+            -> goToTaskEdit(viewEffect.taskID, true)
         }
+    }
+
+    override fun onTaskClicked(id: Long) {
+        tasksListViewModel.processViewEvent(
+            TasksListViewModel.ViewEvent.OnTaskClicked(id)
+        )
+    }
+
+    private fun goToTaskEdit(id: Long?, isEdit: Boolean) {
+        val bundle = TaskFragment.getBundleEditTask(id, isEdit)
+        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
+    }
+
+    private fun goToTaskAdd(projectID: Long) {
+        val bundle = TaskFragment.getBundleCreateTask(projectID)
+        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
     }
 
     private fun getSectionCallback(tasks: List<Task>): AdapterStickyItemDecorator2.SectionCallback {
@@ -129,16 +150,6 @@ class TasksListFragment(
                 return resources.getStringArray(R.array.task_types)[tasks[position].state]
             }
         }
-    }
-
-    private fun goToTaskEdit(id: Long?, isEdit: Boolean) {
-        val bundle = TaskFragment.getBundleEditTask(id, isEdit)
-        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
-    }
-
-    private fun goToTaskAdd(projectID: Long) {
-        val bundle = TaskFragment.getBundleCreateTask(projectID)
-        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
     }
 
     companion object {

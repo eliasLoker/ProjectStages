@@ -47,7 +47,7 @@ class ProjectsViewModel(
                                         true -> interactor.getLastTaskTimestampsByProjectId(projectId)
                                         false -> projectEntity.createdTimestamp
                                     }
-                                    val formattedDate = Constants.userFormat.format(Date(timestamp))
+                                    val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
 
                                     val completedTasks
                                             = interactor.countStatesTasksByProjectId(projectId, Constants.TaskStates.COMPLETED.stateID)
