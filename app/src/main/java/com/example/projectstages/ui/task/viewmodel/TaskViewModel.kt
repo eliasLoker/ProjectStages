@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.task.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.TaskEntity
@@ -29,19 +28,18 @@ class TaskViewModel(
     }
 
     private fun fetchTask() {
-        if (!isEdit) {
+        if (isEdit) {
+            taskID ?: throw IllegalArgumentException("TaskID is null, but fragment in edit mode")
+            sendAction(Action.SetTitle(Constants.TaskTitleType.EDIT))
+            viewModelScope.launch {
+                val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskID) }
+                val resultState = async { taskInteractor.getTaskStateByTaskId(taskID) }
+                taskType = resultState.await()
+                sendAction(Action.SuccessEdit(resultDescription.await(), taskType))
+            }
+        } else {
             sendAction(Action.SetTitle(Constants.TaskTitleType.ADD))
             sendAction(Action.SuccessAdd)
-        } else {
-            taskID?.let { taskIdNotNull ->
-                sendAction(Action.SetTitle(Constants.TaskTitleType.EDIT))
-                viewModelScope.launch {
-                    val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskIdNotNull) }
-                    val resultState = async { taskInteractor.getTaskStateByTaskId(taskIdNotNull) }
-                    taskType = resultState.await()
-                    sendAction(Action.SuccessEdit(resultDescription.await(), taskType))
-                }
-            }
         }
     }
 
@@ -62,29 +60,32 @@ class TaskViewModel(
     }
 
     private fun onSaveButtonClicked() {
-        if (isEdit) {
-            viewModelScope.launch {
-                taskID?.let {
-                    val timestamp = System.currentTimeMillis()
-                    val updateResult = taskInteractor.updateTask(it, taskStringBuilder.toString(), taskType, timestamp)
-                    val effect = when(updateResult > 0) {
-                        true -> ViewEffect.GoToTaskList
-                        false -> ViewEffect.FailureUpdate
-                    }
-                    viewEffect.value = effect
-                }
+        if (isEdit) updateTask() else createTask()
+    }
+
+    private fun createTask() {
+        viewModelScope.launch {
+            val timestamp = System.currentTimeMillis()
+            val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
+            val insertResult = taskInteractor.insertTask(task)
+            val effect = when(insertResult > 0) {
+                true -> ViewEffect.GoToTaskList
+                false -> ViewEffect.FailureAdd
             }
-        } else {
-            viewModelScope.launch {
+            viewEffect.value = effect
+        }
+    }
+
+    private fun updateTask() {
+        taskID ?: throw IllegalArgumentException("TaskID is null")
+        viewModelScope.launch {
                 val timestamp = System.currentTimeMillis()
-                val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
-                val insertResult = taskInteractor.insertTask(task)
-                val effect = when(insertResult > 0) {
+                val updateResult = taskInteractor.updateTask(taskID, taskStringBuilder.toString(), taskType, timestamp)
+                val effect = when(updateResult > 0) {
                     true -> ViewEffect.GoToTaskList
-                    false -> ViewEffect.FailureAdd
+                    false -> ViewEffect.FailureUpdate
                 }
                 viewEffect.value = effect
-            }
         }
     }
 

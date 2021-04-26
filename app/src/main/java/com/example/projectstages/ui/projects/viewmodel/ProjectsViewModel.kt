@@ -13,8 +13,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ProjectsViewModel(
-    private val title: String,
-    private val subtitle: String,
+    title: String,
+    subtitle: String,
     private val interactor: ProjectsInteractor
 ) :
     BaseViewModel<
@@ -60,6 +60,7 @@ class ProjectsViewModel(
                                         progressTasks,
                                         thoughtTasks
                                     )
+                                    //TODO(Продумать, как создать FLow из countTasksByState)
                                     //TODO(Check queries with incorrect data)
                                     val project = Project(
                                         projectEntity.id,

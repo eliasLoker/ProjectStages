@@ -24,17 +24,9 @@ class TasksListViewModel(
 
     private val tasks = ArrayList<Task>()
 
-//    private val userFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-
     init {
         fetchTasks()
     }
-//    override val tasksListNavigationEvents = SingleLiveEvent<TasksListNavigationEvents>()
-//TODO("заменить на viewEffect")
-
-//    override fun onViewCreated(isFirstLoading: Boolean) {
-//        fetchTasks()
-//    }
 
     private fun fetchTasks() {
         viewModelScope.launch {
@@ -81,31 +73,6 @@ class TasksListViewModel(
             -> viewEffect.value = ViewEffect.GoToTask(viewEvent.taskId)
         }
     }
-
-    /*
-    //TODO("Коллбэки в viewEvent")
-    override fun onAddTaskButtonClicked(description: String, taskType: Int) {
-        viewModelScope.launch {
-            val timestamp = System.currentTimeMillis()
-            val task = TaskEntity(projectId, description, taskType, timestamp)
-            val insertResult = listInteractor.insertTask(task)
-            val event = when (insertResult < 0) {
-                true -> TasksListNavigationEvents.FailureAddDialog
-                false -> TasksListNavigationEvents.SuccessAddDialog
-            }
-            tasksListNavigationEvents.value = event
-        }
-    }
-
-    override fun onTaskClicked(id: Long) {
-        tasksListNavigationEvents.value = TasksListNavigationEvents.GoToTask(id)
-    }
-
-
-    override fun onGoToAddTaskClicked() {
-        tasksListNavigationEvents.value = TasksListNavigationEvents.GoToAddTask(projectId)
-    }
-    */
 
     override fun onReduceState(viewAction: Action): ViewState {
         return when (viewAction) {
