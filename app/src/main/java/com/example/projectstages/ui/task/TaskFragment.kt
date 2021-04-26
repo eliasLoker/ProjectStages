@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.task
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -48,6 +49,7 @@ class TaskFragment(
                 Constants.TaskTitleType.ADD -> {
                     toolbar.toolbar.subtitle = requireContext().getString(R.string.task_add)
                     saveButton.text = requireContext().getString(R.string.task_save_task)
+                    toolbar.deleteQuestionMenuButton.isVisible = false
                 }
                 Constants.TaskTitleType.EDIT -> {
                     toolbar.toolbar.subtitle = requireContext().getString(R.string.task_edit)
@@ -100,6 +102,12 @@ class TaskFragment(
                 TaskViewModel.ViewEvent.OnItemSelectedStateSpinner(it)
             )
         }
+
+        binding.toolbar.deleteQuestionMenuButton.setOnClickListener {
+            taskViewModel.processViewEvent(
+                TaskViewModel.ViewEvent.OnDeleteButtonClicked
+            )
+        }
     }
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
@@ -112,7 +120,26 @@ class TaskFragment(
 
             is TaskViewModel.ViewEffect.FailureUpdate
             -> requireContext().showToast(requireContext().getString(R.string.task_update_error))
+
+            is TaskViewModel.ViewEffect.ShowDeleteDialog
+            -> showDeleteDialog()
         }
+    }
+
+    private fun showDeleteDialog() {
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Вы действительно хотите удалить задачу?")
+            .setPositiveButton("Да") { dialog, _ ->
+                taskViewModel.processViewEvent(
+                    TaskViewModel.ViewEvent.OnAcceptDeleteClicked
+                )
+                dialog.dismiss()
+            }
+            .setNegativeButton("Нет") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        dialog.show()
     }
 
     companion object {

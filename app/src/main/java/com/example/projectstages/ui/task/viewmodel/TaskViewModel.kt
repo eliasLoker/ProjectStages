@@ -56,6 +56,13 @@ class TaskViewModel(
 
             is ViewEvent.OnItemSelectedStateSpinner
             -> taskType = viewEvent.position
+
+            is ViewEvent.OnDeleteButtonClicked
+            -> viewEffect.value = ViewEffect.ShowDeleteDialog
+
+            is ViewEvent.OnAcceptDeleteClicked
+            -> deleteTask()
+
         }
     }
 
@@ -86,6 +93,18 @@ class TaskViewModel(
                     false -> ViewEffect.FailureUpdate
                 }
                 viewEffect.value = effect
+        }
+    }
+
+    private fun deleteTask() {
+        taskID ?: throw IllegalArgumentException("TaskID is null, but try delete")
+        viewModelScope.launch {
+            val deleteResult = taskInteractor.deleteTask(taskID)
+            val effect = when(deleteResult > 0) {
+                true -> ViewEffect.GoToTaskList
+                false -> ViewEffect.FailureDelete
+            }
+            viewEffect.value = effect
         }
     }
 
@@ -152,6 +171,10 @@ class TaskViewModel(
         object FailureAdd: ViewEffect()
 
         object FailureUpdate: ViewEffect()
+
+        object FailureDelete: ViewEffect()
+
+        object ShowDeleteDialog: ViewEffect()
     }
 
     sealed class ViewEvent : BaseViewEvent {
@@ -165,5 +188,9 @@ class TaskViewModel(
         class OnItemSelectedStateSpinner(
             val position: Int
         ) : ViewEvent()
+
+        object OnDeleteButtonClicked : ViewEvent()
+
+        object OnAcceptDeleteClicked : ViewEvent()
     }
 }

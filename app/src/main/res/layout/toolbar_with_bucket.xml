@@ -1,0 +1,21 @@
+<androidx.appcompat.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/purple_700"
+    android:elevation="4dp"
+    app:title="ProjectsStages"
+    app:subtitle="Список проектов"
+    app:titleTextColor="@android:color/white"
+    app:subtitleTextColor="@android:color/white">
+
+    <ImageView
+        android:id="@+id/delete_question_menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete"
+        android:layout_gravity="end"
+        android:layout_marginEnd="15dp" />
+</androidx.appcompat.widget.Toolbar>

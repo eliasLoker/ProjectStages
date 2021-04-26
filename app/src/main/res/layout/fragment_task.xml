@@ -8,7 +8,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
+        layout="@layout/toolbar_with_bucket" />
 
     <Spinner
         android:id="@+id/state_spinner"
