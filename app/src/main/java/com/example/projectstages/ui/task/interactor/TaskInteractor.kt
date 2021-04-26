@@ -14,4 +14,6 @@ class TaskInteractor(
     = projectDao.getTaskStateByTaskId(taskID)
 
     suspend fun insertTask(taskEntity: TaskEntity) = projectDao.insertTask(taskEntity)
+
+    suspend fun updateTask(id: Long, description: String, type: Int, timestamp: Long) = projectDao.updateTaskById(id, description, type, timestamp)
 }

@@ -18,10 +18,6 @@ class TasksListInteractor(
         }
     }
 
-    suspend fun insertTask(taskEntity: TaskEntity) = projectDao.insertTask(taskEntity)
-
-    suspend fun updateTask(id: Long, description: String, type: Int) = projectDao.updateTaskById(id, description, type)
-
     suspend fun deleteTask(id: Long) = projectDao.deleteTaskById(id)
 
     fun getItemType(index: Int) = if (index % 2 == 0) 0 else 1

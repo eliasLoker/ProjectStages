@@ -14,7 +14,6 @@ import com.example.projectstages.base.observeViewEffect
 import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTasksListBinding
 import com.example.projectstages.ui.task.TaskFragment
-import com.example.projectstages.ui.task.viewmodel.TaskViewModelImpl
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapter
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapterListener
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
@@ -85,32 +84,6 @@ class TasksListFragment(
                 TasksListViewModel.ViewEvent.OnAddTaskClicked
             )
         }
-
-        /*
-        //TODO("to ViewEffect")
-        tasksListViewModel.tasksListNavigationEvents.observe(viewLifecycleOwner, {
-            when (it) {
-
-                is TasksListNavigationEvents.SuccessDelete
-                -> requireContext().showToast("Успешно удалено")
-
-                is TasksListNavigationEvents.FailureDelete
-                -> requireContext().showToast("Ошибка удаления")
-
-                is TasksListNavigationEvents.SuccessUpdate
-                -> requireContext().showToast("Таск успешно изменен")
-
-                is TasksListNavigationEvents.FailureUpdate
-                -> requireContext().showToast("Ошибка изменения")
-
-                is TasksListNavigationEvents.GoToTask
-                -> goToTaskEdit(it.taskID, true)
-
-                is TasksListNavigationEvents.GoToAddTask
-                -> goToTaskAdd(it.projectID)
-            }
-        })
-        */
     }
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
@@ -119,7 +92,7 @@ class TasksListFragment(
             -> goToTaskAdd(viewEffect.projectId)
 
             is TasksListViewModel.ViewEffect.GoToTask
-            -> goToTaskEdit(viewEffect.taskID, true)
+            -> goToTaskEdit(viewEffect.taskID)
         }
     }
 
@@ -129,8 +102,8 @@ class TasksListFragment(
         )
     }
 
-    private fun goToTaskEdit(id: Long?, isEdit: Boolean) {
-        val bundle = TaskFragment.getBundleEditTask(id, isEdit)
+    private fun goToTaskEdit(id: Long) {
+        val bundle = TaskFragment.getBundleEditTask(id)
         findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
     }
 

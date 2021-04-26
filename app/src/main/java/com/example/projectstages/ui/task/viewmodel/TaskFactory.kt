@@ -2,7 +2,6 @@ package com.example.projectstages.ui.task.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 
 class TaskFactory(
@@ -13,6 +12,6 @@ class TaskFactory(
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return TaskViewModelImpl(isEdit, projectID, taskID, taskInteractor) as T
+        return TaskViewModel(isEdit, projectID, taskID, taskInteractor) as T
     }
 }

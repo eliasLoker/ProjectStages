@@ -27,3 +27,4 @@ data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 }
+//TODO("Переименовать createdTimestamp, тк при редактировании будет обновляться")

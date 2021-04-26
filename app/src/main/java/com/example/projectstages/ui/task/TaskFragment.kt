@@ -1,7 +1,6 @@
 package com.example.projectstages.ui.task
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
@@ -16,27 +15,28 @@ import com.example.projectstages.base.viewmodel.BaseViewEffect
 import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
-import com.example.projectstages.ui.task.viewmodel.TaskViewModelImpl
+import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.onItemSelected
 import com.example.projectstages.utils.onTextChanged
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
+import com.example.projectstages.utils.showToast
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
 ) : BaseFragment<
         FragmentTaskBinding,
-        TaskViewModelImpl.ViewState,
-        TaskViewModelImpl.Action,
-        TaskViewModelImpl.ViewEffect,
-        TaskViewModelImpl.ViewEvent,
-        TaskViewModelImpl
+        TaskViewModel.ViewState,
+        TaskViewModel.Action,
+        TaskViewModel.ViewEffect,
+        TaskViewModel.ViewEvent,
+        TaskViewModel
         >(layoutID, FragmentTaskBinding::inflate) {
 
-    private lateinit var taskViewModel: TaskViewModelImpl
+    private lateinit var taskViewModel: TaskViewModel
 
-    private val stateObserver = Observer<TaskViewModelImpl.ViewState> {
+    private val stateObserver = Observer<TaskViewModel.ViewState> {
         binding.apply {
             progressBar.isVisible = it.progressBarVisibility
             stateSpinner.isVisible = it.stateSpinnerVisibility
@@ -67,7 +67,7 @@ class TaskFragment(
         val factory = TaskFactory(isEdit, projectID, taskID, interactor)
         taskViewModel = ViewModelProviders
             .of(this, factory)
-            .get(TaskViewModelImpl::class.java)
+            .get(TaskViewModel::class.java)
 
         val states = resources.getStringArray(R.array.task_types)
         val spinnerItems = ArrayList<SpinnerItem>().apply {
@@ -85,41 +85,33 @@ class TaskFragment(
 
         binding.saveButton.setOnClickListener {
             taskViewModel.processViewEvent(
-                TaskViewModelImpl.ViewEvent.OnSaveButtonClicked
+                TaskViewModel.ViewEvent.OnSaveButtonClicked
             )
         }
 
         binding.descriptionTextInputEditText.onTextChanged {
-//            taskViewModel.onTextChangedDescription(it)
-            //TODO("To viewEvent")
             taskViewModel.processViewEvent(
-                TaskViewModelImpl.ViewEvent.OnTextChangedDescription(it)
+                TaskViewModel.ViewEvent.OnTextChangedDescription(it)
             )
         }
 
         binding.stateSpinner.onItemSelected {
-//            taskViewModel.onItemSelectedStateSpinner(it)
-            //TODO("To viewEvent")
+            taskViewModel.processViewEvent(
+                TaskViewModel.ViewEvent.OnItemSelectedStateSpinner(it)
+            )
         }
-
-        /*
-        //TODO("to ViewEffect")
-        taskViewModel.taskEvents.observe(viewLifecycleOwner, {
-            when(it) {
-                is TaskEvents.SuccessAdd -> {
-                    //TODO("Maybe add toast")
-                    findNavController().popBackStack()
-                }
-                is TaskEvents.FailureAdd -> requireContext().showToast("Не удалось добавить запись")
-            }
-        })
-        */
     }
 
     override fun processViewEffect(viewEffect: BaseViewEffect) {
         when(viewEffect) {
-            is TaskViewModelImpl.ViewEffect.GoToTaskList
+            is TaskViewModel.ViewEffect.GoToTaskList
             -> findNavController().popBackStack()
+
+            is TaskViewModel.ViewEffect.FailureAdd
+            -> requireContext().showToast(requireContext().getString(R.string.task_add_error))
+
+            is TaskViewModel.ViewEffect.FailureUpdate
+            -> requireContext().showToast(requireContext().getString(R.string.task_update_error))
         }
     }
 
@@ -130,11 +122,9 @@ class TaskFragment(
         private const val IS_EDIT = "IS_EDIT"
 
         @JvmStatic
-        fun getBundleEditTask(taskID: Long?, isEdit: Boolean) = Bundle().apply {
-            putBoolean(IS_EDIT, isEdit)
-            taskID?.let {
-                putLong(TASK_ID, taskID)
-            }
+        fun getBundleEditTask(taskID: Long) = Bundle().apply {
+            putBoolean(IS_EDIT, true)
+            putLong(TASK_ID, taskID)
         }
 
         @JvmStatic

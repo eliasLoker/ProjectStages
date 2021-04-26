@@ -25,6 +25,8 @@
     <string name="tasks_list_error">Ошибка получения списка задач</string>
 
     <string name="task_add">Добавить задачу</string>
+    <string name="task_add_error">Не удалось добавить задачу</string>
+    <string name="task_update_error">Не удалось обновить задачу</string>
     <string name="task_edit">Редактировать задачу</string>
     <string name="task_save_task">Сохранить задачу</string>
     <string name="task_save_changes">Сохранить изменения</string>

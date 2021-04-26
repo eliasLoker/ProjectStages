@@ -9,23 +9,20 @@ import com.example.projectstages.utils.Constants
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class TaskViewModelImpl(
+class TaskViewModel(
     private val isEdit: Boolean,
     private val projectID: Long,
     private val taskID: Long?,
     private val taskInteractor: TaskInteractor
 ) : BaseViewModel<
-        TaskViewModelImpl.ViewState,
-        TaskViewModelImpl.Action,
-        TaskViewModelImpl.ViewEffect,
-        TaskViewModelImpl.ViewEvent
+        TaskViewModel.ViewState,
+        TaskViewModel.Action,
+        TaskViewModel.ViewEffect,
+        TaskViewModel.ViewEvent
         >(ViewState()) {
 
     private var taskStringBuilder = StringBuilder()
     private var taskType = 0
-
-//    override val taskEvents = SingleLiveEvent<TaskEvents>()
-    //TODO("заменить на viewEffect")
 
     init {
         fetchTask()
@@ -58,61 +55,38 @@ class TaskViewModelImpl(
                 taskStringBuilder.clear()
                 taskStringBuilder.append(viewEvent.text)
             }
+
+            is ViewEvent.OnItemSelectedStateSpinner
+            -> taskType = viewEvent.position
         }
     }
 
     private fun onSaveButtonClicked() {
         if (isEdit) {
-
-        } else {
             viewModelScope.launch {
-                val timestamp = System.currentTimeMillis()
-                Log.d("TaskDebug", "WRITE: $projectID, ${taskStringBuilder.toString()}, $taskType, $timestamp")
-                //TODO("Исправить запись")
-//                val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
-                val task = TaskEntity(projectID, "taskStringBuilder.toString()", 1, timestamp)
-                val insertResult = taskInteractor.insertTask(task)
-                viewEffect.value = ViewEffect.GoToTaskList
-                /*
-                val event = when (insertResult < 0) {
-                    true -> TaskEvents.FailureAdd
-                    false -> TaskEvents.SuccessAdd
+                taskID?.let {
+                    val timestamp = System.currentTimeMillis()
+                    val updateResult = taskInteractor.updateTask(it, taskStringBuilder.toString(), taskType, timestamp)
+                    val effect = when(updateResult > 0) {
+                        true -> ViewEffect.GoToTaskList
+                        false -> ViewEffect.FailureUpdate
+                    }
+                    viewEffect.value = effect
                 }
-                taskEvents.value = event
-                */
             }
-        }
-    }
-
-    /*
-    //TODO("Коллбэки в viewEvent")
-    override fun onSaveButtonClicked() {
-        if (isEdit) {
-
         } else {
             viewModelScope.launch {
                 val timestamp = System.currentTimeMillis()
-                Log.d("TaskDebug", "WRITE: $projectID, ${taskStringBuilder.toString()}, $taskType, $timestamp")
                 val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
                 val insertResult = taskInteractor.insertTask(task)
-                val event = when (insertResult < 0) {
-                    true -> TaskEvents.FailureAdd
-                    false -> TaskEvents.SuccessAdd
+                val effect = when(insertResult > 0) {
+                    true -> ViewEffect.GoToTaskList
+                    false -> ViewEffect.FailureAdd
                 }
-                taskEvents.value = event
+                viewEffect.value = effect
             }
         }
     }
-
-    override fun onTextChangedDescription(text: String) {
-        taskStringBuilder.clear()
-        taskStringBuilder.append(text)
-    }
-
-    override fun onItemSelectedStateSpinner(position: Int) {
-        taskType = position
-    }
-    */
 
     override fun onReduceState(viewAction: Action): ViewState {
         return when(viewAction) {
@@ -173,6 +147,10 @@ class TaskViewModelImpl(
     sealed class ViewEffect : BaseViewEffect {
 
         object GoToTaskList : ViewEffect()
+
+        object FailureAdd: ViewEffect()
+
+        object FailureUpdate: ViewEffect()
     }
 
     sealed class ViewEvent : BaseViewEvent {
@@ -181,6 +159,10 @@ class TaskViewModelImpl(
 
         class OnTextChangedDescription(
             val text: String
+        ) : ViewEvent()
+
+        class OnItemSelectedStateSpinner(
+            val position: Int
         ) : ViewEvent()
     }
 }
