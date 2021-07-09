@@ -6,13 +6,15 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
-import com.example.projectstages.base.observeViewEffect
-import com.example.projectstages.base.observeViewState
-import com.example.projectstages.base.viewmodel.BaseViewEffect
+import com.example.projectstages.base.getBooleanFromBundleExt
+import com.example.projectstages.base.getStringExt
+import com.example.projectstages.base.launchWhenStartedWithCollect
+import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
+import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
@@ -20,9 +22,8 @@ import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.onItemSelected
 import com.example.projectstages.utils.onTextChanged
-import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
-import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
-import com.example.projectstages.utils.showToast
+import kotlinx.coroutines.flow.onEach
+import com.example.projectstages.base.getLongFromBundleExt as getLongFromBundleExt1
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
@@ -62,9 +63,9 @@ class TaskFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val projectID = arguments?.getLong(PROJECT_ID) ?: 0L
-        val taskID = arguments?.getLong(TASK_ID)
-        val isEdit = arguments?.getBoolean(IS_EDIT) ?: false
+        val projectID = getLongFromBundleExt1(PROJECT_ID)
+        val taskID = getLongFromBundleExt1(TASK_ID)
+        val isEdit = getBooleanFromBundleExt(IS_EDIT)
         val interactor = TaskInteractor(requireContext().appComponent.projectDao)
         val factory = TaskFactory(isEdit, projectID, taskID, interactor)
         taskViewModel = ViewModelProviders
@@ -82,8 +83,18 @@ class TaskFragment(
         binding.stateSpinner.apply {
             adapter = spinnerAdapter
         }
-        observeViewState(taskViewModel.stateLiveData, stateObserver)
-        observeViewEffect(taskViewModel.viewEffect, viewEffectObserver)
+
+        taskViewModel.stateFlow.onEach {
+            //TODO('Не нравится return, подумать еще')
+            val viewState = it ?: return@onEach
+            updateUI(viewState)
+        }.launchWhenStartedWithCollect(lifecycleScope)
+
+        taskViewModel.viewEffect.onEach {
+            //TODO('Не нравится return, подумать еще')
+            val viewEffect = it ?: return@onEach
+            showSingleEvent(viewEffect)
+        }.launchWhenStartedWithCollect(lifecycleScope)
 
         binding.saveButton.setOnClickListener {
             taskViewModel.processViewEvent(
@@ -110,20 +121,30 @@ class TaskFragment(
         }
     }
 
-    override fun processViewEffect(viewEffect: BaseViewEffect) {
-        when(viewEffect) {
-            is TaskViewModel.ViewEffect.GoToTaskList
-            -> findNavController().popBackStack()
-
-            is TaskViewModel.ViewEffect.FailureAdd
-            -> requireContext().showToast(requireContext().getString(R.string.task_add_error))
-
-            is TaskViewModel.ViewEffect.FailureUpdate
-            -> requireContext().showToast(requireContext().getString(R.string.task_update_error))
-
-            is TaskViewModel.ViewEffect.ShowDeleteDialog
-            -> showDeleteDialog()
+    private fun updateUI(viewState: TaskViewModel.ViewState) {
+        binding.apply {
+            progressBar.isVisible = viewState.progressBarVisibility
+            stateSpinner.isVisible = viewState.stateSpinnerVisibility
+            descriptionTextInputLayout.isVisible = viewState.descriptionEditTextVisibility
+            saveButton.isVisible = viewState.saveButtonVisibility
+            descriptionTextInputEditText.setText(viewState.descriptionEditTextText)
+            stateSpinner.setSelection(viewState.stateSpinnerPosition)
+            when(viewState.taskTitleType) {
+                Constants.TaskTitleType.ADD -> {
+                    toolbar.toolbar.subtitle = getStringExt(R.string.task_add)
+                    saveButton.text = getStringExt(R.string.task_save_task)
+                    toolbar.deleteQuestionMenuButton.isVisible = false
+                }
+                Constants.TaskTitleType.EDIT -> {
+                    toolbar.toolbar.subtitle = getStringExt(R.string.task_edit)
+                    saveButton.text = getStringExt(R.string.task_save_changes)
+                }
+            }
         }
+    }
+
+    private fun showSingleEvent(viewEffect: TaskViewModel.ViewEffect) {
+
     }
 
     private fun showDeleteDialog() {

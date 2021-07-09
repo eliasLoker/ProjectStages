@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.task.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.TaskEntity
@@ -32,79 +33,17 @@ class TaskViewModel(
             taskID ?: throw IllegalArgumentException("TaskID is null, but fragment in edit mode")
             sendAction(Action.SetTitle(Constants.TaskTitleType.EDIT))
             viewModelScope.launch {
+                Log.d("TaskDebug", "Req tID: $taskID")
                 val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskID) }
                 val resultState = async { taskInteractor.getTaskStateByTaskId(taskID) }
                 taskType = resultState.await()
-                sendAction(Action.SuccessEdit(resultDescription.await(), taskType))
+                val resDescr = resultDescription.await()
+                sendAction(Action.SuccessEdit(resDescr, taskType))
+                Log.d("TaskDebug", "Descr: $resDescr, TT: $taskType")
             }
         } else {
             sendAction(Action.SetTitle(Constants.TaskTitleType.ADD))
             sendAction(Action.SuccessAdd)
-        }
-    }
-
-    override fun processViewEvent(viewEvent: ViewEvent) {
-        when(viewEvent) {
-            is ViewEvent.OnSaveButtonClicked
-            -> onSaveButtonClicked()
-
-            is ViewEvent.OnTextChangedDescription
-            -> {
-                taskStringBuilder.clear()
-                taskStringBuilder.append(viewEvent.text)
-            }
-
-            is ViewEvent.OnItemSelectedStateSpinner
-            -> taskType = viewEvent.position
-
-            is ViewEvent.OnDeleteButtonClicked
-            -> viewEffect.value = ViewEffect.ShowDeleteDialog
-
-            is ViewEvent.OnAcceptDeleteClicked
-            -> deleteTask()
-
-        }
-    }
-
-    private fun onSaveButtonClicked() {
-        if (isEdit) updateTask() else createTask()
-    }
-
-    private fun createTask() {
-        viewModelScope.launch {
-            val timestamp = System.currentTimeMillis()
-            val task = TaskEntity(projectID, taskStringBuilder.toString(), taskType, timestamp)
-            val insertResult = taskInteractor.insertTask(task)
-            val effect = when(insertResult > 0) {
-                true -> ViewEffect.GoToTaskList
-                false -> ViewEffect.FailureAdd
-            }
-            viewEffect.value = effect
-        }
-    }
-
-    private fun updateTask() {
-        taskID ?: throw IllegalArgumentException("TaskID is null")
-        viewModelScope.launch {
-                val timestamp = System.currentTimeMillis()
-                val updateResult = taskInteractor.updateTask(taskID, taskStringBuilder.toString(), taskType, timestamp)
-                val effect = when(updateResult > 0) {
-                    true -> ViewEffect.GoToTaskList
-                    false -> ViewEffect.FailureUpdate
-                }
-                viewEffect.value = effect
-        }
-    }
-
-    private fun deleteTask() {
-        taskID ?: throw IllegalArgumentException("TaskID is null, but try delete")
-        viewModelScope.launch {
-            val deleteResult = taskInteractor.deleteTask(taskID)
-            val effect = when(deleteResult > 0) {
-                true -> ViewEffect.GoToTaskList
-                false -> ViewEffect.FailureDelete
-            }
-            viewEffect.value = effect
         }
     }
 
@@ -135,6 +74,25 @@ class TaskViewModel(
                 descriptionEditTextVisibility = true,
                 saveButtonVisibility = true,
             )
+        }
+    }
+
+    override fun processViewEvent(viewEvent: ViewEvent) {
+        when(viewEvent) {
+            is ViewEvent.OnSaveButtonClicked
+            -> { }
+
+            is ViewEvent.OnTextChangedDescription
+            -> { }
+
+            is ViewEvent.OnItemSelectedStateSpinner
+            -> { }
+
+            is ViewEvent.OnDeleteButtonClicked
+            -> { }
+
+            is ViewEvent.OnAcceptDeleteClicked
+            -> { }
         }
     }
 

@@ -5,12 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.base.viewmodel.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
 private typealias FragmentViewBindingInflater2<VB> = (
     inflater: LayoutInflater,
@@ -35,9 +39,11 @@ abstract class BaseFragment<
 
     protected val binding get() = _binding!!
 
+    /*
     protected val viewEffectObserver = Observer<BaseViewEffect> {
         processViewEffect(it)
     }
+    */
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,19 +59,24 @@ abstract class BaseFragment<
         _binding = null
     }
 
-    abstract fun processViewEffect(viewEffect: BaseViewEffect)
+//    abstract fun processViewEffect(viewEffect: BaseViewEffect)
 }
 
-fun <T : BaseViewState, U> LifecycleOwner.observeViewState(liveDate: LiveData<T>, observer: Observer<U>) {
-    liveDate.observe(this, observer as Observer<T>)
-    //TODO("Додумать и переписать реализацию с дженериками")
+/*
+Thanks to Kirill Rozov :)
+*/
+fun <T> Flow<T>.launchWhenStartedWithCollect(lifecycleCoroutineScope: LifecycleCoroutineScope) {
+    lifecycleCoroutineScope.launchWhenStarted {
+        this@launchWhenStartedWithCollect.collect()
+    }
 }
 
-fun <T> LifecycleOwner.observeViewState2(liveData: LiveData<T>, observer: Observer<T>) {
-    liveData.observe(this, observer)
+fun Fragment.getStringExt(@StringRes resId: Int) : String {
+    return this.requireContext().resources.getString(resId)
 }
 
-fun <T : BaseViewEffect, U> LifecycleOwner.observeViewEffect(liveDate: LiveData<T>, observer: Observer<U>) {
-    liveDate.observe(this, observer as Observer<T>)
-    //TODO("Додумать и переписать реализацию с дженериками")
-}
+fun Fragment.getStringArrayExt(resId: Int) : Array<String> = this.requireContext().resources.getStringArray(resId)
+
+fun Fragment.getLongFromBundleExt(key: String) : Long = arguments?.getLong(key) ?: 0L
+
+fun Fragment.getBooleanFromBundleExt(key: String) : Boolean = arguments?.getBoolean(key) ?: false

@@ -1,17 +1,19 @@
 package com.example.projectstages.ui.taskslist
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
-import com.example.projectstages.base.observeViewEffect
-import com.example.projectstages.base.viewmodel.BaseViewEffect
+import com.example.projectstages.base.launchWhenStartedWithCollect
 import com.example.projectstages.databinding.FragmentTasksListBinding
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapter
@@ -23,6 +25,7 @@ import com.example.projectstages.ui.taskslist.viewmodel.TasksListViewModel
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.AdapterStickyItemDecorator2
 import com.example.projectstages.utils.Constants
+import kotlinx.coroutines.flow.onEach
 
 class TasksListFragment(
     layoutID: Int = R.layout.fragment_tasks_list
@@ -37,27 +40,17 @@ class TasksListFragment(
 
     private lateinit var tasksListViewModel: TasksListViewModel
     private lateinit var tasksListAdapter: TasksListAdapter
+    private lateinit var navigation: TasksNavigationListener
 
-    private val stateObserver = Observer<TasksListViewModel.ViewState> {
-        binding.apply {
-            progressBar.isVisible = it.progressBarVisibility
-            recyclerView.isVisible = it.taskRecyclerVisibility
-            tasksListAdapter.setList(it.tasks)
-            val errorText = when(it.errorMessageTextViewType) {
-                Constants.EmptyList.EMPTY -> requireContext().getString(R.string.tasks_list_empty)
-                Constants.EmptyList.ERROR -> requireContext().getString(R.string.tasks_list_error)
-            }
-            errorTextView.apply {
-                text = errorText
-                isVisible = it.errorMessageTextViewVisibility
-            }
-        }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        navigation = activity as TasksNavigationListener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val id = arguments?.getLong(TAG_FOR_ID, 0L) ?: 0L
+        val id = arguments?.getLong(TAG_FOR_PROJECT_ID, 0L) ?: 0L
 
         val interactor = TasksListInteractor(requireContext().appComponent.projectDao)
         val factory = TasksListFactory(id, interactor)
@@ -73,11 +66,17 @@ class TasksListFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-//        observeViewState2(tasksListViewModel.stateLiveData, stateObserver)
-        tasksListViewModel.stateLiveData.observe(viewLifecycleOwner, stateObserver)
-        observeViewEffect(tasksListViewModel.viewEffect, viewEffectObserver)
-        //TODO(Понять, почему observeViewState отрабатывает, как я написал, а не как я задумывал
-        // изначально")
+        tasksListViewModel.stateFlow.onEach {
+            //TODO('Не нравится return, подумать еще')
+            val viewState = it ?: return@onEach
+            updateUI(viewState)
+        }.launchWhenStartedWithCollect(lifecycleScope)
+
+        tasksListViewModel.viewEffect.onEach {
+            //TODO('Не нравится return, подумать еще')
+            val viewEffect = it ?: return@onEach
+            showSingleEvent(viewEffect)
+        }.launchWhenStartedWithCollect(lifecycleScope)
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             tasksListViewModel.processViewEvent(
@@ -86,13 +85,29 @@ class TasksListFragment(
         }
     }
 
-    override fun processViewEffect(viewEffect: BaseViewEffect) {
-        when(viewEffect) {
-            is TasksListViewModel.ViewEffect.GoToAddTask
-            -> goToTaskAdd(viewEffect.projectId)
+    private fun updateUI(viewState: TasksListViewModel.ViewState) {
+        binding.apply {
+            progressBar.isVisible = viewState.progressBarVisibility
+            recyclerView.isVisible = viewState.taskRecyclerVisibility
+            tasksListAdapter.setList(viewState.tasks)
+            val errorText = when(viewState.errorMessageTextViewType) {
+                Constants.EmptyList.EMPTY -> requireContext().getString(R.string.tasks_list_empty)
+                Constants.EmptyList.ERROR -> requireContext().getString(R.string.tasks_list_error)
+            }
+            errorTextView.apply {
+                text = errorText
+                isVisible = viewState.errorMessageTextViewVisibility
+            }
+        }
+    }
 
+    private fun showSingleEvent(viewEffect: TasksListViewModel.ViewEffect) {
+        when(viewEffect) {
             is TasksListViewModel.ViewEffect.GoToTask
-            -> goToTaskEdit(viewEffect.taskID)
+            -> navigation.goToTask(viewEffect.taskID)
+
+            is TasksListViewModel.ViewEffect.GoToAddTask
+            -> navigation.goToAddTask(viewEffect.projectId)
         }
     }
 
@@ -127,9 +142,14 @@ class TasksListFragment(
 
     companion object {
 
-        private const val TAG_FOR_ID = "ID"
+        private const val TAG_FOR_PROJECT_ID = "PROJECT_ID"
+
+
+//        private const val PROJECT_ID = "PROJECT_ID"
 
         @JvmStatic
-        fun getBundle(id: Long) = Bundle().apply { putLong(TAG_FOR_ID, id) }
+        fun newInstance(projectID: Long) = Bundle().apply {
+            putLong(TAG_FOR_PROJECT_ID, projectID)
+        }
     }
 }

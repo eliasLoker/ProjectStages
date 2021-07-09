@@ -27,7 +27,7 @@ class ProjectsViewModel(
         (ViewState()) {
 
     init {
-        sendAction(Action.SetToolbar(title, subtitle))
+//        sendAction(Action.SetToolbar(title, subtitle))
         fetchProjects()
     }
 
@@ -93,39 +93,16 @@ class ProjectsViewModel(
         }
     }
 
-    private fun onAddProjectClicked(name: String, type: Int) {
-        viewModelScope.launch {
-            val timestamp = System.currentTimeMillis()
-            val project = ProjectEntity(name, type, timestamp)
-            val insertResult = interactor.insertProject(project)
-            val effect = when (insertResult >= 0) {
-                true -> ViewEffect.SuccessAddDialog
-                false -> ViewEffect.FailureAddDialog
-            }
-            viewEffect.value = effect
-        }
-    }
-
-    override fun processViewEvent(viewEvent: ViewEvent) {
-        when(viewEvent) {
-            is ViewEvent.OnAcceptAddProjectClicked
-            -> onAddProjectClicked(
-                viewEvent.name,
-                viewEvent.type
-            )
-
-            is ViewEvent.OnAddProjectClicked
-            -> viewEffect.value = ViewEffect.ShowAddProjectDialog
-
-            is ViewEvent.OnItemClicked
-            -> viewEffect.value = ViewEffect.GoToTaskList(viewEvent.id)
-        }
-    }
-
     override fun onReduceState(viewAction: Action): ViewState {
-        return when (viewAction) {
+        return when(viewAction) {
             is Action.Loading
             -> state.copy()
+
+            is Action.NotEmptyList -> state.copy(
+                progressBarVisibility = false,
+                projectsAdapterVisibility = true,
+                projects = viewAction.projects
+            )
 
             is Action.SetToolbar
             -> state.copy(
@@ -139,18 +116,34 @@ class ProjectsViewModel(
                 emptyListTextViewVisibility = true
             )
 
-            is Action.NotEmptyList
-            -> state.copy(
-                progressBarVisibility = false,
-                projectsAdapterVisibility = true,
-                projects = viewAction.projects
-            )
-
             is Action.Error
             -> state.copy(
                 progressBarVisibility = false,
                 errorTextViewVisibility = true
             )
+        }
+    }
+
+    override fun processViewEvent(viewEvent: ViewEvent) {
+        when(viewEvent) {
+            is ViewEvent.OnAddProjectClicked ->
+                viewEffectChannel.sendViewEffect(ViewEffect.ShowAddProjectDialog)
+
+
+            is ViewEvent.OnAcceptAddProjectClicked -> {
+                viewModelScope.launch {
+                    val project = ProjectEntity(viewEvent.name, viewEvent.type, System.currentTimeMillis())
+                    val insertResult = interactor.insertProject(project)
+                    val event = when(insertResult > 0) {
+                        true -> ViewEffect.SuccessAddDialog
+                        false -> ViewEffect.FailureAddDialog
+                    }
+                    viewEffectChannel.sendViewEffect(event)
+                }
+            }
+
+            is ViewEvent.OnItemClicked
+            -> viewEffectChannel.sendViewEffect(ViewEffect.GoToTaskList(viewEvent.id))
         }
     }
 

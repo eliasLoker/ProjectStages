@@ -1,9 +1,14 @@
 package com.example.projectstages.base.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.projectstages.utils.SingleLiveEvent
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 abstract class BaseViewModel<
@@ -13,15 +18,37 @@ abstract class BaseViewModel<
         ViewEvent : BaseViewEvent
         >(initialState : ViewState) : ViewModel() {
 
-    private val _viewEffect: SingleLiveEvent<ViewEffect> = SingleLiveEvent()
-    val viewEffect = _viewEffect
+    /*
+      private val _viewEffect: SingleLiveEvent<ViewEffect> = SingleLiveEvent()
+      val viewEffect = _viewEffect
+      */
+    /*
+    https://stackoverflow.com/questions/59002902/singleliveevent-with-buffer-with-coroutines
+    Подумать над оптимизацией этого решения доставки единичных Event'ов
 
+    Альтернативный вариант замены SingleLiveEvent на Flow для LiveData:
+    https://proandroiddev.com/android-singleliveevent-redux-with-kotlin-flow-b755c70bb055
+    */
+//    protected val viewEffectChannel = BroadcastChannel<ViewEffect?>(Channel.BUFFERED)
+    /*
+    Вариант BroadcastChannel<ViewEffect?>(Channel.BUFFERED) копил все таки event'ы, даже с
+    единичным capacity.
+    //TODO("Разобраться детальнее")
+    https://github.com/Kotlin/kotlinx.coroutines/issues/2005
+    */
+    protected val viewEffectChannel = Channel<ViewEffect?>(Channel.BUFFERED)
+    val viewEffect = viewEffectChannel.receiveAsFlow()
+
+    /*
     private val stateMutableLiveData = MutableLiveData<ViewState>()
     val stateLiveData = stateMutableLiveData.asLiveData()
+    */
+    private val stateMutableFlow = MutableStateFlow<ViewState?>(null)
+    val stateFlow: StateFlow<ViewState?> = stateMutableFlow.asStateFlow()
 
     protected var state by Delegates.observable(initialState) { _, old, new ->
-        stateMutableLiveData.value = new
-
+        stateMutableFlow.value = new
+        //TODO("Заглянуть сюда и еще подумать")
         if (new != old) {
 //            addStateTransition(old, new)
 //            logLast()
@@ -32,17 +59,15 @@ abstract class BaseViewModel<
         state = onReduceState(viewAction)
     }
 
-//    fun onActivityCreated() {
-//        onLoadData()
-//    }
-
-//    abstract fun onViewCreated(isFirstLoading: Boolean)
-    //TODO("Проверить, что везде коллбэк именно onViewCreated")
-
     protected abstract fun onReduceState(viewAction: Action) : ViewState
 
     abstract fun processViewEvent(viewEvent: ViewEvent)
 
-    fun <T> MutableLiveData<T>.asLiveData() = this as LiveData<T>
+    @ExperimentalCoroutinesApi
+    protected fun <T : BaseViewEffect?> Channel<T?>.sendViewEffect(viewEffect: T?) {
+        viewModelScope.launch {
+            this@sendViewEffect.send(viewEffect)
+        }
+    }
 }
 

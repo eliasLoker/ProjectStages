@@ -1,8 +1,10 @@
 package com.example.projectstages.ui.projects
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -14,13 +16,14 @@ import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
-import com.example.projectstages.base.observeViewEffect
-import com.example.projectstages.base.viewmodel.BaseViewEffect
+import com.example.projectstages.base.getStringExt
+import com.example.projectstages.base.launchWhenStartedWithCollect
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
@@ -30,6 +33,7 @@ import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.ui.taskslist.TasksListFragment
 import com.example.projectstages.utils.AdapterItemDecorator
+import kotlinx.coroutines.flow.onEach
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
@@ -44,17 +48,12 @@ class ProjectsFragment(
 
     private lateinit var projectsViewModel: ProjectsViewModel
     private lateinit var projectsAdapter: ProjectsAdapter
+    private lateinit var navigation: ProjectsNavigationListener
 
-    private val stateObserver = Observer<ProjectsViewModel.ViewState> {
-        binding.apply {
-            progressBar.isVisible = it.progressBarVisibility
-            recyclerView.isVisible = it.projectsAdapterVisibility
-            projectsAdapter.setList(it.projects)
-            toolbar.toolbar.apply {
-                title = it.title
-                subtitle = it.subtitle
-            }
-        }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        navigation = (activity) as ProjectsNavigationListener
+        Log.d("TasksDebug", "Navigation $navigation")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,10 +75,20 @@ class ProjectsFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        projectsViewModel.stateLiveData.observe(viewLifecycleOwner, stateObserver)
-        observeViewEffect(projectsViewModel.viewEffect, viewEffectObserver)
-        //TODO(Понять, почему observeViewState отрабатывает, как я написал, а не как я задумывал
-        // изначально")
+        projectsViewModel.stateFlow.onEach {
+            Log.d("ViewStateDeb", "PF: $it")
+            //TODO('Не нравится return, подумать еще')
+            val viewState = it ?: return@onEach
+            updateUI(viewState)
+        }.launchWhenStartedWithCollect(lifecycleScope)
+
+//        observeViewEffect(projectsViewModel.viewEffect, viewEffectObserver)
+        projectsViewModel.viewEffect.onEach {
+//            Toast.makeText(requireContext(), "Toast", Toast.LENGTH_SHORT).show()
+            //TODO('Не нравится return, подумать еще')
+            val viewEffect = it ?: return@onEach
+            showSingleEvent(viewEffect)
+        }.launchWhenStartedWithCollect(lifecycleScope)
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             projectsViewModel.processViewEvent(
@@ -88,25 +97,37 @@ class ProjectsFragment(
         }
     }
 
-    override fun processViewEffect(viewEffect: BaseViewEffect) {
-        when (viewEffect) {
+    private fun updateUI(viewState: ProjectsViewModel.ViewState) {
+        binding.apply {
+            progressBar.isVisible = viewState.progressBarVisibility
+            recyclerView.isVisible = viewState.projectsAdapterVisibility
+            projectsAdapter.setList(viewState.projects)
+            toolbar.toolbar.apply {
+                title = viewState.title
+                subtitle = viewState.subtitle
+            }
+        }
+    }
+
+    private fun showSingleEvent(viewEffect: ProjectsViewModel.ViewEffect) {
+        when(viewEffect) {
             is ProjectsViewModel.ViewEffect.ShowAddProjectDialog
             -> showAddProjectDialog()
 
-            is ProjectsViewModel.ViewEffect.GoToTaskList
-            -> goToTasks(viewEffect.projectID)
-
             is ProjectsViewModel.ViewEffect.SuccessAddDialog
             -> showSimpleDialog(
-                requireContext().getString(R.string.project_success_add_title),
-                requireContext().getString(R.string.project_success_add_message)
+                getStringExt(R.string.project_success_add_title),
+                getStringExt(R.string.project_success_add_message)
             )
 
             is ProjectsViewModel.ViewEffect.FailureAddDialog
             -> showErrorDialog(
-                requireContext().getString(R.string.project_error_add_title),
-                requireContext().getString(R.string.project_error_add_message)
-                )
+                getStringExt(R.string.project_error_add_title),
+                getStringExt(R.string.project_error_add_message)
+            )
+
+            is ProjectsViewModel.ViewEffect.GoToTaskList
+            -> navigation.goToTaskFromProjects(viewEffect.projectID)
         }
     }
 
@@ -268,19 +289,12 @@ class ProjectsFragment(
         dialog.show()
     }
 
-    private fun goToTasks(id: Long) {
-        findNavController().navigate(
-            R.id.action_projectsFragment_to_tasksFragment,
-            TasksListFragment.getBundle(id)
-        )
-    }
-
     private fun showGoToTasksDialog(id: Long) {
         //TODO("Maybe delete")
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Какой экран открыть?")
             .setPositiveButton("TasksList") { dialog, _ ->
-                goToTasks(id)
+//                goToTasks(id)
                 dialog.dismiss()
             }
             .setNegativeButton("Отмена") { dialog, _ ->

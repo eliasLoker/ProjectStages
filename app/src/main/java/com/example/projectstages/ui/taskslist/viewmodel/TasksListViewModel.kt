@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.taskslist.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
@@ -14,7 +15,7 @@ import kotlin.collections.ArrayList
 
 class TasksListViewModel(
     private val projectId: Long,
-    private val listInteractor: TasksListInteractor
+    private val tasksListInteractor: TasksListInteractor
 ) : BaseViewModel<
         TasksListViewModel.ViewState,
         TasksListViewModel.Action,
@@ -25,13 +26,41 @@ class TasksListViewModel(
     private val tasks = ArrayList<Task>()
 
     init {
-        fetchTasks()
+        Log.d("TasksListVM", "prid $projectId")
+        viewModelScope.launch {
+            when(val tasks = tasksListInteractor.getTasks(projectId)) {
+                is ResultWrapper.Success -> {
+                    tasks.data.collectLatest {
+                        when(it.isNotEmpty()) {
+                            true -> {
+                                this@TasksListViewModel.tasks.clear()
+                                it.forEachIndexed { index, taskEntity ->
+                                    val task = Task(
+                                        taskEntity.id,
+                                        taskEntity.description,
+                                        Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
+                                        tasksListInteractor.getItemType(index),
+                                        taskEntity.state
+                                    )
+                                    this@TasksListViewModel.tasks.add(task)
+                                }
+                                this@TasksListViewModel.tasks.sortBy { i -> i.state }
+                                sendAction(Action.NotEmptyList(this@TasksListViewModel.tasks))
+                            }
+                            false -> sendAction(Action.EmptyList)
+                        }
+                    }
+                }
+                is ResultWrapper.Error
+                -> sendAction(Action.Error)
+            }
+        }
     }
 
     private fun fetchTasks() {
         viewModelScope.launch {
             //TODO("Flow не вываливается в Error, если указать несуществующий ProjectID")
-            when (val tasks = listInteractor.getTasks(projectId)) {
+            when (val tasks = tasksListInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success
                 -> {
                     tasks.data.collectLatest {
@@ -43,7 +72,7 @@ class TasksListViewModel(
                                         taskEntity.id,
                                         taskEntity.description,
                                         Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
-                                        listInteractor.getItemType(index),
+                                        tasksListInteractor.getItemType(index),
                                         taskEntity.state
                                     )
                                     this@TasksListViewModel.tasks.add(task)
@@ -66,11 +95,9 @@ class TasksListViewModel(
 
     override fun processViewEvent(viewEvent: ViewEvent) {
         when(viewEvent) {
-            is ViewEvent.OnAddTaskClicked
-            -> viewEffect.value = ViewEffect.GoToAddTask(projectId)
+            is ViewEvent.OnTaskClicked-> viewEffectChannel.sendViewEffect(ViewEffect.GoToTask(viewEvent.taskId))
 
-            is ViewEvent.OnTaskClicked
-            -> viewEffect.value = ViewEffect.GoToTask(viewEvent.taskId)
+            is ViewEvent.OnAddTaskClicked -> viewEffectChannel.sendViewEffect(ViewEffect.GoToAddTask(projectId))
         }
     }
 
