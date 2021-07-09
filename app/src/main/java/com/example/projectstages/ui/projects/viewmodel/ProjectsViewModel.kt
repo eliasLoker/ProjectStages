@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.ProjectEntity
@@ -34,38 +35,45 @@ class ProjectsViewModel(
 
     private fun fetchProjects() {
         viewModelScope.launch {
-            when (val projects = interactor.getProjects()) {
+            when(val projects = interactor.getProjects2()) {
                 is ResultWrapper.Success -> {
+                    Log.d("ProjectsViewModel", "SUCCESS ResultWrapper")
                     projects.data.collectLatest {
+                        Log.d("ProjectsViewModel", "SUCCESS collectLatest $it")
                         when(it.isNotEmpty()) {
                             true -> {
                                 _projects.clear()
-                                it.forEach{ projectEntity ->
-                                    val projectId = projectEntity.id
-                                        val count = interactor.countTasksByProjectId(projectId)
+                                it.forEach { projectsWithTasks ->
+                                    val projectId = projectsWithTasks.id
+                                    val count = projectsWithTasks.tasks.size
                                     val timestamp = when(count > 0) {
-                                        true -> interactor.getLastTaskTimestampsByProjectId(projectId)
-                                        false -> projectEntity.createdTimestamp
+                                        true -> {
+//                                            it.map { it.tasks }.maxOf { it1 -> it1.createdTimestamp }
+                                            projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.createdTimestamp
+                                            //TODO(Противно использовать !!, подумать еще на досуге )
+                                        }
+                                        false -> projectsWithTasks.createdTimestamp
                                     }
+
                                     val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
 
                                     val completedTasks
-                                            = interactor.countStatesTasksByProjectId(projectId, Constants.TaskStates.COMPLETED.stateID)
+                                            = projectsWithTasks.tasks.filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }.count()
                                     val progressTasks
-                                            = interactor.countStatesTasksByProjectId(projectId, Constants.TaskStates.IN_PROGRESS.stateID)
+                                            = projectsWithTasks.tasks.filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_PROGRESS.stateID }.count()
                                     val thoughtTasks
-                                            = interactor.countStatesTasksByProjectId(projectId, Constants.TaskStates.IN_THOUGHT.stateID)
+                                            = projectsWithTasks.tasks.filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_THOUGHT.stateID }.count()
+
                                     val countTasksByState = arrayOf(
                                         completedTasks,
                                         progressTasks,
                                         thoughtTasks
                                     )
-                                    //TODO(Продумать, как создать FLow из countTasksByState)
-                                    //TODO(Check queries with incorrect data)
+
                                     val project = Project(
-                                        projectEntity.id,
-                                        projectEntity.name,
-                                        projectEntity.type,
+                                        projectsWithTasks.id,
+                                        projectsWithTasks.name,
+                                        projectsWithTasks.type,
                                         formattedDate,
                                         countTasksByState
                                     )
@@ -77,7 +85,10 @@ class ProjectsViewModel(
                         }
                     }
                 }
-                is ResultWrapper.Error -> sendAction(Action.Error)
+
+                is ResultWrapper.Error -> {
+                    Log.d("ProjectsViewModel", "ERROR")
+                }
             }
         }
     }
