@@ -8,21 +8,77 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_with_add"
+        layout="@layout/toolbar_projects"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/placeholder_view"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:background="@drawable/shape_rectangle_rounded_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+
+    <View
+        android:id="@+id/vertical_separator_view"
+        android:layout_width="1dp"
+        android:layout_height="50dp"
+        android:background="@android:color/white"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/placeholder_view"
+        />
+
+    <TextView
+        android:id="@+id/all_tasks_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20 \nAll tasks"
+        android:textColor="@android:color/white"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toStartOf="@id/vertical_separator_view"
+        app:layout_constraintBottom_toBottomOf="@id/vertical_separator_view"
+        app:layout_constraintTop_toTopOf="@id/vertical_separator_view"
+        />
+
+    <TextView
+        android:id="@+id/completed_tasks_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10 \nCompleted tasks"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toEndOf="@id/vertical_separator_view"
+        app:layout_constraintTop_toTopOf="@id/vertical_separator_view"
+        app:layout_constraintBottom_toBottomOf="@id/vertical_separator_view"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/white"
+        android:background="@android:color/white"
+        android:layout_margin="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vertical_separator_view"
+        app:layout_constraintBottom_toTopOf="@id/add_project_button"
         tools:listitem="@layout/item_projects_default"/>
+
+    <Button
+        android:id="@+id/add_project_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Добавить проект"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

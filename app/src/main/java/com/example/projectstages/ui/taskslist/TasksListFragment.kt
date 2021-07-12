@@ -100,16 +100,6 @@ class TasksListFragment(
         )
     }
 
-    private fun goToTaskEdit(id: Long) {
-        val bundle = TaskFragment.getBundleForEditTask(id)
-        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
-    }
-
-    private fun goToTaskAdd(projectID: Long) {
-        val bundle = TaskFragment.getBundleForCreateTask(projectID)
-        findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
-    }
-
     private fun getSectionCallback(tasks: List<Task>): AdapterStickyItemDecorator2.SectionCallback {
         return object : AdapterStickyItemDecorator2.SectionCallback {
             override fun isSection(position: Int): Boolean {

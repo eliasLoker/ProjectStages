@@ -38,7 +38,7 @@ class ProjectsViewModel(
             when(val projects = interactor.getProjects2()) {
                 is ResultWrapper.Success -> {
                     Log.d("ProjectsViewModel", "SUCCESS ResultWrapper")
-                    projects.data.collectLatest {
+                    projects.data.collectLatest { it ->
                         Log.d("ProjectsViewModel", "SUCCESS collectLatest $it")
                         when(it.isNotEmpty()) {
                             true -> {
@@ -79,7 +79,16 @@ class ProjectsViewModel(
                                     )
                                     _projects.add(project)
                                 }
-                                sendAction(Action.NotEmptyList(_projects))
+                                val allTasks  = it.map { list -> list.tasks }
+                                    .flatten()
+                                    .count()
+
+                                val completedTasks  = it.map { list -> list.tasks }
+                                    .flatten()
+                                    .filter { taskEntity -> taskEntity.state == 0 }
+                                    .count()
+
+                                sendAction(Action.NotEmptyList(_projects, allTasks, completedTasks))
                             }
                             false -> sendAction(Action.EmptyList)
                         }
@@ -101,7 +110,9 @@ class ProjectsViewModel(
             is Action.NotEmptyList -> state.copy(
                 progressBarVisibility = false,
                 projectsAdapterVisibility = true,
-                projects = viewAction.projects
+                projects = viewAction.projects,
+                allTasks = viewAction.allTasks,
+                completedTasks = viewAction.completedTasks
             )
 
             is Action.SetToolbar
@@ -154,7 +165,9 @@ class ProjectsViewModel(
         val emptyListTextViewVisibility: Boolean = false,
         val projectsAdapterVisibility: Boolean = false,
         val projects: List<Project> = emptyList(),
-        val errorTextViewVisibility: Boolean = false
+        val errorTextViewVisibility: Boolean = false,
+        val allTasks: Int = 0,
+        val completedTasks: Int = 0
     ) : BaseViewState
 
     sealed class Action : BaseAction {
@@ -169,7 +182,9 @@ class ProjectsViewModel(
         object EmptyList : Action()
 
         class NotEmptyList(
-            val projects: List<Project>
+            val projects: List<Project>,
+            val allTasks: Int,
+            val completedTasks: Int
         ) : Action()
 
         object Error : Action()

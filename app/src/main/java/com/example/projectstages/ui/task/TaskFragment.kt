@@ -7,10 +7,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProviders
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
-import com.example.projectstages.base.BaseFragment
-import com.example.projectstages.base.getBooleanFromBundleExt
-import com.example.projectstages.base.getLongFromBundleExt
-import com.example.projectstages.base.getStringExt
+import com.example.projectstages.base.*
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
@@ -44,7 +41,7 @@ class TaskFragment(
             .of(this, factory)
             .get(TaskViewModel::class.java)
 
-        val states = resources.getStringArray(R.array.task_types)
+        val states = getStringArrayExt(R.array.task_types)
         val spinnerItems = ArrayList<SpinnerItem>().apply {
             add(SpinnerItem(states[0], R.drawable.ic_completed))
             add(SpinnerItem(states[1], R.drawable.ic_progress))

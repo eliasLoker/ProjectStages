@@ -83,6 +83,8 @@ class ProjectsFragment(
                 title = viewState.title
                 subtitle = viewState.subtitle
             }
+            allTasksTextView.text = String.format(getStringExt(R.string.all_tasks), viewState.allTasks)
+            completedTasksTextView.text = String.format(getStringExt(R.string.completed_tasks), viewState.completedTasks)
         }
     }
 

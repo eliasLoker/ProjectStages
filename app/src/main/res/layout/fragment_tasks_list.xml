@@ -7,7 +7,7 @@
     tools:context=".ui.taskslist.TasksListFragment">
 
     <include android:id="@+id/toolbar"
-        layout="@layout/toolbar_with_add" />
+        layout="@layout/toolbar_projects" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
