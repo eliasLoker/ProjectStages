@@ -4,15 +4,13 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.base.getBooleanFromBundleExt
+import com.example.projectstages.base.getLongFromBundleExt
 import com.example.projectstages.base.getStringExt
-import com.example.projectstages.base.launchWhenStartedWithCollect
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
@@ -22,49 +20,23 @@ import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.onItemSelected
 import com.example.projectstages.utils.onTextChanged
-import kotlinx.coroutines.flow.onEach
-import com.example.projectstages.base.getLongFromBundleExt as getLongFromBundleExt1
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
 ) : BaseFragment<
         FragmentTaskBinding,
         TaskViewModel.ViewState,
-        TaskViewModel.Action,
-        TaskViewModel.ViewEffect,
-        TaskViewModel.ViewEvent,
-        TaskViewModel
+        TaskViewModel.ViewEffect
         >(layoutID, FragmentTaskBinding::inflate) {
 
     private lateinit var taskViewModel: TaskViewModel
 
-    private val stateObserver = Observer<TaskViewModel.ViewState> {
-        binding.apply {
-            progressBar.isVisible = it.progressBarVisibility
-            stateSpinner.isVisible = it.stateSpinnerVisibility
-            descriptionTextInputLayout.isVisible = it.descriptionEditTextVisibility
-            saveButton.isVisible = it.saveButtonVisibility
-            descriptionTextInputEditText.setText(it.descriptionEditTextText)
-            stateSpinner.setSelection(it.stateSpinnerPosition)
-            when(it.taskTitleType) {
-                Constants.TaskTitleType.ADD -> {
-                    toolbar.toolbar.subtitle = requireContext().getString(R.string.task_add)
-                    saveButton.text = requireContext().getString(R.string.task_save_task)
-                    toolbar.deleteQuestionMenuButton.isVisible = false
-                }
-                Constants.TaskTitleType.EDIT -> {
-                    toolbar.toolbar.subtitle = requireContext().getString(R.string.task_edit)
-                    saveButton.text = requireContext().getString(R.string.task_save_changes)
-                }
-            }
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val projectID = getLongFromBundleExt1(PROJECT_ID)
-        val taskID = getLongFromBundleExt1(TASK_ID)
+        val projectID = getLongFromBundleExt(PROJECT_ID)
+        val taskID = getLongFromBundleExt(TASK_ID)
         val isEdit = getBooleanFromBundleExt(IS_EDIT)
         val interactor = TaskInteractor(requireContext().appComponent.projectDao)
         val factory = TaskFactory(isEdit, projectID, taskID, interactor)
@@ -84,17 +56,8 @@ class TaskFragment(
             adapter = spinnerAdapter
         }
 
-        taskViewModel.stateFlow.onEach {
-            //TODO('Не нравится return, подумать еще')
-            val viewState = it ?: return@onEach
-            updateUI(viewState)
-        }.launchWhenStartedWithCollect(lifecycleScope)
-
-        taskViewModel.viewEffect.onEach {
-            //TODO('Не нравится return, подумать еще')
-            val viewEffect = it ?: return@onEach
-            showSingleEvent(viewEffect)
-        }.launchWhenStartedWithCollect(lifecycleScope)
+        onEachViewState(taskViewModel.stateFlow)
+        onEachViewEffect(taskViewModel.viewEffect)
 
         binding.saveButton.setOnClickListener {
             taskViewModel.processViewEvent(
@@ -121,7 +84,7 @@ class TaskFragment(
         }
     }
 
-    private fun updateUI(viewState: TaskViewModel.ViewState) {
+    override fun updateViewState(viewState: TaskViewModel.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             stateSpinner.isVisible = viewState.stateSpinnerVisibility
@@ -143,8 +106,8 @@ class TaskFragment(
         }
     }
 
-    private fun showSingleEvent(viewEffect: TaskViewModel.ViewEffect) {
-
+    override fun showSingleEvent(viewEffect: TaskViewModel.ViewEffect) {
+        TODO("Not yet implemented")
     }
 
     private fun showDeleteDialog() {
@@ -170,13 +133,13 @@ class TaskFragment(
         private const val IS_EDIT = "IS_EDIT"
 
         @JvmStatic
-        fun getBundleEditTask(taskID: Long) = Bundle().apply {
+        fun getBundleForEditTask(taskID: Long) = Bundle().apply {
             putBoolean(IS_EDIT, true)
             putLong(TASK_ID, taskID)
         }
 
         @JvmStatic
-        fun getBundleCreateTask(projectID: Long) = Bundle().apply {
+        fun getBundleForCreateTask(projectID: Long) = Bundle().apply {
             putLong(PROJECT_ID, projectID)
         }
     }

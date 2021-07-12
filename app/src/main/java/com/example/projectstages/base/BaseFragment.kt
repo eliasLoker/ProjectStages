@@ -8,15 +8,14 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.base.viewmodel.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
-private typealias FragmentViewBindingInflater2<VB> = (
+private typealias FragmentViewBindingInflater<VB> = (
     inflater: LayoutInflater,
     parent: ViewGroup?,
     attachToParent: Boolean
@@ -24,26 +23,17 @@ private typealias FragmentViewBindingInflater2<VB> = (
 
 abstract class BaseFragment<
         VB : ViewBinding,
-        ViewState : BaseViewState,
-        Action : BaseAction,
-        ViewEffect: BaseViewEffect,
-        ViewEvent : BaseViewEvent,
-        ViewModel : BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
+        ViewState : BaseViewState?,
+        ViewEffect: BaseViewEffect?
         >(
     @LayoutRes
     private val layoutID: Int,
-    private val bindingInflater: FragmentViewBindingInflater2<VB>
+    private val bindingInflater: FragmentViewBindingInflater<VB>
 ) : Fragment(layoutID) {
 
     private var _binding: VB? = null
 
     protected val binding get() = _binding!!
-
-    /*
-    protected val viewEffectObserver = Observer<BaseViewEffect> {
-        processViewEffect(it)
-    }
-    */
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,15 +49,32 @@ abstract class BaseFragment<
         _binding = null
     }
 
-//    abstract fun processViewEffect(viewEffect: BaseViewEffect)
-}
+    abstract fun updateViewState(viewState: ViewState)
 
-/*
-Thanks to Kirill Rozov :)
-*/
-fun <T> Flow<T>.launchWhenStartedWithCollect(lifecycleCoroutineScope: LifecycleCoroutineScope) {
-    lifecycleCoroutineScope.launchWhenStarted {
-        this@launchWhenStartedWithCollect.collect()
+    abstract fun showSingleEvent(viewEffect: ViewEffect)
+
+    //TODO("Подумать над вызовом этих методов автоматически")
+    fun onEachViewState(viewStateFlow: Flow<ViewState?>) {
+        viewStateFlow.onEach {
+            val viewStateNotNull = it ?: return@onEach
+            updateViewState(viewStateNotNull)
+        }.launchWhenStartedWithCollect(this.lifecycleScope)
+    }
+
+    fun onEachViewEffect(viewEffectFlow: Flow<ViewEffect?>) {
+        viewEffectFlow.onEach {
+            val viewEffectNotNull = it ?: return@onEach
+            showSingleEvent(viewEffectNotNull)
+        }.launchWhenStartedWithCollect(this.lifecycleScope)
+    }
+
+    /*
+        Thanks to Kirill Rozov :)
+    */
+    private fun <T> Flow<T>.launchWhenStartedWithCollect(lifecycleCoroutineScope: LifecycleCoroutineScope) {
+        lifecycleCoroutineScope.launchWhenStarted {
+            this@launchWhenStartedWithCollect.collect()
+        }
     }
 }
 

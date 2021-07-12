@@ -2,18 +2,14 @@ package com.example.projectstages.ui.taskslist
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
-import com.example.projectstages.base.launchWhenStartedWithCollect
 import com.example.projectstages.databinding.FragmentTasksListBinding
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapter
@@ -25,17 +21,13 @@ import com.example.projectstages.ui.taskslist.viewmodel.TasksListViewModel
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.AdapterStickyItemDecorator2
 import com.example.projectstages.utils.Constants
-import kotlinx.coroutines.flow.onEach
 
 class TasksListFragment(
     layoutID: Int = R.layout.fragment_tasks_list
 ) : BaseFragment<
         FragmentTasksListBinding,
         TasksListViewModel.ViewState,
-        TasksListViewModel.Action,
-        TasksListViewModel.ViewEffect,
-        TasksListViewModel.ViewEvent,
-        TasksListViewModel
+        TasksListViewModel.ViewEffect
         >(layoutID, FragmentTasksListBinding::inflate), TasksListAdapterListener {
 
     private lateinit var tasksListViewModel: TasksListViewModel
@@ -66,17 +58,8 @@ class TasksListFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        tasksListViewModel.stateFlow.onEach {
-            //TODO('Не нравится return, подумать еще')
-            val viewState = it ?: return@onEach
-            updateUI(viewState)
-        }.launchWhenStartedWithCollect(lifecycleScope)
-
-        tasksListViewModel.viewEffect.onEach {
-            //TODO('Не нравится return, подумать еще')
-            val viewEffect = it ?: return@onEach
-            showSingleEvent(viewEffect)
-        }.launchWhenStartedWithCollect(lifecycleScope)
+        onEachViewState(tasksListViewModel.stateFlow)
+        onEachViewEffect(tasksListViewModel.viewEffect)
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             tasksListViewModel.processViewEvent(
@@ -85,7 +68,7 @@ class TasksListFragment(
         }
     }
 
-    private fun updateUI(viewState: TasksListViewModel.ViewState) {
+    override fun updateViewState(viewState: TasksListViewModel.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.taskRecyclerVisibility
@@ -101,7 +84,7 @@ class TasksListFragment(
         }
     }
 
-    private fun showSingleEvent(viewEffect: TasksListViewModel.ViewEffect) {
+    override fun showSingleEvent(viewEffect: TasksListViewModel.ViewEffect) {
         when(viewEffect) {
             is TasksListViewModel.ViewEffect.GoToTask
             -> navigation.goToTask(viewEffect.taskID)
@@ -118,12 +101,12 @@ class TasksListFragment(
     }
 
     private fun goToTaskEdit(id: Long) {
-        val bundle = TaskFragment.getBundleEditTask(id)
+        val bundle = TaskFragment.getBundleForEditTask(id)
         findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
     }
 
     private fun goToTaskAdd(projectID: Long) {
-        val bundle = TaskFragment.getBundleCreateTask(projectID)
+        val bundle = TaskFragment.getBundleForCreateTask(projectID)
         findNavController().navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
     }
 
@@ -145,10 +128,8 @@ class TasksListFragment(
         private const val TAG_FOR_PROJECT_ID = "PROJECT_ID"
 
 
-//        private const val PROJECT_ID = "PROJECT_ID"
-
         @JvmStatic
-        fun newInstance(projectID: Long) = Bundle().apply {
+        fun getBundle(projectID: Long) = Bundle().apply {
             putLong(TAG_FOR_PROJECT_ID, projectID)
         }
     }

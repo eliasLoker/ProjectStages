@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -14,16 +13,12 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.base.getStringExt
-import com.example.projectstages.base.launchWhenStartedWithCollect
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
@@ -31,19 +26,14 @@ import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
-import com.example.projectstages.ui.taskslist.TasksListFragment
 import com.example.projectstages.utils.AdapterItemDecorator
-import kotlinx.coroutines.flow.onEach
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
 ) : BaseFragment<
         FragmentProjectsBinding,
         ProjectsViewModel.ViewState,
-        ProjectsViewModel.Action,
-        ProjectsViewModel.ViewEffect,
-        ProjectsViewModel.ViewEvent,
-        ProjectsViewModel
+        ProjectsViewModel.ViewEffect
         >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
     private lateinit var projectsViewModel: ProjectsViewModel
@@ -53,7 +43,6 @@ class ProjectsFragment(
     override fun onAttach(context: Context) {
         super.onAttach(context)
         navigation = (activity) as ProjectsNavigationListener
-        Log.d("TasksDebug", "Navigation $navigation")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,20 +64,8 @@ class ProjectsFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        projectsViewModel.stateFlow.onEach {
-            Log.d("ViewStateDeb", "PF: $it")
-            //TODO('Не нравится return, подумать еще')
-            val viewState = it ?: return@onEach
-            updateUI(viewState)
-        }.launchWhenStartedWithCollect(lifecycleScope)
-
-//        observeViewEffect(projectsViewModel.viewEffect, viewEffectObserver)
-        projectsViewModel.viewEffect.onEach {
-//            Toast.makeText(requireContext(), "Toast", Toast.LENGTH_SHORT).show()
-            //TODO('Не нравится return, подумать еще')
-            val viewEffect = it ?: return@onEach
-            showSingleEvent(viewEffect)
-        }.launchWhenStartedWithCollect(lifecycleScope)
+        onEachViewState(projectsViewModel.stateFlow)
+        onEachViewEffect(projectsViewModel.viewEffect)
 
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
             projectsViewModel.processViewEvent(
@@ -97,7 +74,7 @@ class ProjectsFragment(
         }
     }
 
-    private fun updateUI(viewState: ProjectsViewModel.ViewState) {
+    override fun updateViewState(viewState: ProjectsViewModel.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.projectsAdapterVisibility
@@ -109,7 +86,7 @@ class ProjectsFragment(
         }
     }
 
-    private fun showSingleEvent(viewEffect: ProjectsViewModel.ViewEffect) {
+    override fun showSingleEvent(viewEffect: ProjectsViewModel.ViewEffect) {
         when(viewEffect) {
             is ProjectsViewModel.ViewEffect.ShowAddProjectDialog
             -> showAddProjectDialog()

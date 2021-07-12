@@ -27,7 +27,7 @@ class ProjectsViewModel(
         (ViewState()) {
 
     init {
-//        sendAction(Action.SetToolbar(title, subtitle))
+        sendAction(Action.SetToolbar(title, subtitle))
         fetchProjects()
     }
 
