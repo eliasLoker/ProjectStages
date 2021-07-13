@@ -73,11 +73,11 @@ class TaskFragment(
             )
         }
 
-        binding.toolbar.deleteQuestionMenuButton.setOnClickListener {
-            viewModel.processViewEvent(
-                TaskViewModel.ViewEvent.OnDeleteButtonClicked
-            )
-        }
+//        binding.toolbar.deleteQuestionMenuButton.setOnClickListener {
+//            viewModel.processViewEvent(
+//                TaskViewModel.ViewEvent.OnDeleteButtonClicked
+//            )
+//        }
     }
 
     override fun updateViewState(viewState: TaskViewModel.ViewState) {
@@ -90,12 +90,12 @@ class TaskFragment(
             stateSpinner.setSelection(viewState.stateSpinnerPosition)
             when(viewState.taskTitleType) {
                 Constants.TaskTitleType.ADD -> {
-                    toolbar.toolbar.subtitle = getStringExt(R.string.task_add)
+//                    toolbar.toolbar.subtitle = getStringExt(R.string.task_add)
                     saveButton.text = getStringExt(R.string.task_save_task)
-                    toolbar.deleteQuestionMenuButton.isVisible = false
+//                    toolbar.deleteQuestionMenuButton.isVisible = false
                 }
                 Constants.TaskTitleType.EDIT -> {
-                    toolbar.toolbar.subtitle = getStringExt(R.string.task_edit)
+//                    toolbar.toolbar.subtitle = getStringExt(R.string.task_edit)
                     saveButton.text = getStringExt(R.string.task_save_changes)
                 }
             }

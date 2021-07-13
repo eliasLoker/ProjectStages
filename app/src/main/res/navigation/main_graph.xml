@@ -13,10 +13,10 @@
         <action
             android:id="@+id/action_projectsFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"
-            app:enterAnim="@anim/to_right_in"
-            app:exitAnim="@anim/to_right_out"
-            app:popEnterAnim="@anim/to_left_in"
-            app:popExitAnim="@anim/to_left_out"/>
+            app:enterAnim="@anim/to_left_in"
+            app:exitAnim="@anim/to_left_out"
+            app:popEnterAnim="@anim/to_right_in"
+            app:popExitAnim="@anim/to_right_out"/>
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"
@@ -25,13 +25,12 @@
         tools:layout="@layout/fragment_tasks_list" >
         <action
             android:id="@+id/action_tasksFragment_to_taskFragment"
-            app:destination="@id/taskFragment" />
+            app:destination="@id/taskFragment"
+            app:enterAnim="@anim/to_left_in"
+            app:exitAnim="@anim/to_left_out"
+            app:popEnterAnim="@anim/to_right_in"
+            app:popExitAnim="@anim/to_right_out"/>
     </fragment>
-    <fragment
-        android:id="@+id/testFragment"
-        android:name="com.example.projectstages.ui.test.TestFragment"
-        android:label="fragment_test"
-        tools:layout="@layout/fragment_test" />
     <fragment
         android:id="@+id/taskFragment"
         android:name="com.example.projectstages.ui.task.TaskFragment"

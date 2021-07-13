@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".ui.task.TaskFragment">
 
-    <include
+<!--    <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar_with_bucket" />
+        layout="@layout/toolbar_with_bucket" />-->
 
     <Spinner
         android:id="@+id/state_spinner"
@@ -23,7 +23,7 @@
         android:background="@drawable/shape_outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible"/>
 
     <com.google.android.material.textfield.TextInputLayout

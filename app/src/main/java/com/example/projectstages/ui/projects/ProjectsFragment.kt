@@ -76,10 +76,10 @@ class ProjectsFragment(
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.projectsAdapterVisibility
             projectsAdapter.setList(viewState.projects)
-            toolbar.toolbar.apply {
+//            toolbar.toolbar.apply {
 //                title = viewState.title
 //                subtitle = viewState.subtitle
-            }
+//            }
             allTasksTextView.text = String.format(getStringExt(R.string.all_tasks), viewState.allTasks)
             completedTasksTextView.text = String.format(getStringExt(R.string.completed_tasks), viewState.completedTasks)
         }
