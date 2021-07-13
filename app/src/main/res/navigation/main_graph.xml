@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_projects" >
         <action
             android:id="@+id/action_projectsFragment_to_tasksFragment"
-            app:destination="@id/tasksFragment" />
+            app:destination="@id/tasksFragment"
+            app:enterAnim="@anim/to_right_in"
+            app:exitAnim="@anim/to_right_out"
+            app:popEnterAnim="@anim/to_left_in"
+            app:popExitAnim="@anim/to_left_out"/>
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"

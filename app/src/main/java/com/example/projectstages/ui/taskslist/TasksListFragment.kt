@@ -55,11 +55,11 @@ class TasksListFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        binding.toolbar.addQuestionMenuButton.setOnClickListener {
-            viewModel.processViewEvent(
-                TasksListViewModel.ViewEvent.OnAddTaskClicked
-            )
-        }
+//        binding.toolbar.addQuestionMenuButton.setOnClickListener {
+//            viewModel.processViewEvent(
+//                TasksListViewModel.ViewEvent.OnAddTaskClicked
+//            )
+//        }
     }
 
     override fun updateViewState(viewState: TasksListViewModel.ViewState) {

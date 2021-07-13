@@ -1,0 +1,50 @@
+<androidx.appcompat.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/purple_700"
+    android:elevation="4dp"
+    app:titleTextColor="@android:color/white"
+    app:subtitleTextColor="@android:color/white">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/project_name_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Проекты"
+                    android:textColor="@color/white"
+                    android:textStyle="italic"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/arrow_image_view"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_arrow_right"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/project_name_text_view"
+                    app:layout_constraintTop_toTopOf="@id/project_name_text_view"
+                    app:layout_constraintBottom_toBottomOf="@id/project_name_text_view"/>
+
+                <TextView
+                    android:id="@+id/tasks_name_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Задачи"
+                    android:textColor="@color/white"
+                    android:textStyle="italic"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/arrow_image_view"
+                    app:layout_constraintTop_toTopOf="@id/project_name_text_view"
+                    app:layout_constraintBottom_toBottomOf="@id/project_name_text_view"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.appcompat.widget.Toolbar>

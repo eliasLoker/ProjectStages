@@ -49,11 +49,18 @@ class ProjectsAdapter(
     override fun onBindViewHolder(holder: ProjectsHolders.BaseHolder, position: Int) {
         //TODO("Вероятно, в будущем нужно убрать эту расширяемость, тк излишняя и захардкодить три цвета внутри ColorsProgressBar")
         val colorsProgressBar = holder.colorsProgressBar
-        colorsProgressBar.isVisible = projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2] != 0
+
         val progressItemList = ArrayList<ProgressItem>().apply {
-            add(ProgressItem(R.color.bright_green, projects[position].countTasksByState[0].toFloat()))
-            add(ProgressItem(R.color.bright_red, projects[position].countTasksByState[1].toFloat()))
-            add(ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat()))
+            when(projects[position].countTasksByState[0] + projects[position].countTasksByState[1] + projects[position].countTasksByState[2] != 0) {
+                true -> {
+                    add(ProgressItem(R.color.bright_green, projects[position].countTasksByState[0].toFloat()))
+                    add(ProgressItem(R.color.bright_red, projects[position].countTasksByState[1].toFloat()))
+                    add(ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat()))
+                }
+                false -> {
+                    add(ProgressItem(R.color.bright_blue, 1.0f))
+                }
+            }
         }
         colorsProgressBar.initData(progressItemList)
 

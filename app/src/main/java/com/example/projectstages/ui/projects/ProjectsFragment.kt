@@ -64,11 +64,11 @@ class ProjectsFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        binding.toolbar.addQuestionMenuButton.setOnClickListener {
-            viewModel.processViewEvent(
-                ProjectsViewModel.ViewEvent.OnAddProjectClicked
-            )
-        }
+//        binding.toolbar.addQuestionMenuButton.setOnClickListener {
+//            viewModel.processViewEvent(
+//                ProjectsViewModel.ViewEvent.OnAddProjectClicked
+//            )
+//        }
     }
 
     override fun updateViewState(viewState: ProjectsViewModel.ViewState) {
@@ -77,8 +77,8 @@ class ProjectsFragment(
             recyclerView.isVisible = viewState.projectsAdapterVisibility
             projectsAdapter.setList(viewState.projects)
             toolbar.toolbar.apply {
-                title = viewState.title
-                subtitle = viewState.subtitle
+//                title = viewState.title
+//                subtitle = viewState.subtitle
             }
             allTasksTextView.text = String.format(getStringExt(R.string.all_tasks), viewState.allTasks)
             completedTasksTextView.text = String.format(getStringExt(R.string.completed_tasks), viewState.completedTasks)

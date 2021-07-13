@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:text="10 \nCompleted tasks"
         android:layout_marginStart="16dp"
-        android:textColor="@android:color/white"
+        android:textColor="@color/pale_less_green"
         app:layout_constraintStart_toEndOf="@id/vertical_separator_view"
         app:layout_constraintTop_toTopOf="@id/vertical_separator_view"
         app:layout_constraintBottom_toBottomOf="@id/vertical_separator_view"/>

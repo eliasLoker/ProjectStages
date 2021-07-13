@@ -30,5 +30,8 @@
     <color name="bright_red">#D80808</color>
     <color name="bright_green">#149518</color>
     <color name="bright_yellow">#ECD609</color>
+    <color name="bright_blue">#000CFF</color>
     <color name="pail_blue">#F9FBFF</color>
+
+    <color name="pale_less_green">#30FF30</color>
 </resources>
