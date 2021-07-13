@@ -13,12 +13,14 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
-import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.BaseFragment2
 import com.example.projectstages.base.getStringExt
+import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
@@ -30,31 +32,31 @@ import com.example.projectstages.utils.AdapterItemDecorator
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
-) : BaseFragment<
+) : BaseFragment2<
         FragmentProjectsBinding,
         ProjectsViewModel.ViewState,
-        ProjectsViewModel.ViewEffect
+        ProjectsViewModel.Action,
+        ProjectsViewModel.ViewEffect,
+        ProjectsViewModel.ViewEvent
         >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
-    private lateinit var projectsViewModel: ProjectsViewModel
+    override lateinit var viewModelFactory: ViewModelProvider.Factory
+    override val viewModelClass = ProjectsViewModel::class
+
     private lateinit var projectsAdapter: ProjectsAdapter
     private lateinit var navigation: ProjectsNavigationListener
 
     override fun onAttach(context: Context) {
-        super.onAttach(context)
+        val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
+        val title = requireContext().resources.getString(R.string.app_name)
+        val subtitle = requireContext().getString(R.string.project_subtitle)
+        viewModelFactory = ProjectsFactory(title, subtitle, projectsInteractor)
         navigation = (activity) as ProjectsNavigationListener
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
-        val title = requireContext().resources.getString(R.string.app_name)
-        val subtitle = requireContext().getString(R.string.project_subtitle)
-        val projectsFactory = ProjectsFactory(title, subtitle, projectsInteractor)
-        projectsViewModel = ViewModelProviders
-            .of(this, projectsFactory)
-            .get(ProjectsViewModel::class.java)
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -64,11 +66,8 @@ class ProjectsFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        onEachViewState(projectsViewModel.stateFlow)
-        onEachViewEffect(projectsViewModel.viewEffect)
-
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
-            projectsViewModel.processViewEvent(
+            viewModel.processViewEvent(
                 ProjectsViewModel.ViewEvent.OnAddProjectClicked
             )
         }
@@ -111,7 +110,7 @@ class ProjectsFragment(
     }
 
     override fun onItemClicked(id: Long) {
-        projectsViewModel.processViewEvent(
+        viewModel.processViewEvent(
             ProjectsViewModel.ViewEvent.OnItemClicked(id)
         )
     }
@@ -254,12 +253,12 @@ class ProjectsFragment(
             .setView(mainVerticalLayout)
             .create()
         addButton.setOnClickListener {
-            projectsViewModel.processViewEvent(
-                ProjectsViewModel.ViewEvent.OnAcceptAddProjectClicked(
-                    projectNameEditText.text.toString(),
-                    spinner.selectedItemPosition
-                )
-            )
+//            projectsViewModel.processViewEvent(
+//                ProjectsViewModel.ViewEvent.OnAcceptAddProjectClicked(
+//                    projectNameEditText.text.toString(),
+//                    spinner.selectedItemPosition
+//                )
+//            )
             dialog.dismiss()
         }
         cancelButton.setOnClickListener {
