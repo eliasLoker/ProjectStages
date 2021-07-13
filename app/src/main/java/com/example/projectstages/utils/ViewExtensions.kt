@@ -1,6 +1,5 @@
 package com.example.projectstages.utils
 
-import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -8,9 +7,8 @@ import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-
-fun Context.showToast(message: String, length: Int = Toast.LENGTH_SHORT) =
-    Toast.makeText(this, message, length).show()
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 
 fun EditText.onTextChanged(callback: (String) -> Unit) {
     this.addTextChangedListener(object : TextWatcher{
@@ -33,3 +31,18 @@ fun Spinner.onItemSelected(callback: (Int) -> Unit) {
         override fun onNothingSelected(parent: AdapterView<*>?) { }
     }
 }
+
+fun Fragment.getStringExt(@StringRes resId: Int) : String
+= resources.getString(resId)
+
+fun Fragment.getStringArrayExt(resId: Int) : Array<String>
+= resources.getStringArray(resId)
+
+fun Fragment.getLongFromBundleExt(key: String) : Long
+= arguments?.getLong(key) ?: 0L
+
+fun Fragment.getBooleanFromBundleExt(key: String) : Boolean
+= arguments?.getBoolean(key) ?: false
+
+fun Fragment.showToast(message: String, length: Int = Toast.LENGTH_SHORT) =
+    Toast.makeText(requireContext(), message, length).show()

@@ -4,14 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.databinding.FragmentTasksListBinding
-import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapter
 import com.example.projectstages.ui.taskslist.adapter.TasksListAdapterListener
 import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
@@ -27,28 +25,27 @@ class TasksListFragment(
 ) : BaseFragment<
         FragmentTasksListBinding,
         TasksListViewModel.ViewState,
-        TasksListViewModel.ViewEffect
+        TasksListViewModel.Action,
+        TasksListViewModel.ViewEffect,
+        TasksListViewModel.ViewEvent
         >(layoutID, FragmentTasksListBinding::inflate), TasksListAdapterListener {
 
-    private lateinit var tasksListViewModel: TasksListViewModel
+    override lateinit var viewModelFactory: ViewModelProvider.Factory
+    override val viewModelClass = TasksListViewModel::class
+
     private lateinit var tasksListAdapter: TasksListAdapter
     private lateinit var navigation: TasksNavigationListener
 
     override fun onAttach(context: Context) {
-        super.onAttach(context)
+        val id = arguments?.getLong(TAG_FOR_PROJECT_ID, 0L) ?: 0L
+        val interactor = TasksListInteractor(requireContext().appComponent.projectDao)
+        viewModelFactory = TasksListFactory(id, interactor)
         navigation = activity as TasksNavigationListener
+        super.onAttach(context)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val id = arguments?.getLong(TAG_FOR_PROJECT_ID, 0L) ?: 0L
-
-        val interactor = TasksListInteractor(requireContext().appComponent.projectDao)
-        val factory = TasksListFactory(id, interactor)
-        tasksListViewModel = ViewModelProviders
-            .of(this, factory)
-            .get(TasksListViewModel::class.java)
 
         binding.recyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -58,11 +55,8 @@ class TasksListFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-        onEachViewState(tasksListViewModel.stateFlow)
-        onEachViewEffect(tasksListViewModel.viewEffect)
-
         binding.toolbar.addQuestionMenuButton.setOnClickListener {
-            tasksListViewModel.processViewEvent(
+            viewModel.processViewEvent(
                 TasksListViewModel.ViewEvent.OnAddTaskClicked
             )
         }
@@ -95,7 +89,7 @@ class TasksListFragment(
     }
 
     override fun onTaskClicked(id: Long) {
-        tasksListViewModel.processViewEvent(
+        viewModel.processViewEvent(
             TasksListViewModel.ViewEvent.OnTaskClicked(id)
         )
     }

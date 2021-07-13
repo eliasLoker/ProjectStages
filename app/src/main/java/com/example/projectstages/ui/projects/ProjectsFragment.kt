@@ -14,13 +14,10 @@ import androidx.core.text.italic
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
-import com.example.projectstages.base.BaseFragment2
-import com.example.projectstages.base.getStringExt
-import com.example.projectstages.base.viewmodel.BaseViewModel
+import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
@@ -29,10 +26,11 @@ import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.AdapterItemDecorator
+import com.example.projectstages.utils.getStringExt
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
-) : BaseFragment2<
+) : BaseFragment<
         FragmentProjectsBinding,
         ProjectsViewModel.ViewState,
         ProjectsViewModel.Action,

@@ -5,15 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.base.viewmodel.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlin.reflect.KClass
 
 private typealias FragmentViewBindingInflater<VB> = (
     inflater: LayoutInflater,
@@ -23,8 +24,10 @@ private typealias FragmentViewBindingInflater<VB> = (
 
 abstract class BaseFragment<
         VB : ViewBinding,
-        ViewState : BaseViewState?,
-        ViewEffect: BaseViewEffect?
+        ViewState : BaseViewState,
+        Action : BaseAction,
+        ViewEffect: BaseViewEffect,
+        ViewEvent : BaseViewEvent
         >(
     @LayoutRes
     private val layoutID: Int,
@@ -35,6 +38,12 @@ abstract class BaseFragment<
 
     protected val binding get() = _binding!!
 
+    abstract var viewModelFactory: ViewModelProvider.Factory
+    abstract val viewModelClass: KClass<out BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>>
+    internal lateinit var viewModel: BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
+
+    private fun getViewModel() = ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
+
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,6 +51,13 @@ abstract class BaseFragment<
     ): View {
         _binding = bindingInflater.invoke(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = getViewModel()
+        subscribeToViewState(viewModel.stateFlow)
+        subscribeToViewEffect(viewModel.viewEffect)
     }
 
     override fun onDestroyView() {
@@ -53,15 +69,14 @@ abstract class BaseFragment<
 
     abstract fun showSingleEvent(viewEffect: ViewEffect)
 
-    //TODO("Подумать над вызовом этих методов автоматически")
-    fun onEachViewState(viewStateFlow: Flow<ViewState?>) {
+    private fun subscribeToViewState(viewStateFlow: Flow<ViewState?>) {
         viewStateFlow.onEach {
             val viewStateNotNull = it ?: return@onEach
             updateViewState(viewStateNotNull)
         }.launchWhenStartedWithCollect(this.lifecycleScope)
     }
 
-    fun onEachViewEffect(viewEffectFlow: Flow<ViewEffect?>) {
+    private fun subscribeToViewEffect(viewEffectFlow: Flow<ViewEffect?>) {
         viewEffectFlow.onEach {
             val viewEffectNotNull = it ?: return@onEach
             showSingleEvent(viewEffectNotNull)
@@ -77,13 +92,3 @@ abstract class BaseFragment<
         }
     }
 }
-
-fun Fragment.getStringExt(@StringRes resId: Int) : String {
-    return this.requireContext().resources.getString(resId)
-}
-
-fun Fragment.getStringArrayExt(resId: Int) : Array<String> = this.requireContext().resources.getStringArray(resId)
-
-fun Fragment.getLongFromBundleExt(key: String) : Long = arguments?.getLong(key) ?: 0L
-
-fun Fragment.getBooleanFromBundleExt(key: String) : Boolean = arguments?.getBoolean(key) ?: false

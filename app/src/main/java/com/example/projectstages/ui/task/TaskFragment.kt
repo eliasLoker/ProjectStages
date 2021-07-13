@@ -1,45 +1,47 @@
 package com.example.projectstages.ui.task
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
-import com.example.projectstages.base.*
+import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
-import com.example.projectstages.utils.Constants
-import com.example.projectstages.utils.onItemSelected
-import com.example.projectstages.utils.onTextChanged
+import com.example.projectstages.utils.*
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
 ) : BaseFragment<
         FragmentTaskBinding,
         TaskViewModel.ViewState,
-        TaskViewModel.ViewEffect
+        TaskViewModel.Action,
+        TaskViewModel.ViewEffect,
+        TaskViewModel.ViewEvent
         >(layoutID, FragmentTaskBinding::inflate) {
 
-    private lateinit var taskViewModel: TaskViewModel
+    override lateinit var viewModelFactory: ViewModelProvider.Factory
+    override val viewModelClass = TaskViewModel::class
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onAttach(context: Context) {
         val projectID = getLongFromBundleExt(PROJECT_ID)
         val taskID = getLongFromBundleExt(TASK_ID)
         val isEdit = getBooleanFromBundleExt(IS_EDIT)
         val interactor = TaskInteractor(requireContext().appComponent.projectDao)
-        val factory = TaskFactory(isEdit, projectID, taskID, interactor)
-        taskViewModel = ViewModelProviders
-            .of(this, factory)
-            .get(TaskViewModel::class.java)
+        viewModelFactory = TaskFactory(isEdit, projectID, taskID, interactor)
+        super.onAttach(context)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
 
         val states = getStringArrayExt(R.array.task_types)
         val spinnerItems = ArrayList<SpinnerItem>().apply {
@@ -53,29 +55,26 @@ class TaskFragment(
             adapter = spinnerAdapter
         }
 
-        onEachViewState(taskViewModel.stateFlow)
-        onEachViewEffect(taskViewModel.viewEffect)
-
         binding.saveButton.setOnClickListener {
-            taskViewModel.processViewEvent(
+            viewModel.processViewEvent(
                 TaskViewModel.ViewEvent.OnSaveButtonClicked
             )
         }
 
         binding.descriptionTextInputEditText.onTextChanged {
-            taskViewModel.processViewEvent(
+            viewModel.processViewEvent(
                 TaskViewModel.ViewEvent.OnTextChangedDescription(it)
             )
         }
 
         binding.stateSpinner.onItemSelected {
-            taskViewModel.processViewEvent(
+            viewModel.processViewEvent(
                 TaskViewModel.ViewEvent.OnItemSelectedStateSpinner(it)
             )
         }
 
         binding.toolbar.deleteQuestionMenuButton.setOnClickListener {
-            taskViewModel.processViewEvent(
+            viewModel.processViewEvent(
                 TaskViewModel.ViewEvent.OnDeleteButtonClicked
             )
         }
@@ -111,7 +110,7 @@ class TaskFragment(
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Вы действительно хотите удалить задачу?")
             .setPositiveButton("Да") { dialog, _ ->
-                taskViewModel.processViewEvent(
+                viewModel.processViewEvent(
                     TaskViewModel.ViewEvent.OnAcceptDeleteClicked
                 )
                 dialog.dismiss()
