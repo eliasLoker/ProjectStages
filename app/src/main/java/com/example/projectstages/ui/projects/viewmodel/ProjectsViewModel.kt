@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.projects.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.ProjectEntity
@@ -15,8 +14,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ProjectsViewModel(
-    title: String,
-    subtitle: String,
     private val interactor: ProjectsInteractor
 ) :
     BaseViewModel<
@@ -28,7 +25,6 @@ class ProjectsViewModel(
         (ViewState()) {
 
     init {
-//        sendAction(Action.SetToolbar(title, subtitle))
         fetchProjects()
     }
 
@@ -40,14 +36,11 @@ class ProjectsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             when(val projects = interactor.getProjects2()) {
                 is ResultWrapper.Success -> {
-                    Log.d("ProjectsViewModel", "SUCCESS ResultWrapper")
                     projects.data.collectLatest { it ->
-                        Log.d("ProjectsViewModel", "SUCCESS collectLatest $it")
                         when(it.isNotEmpty()) {
                             true -> {
                                 _projects.clear()
                                 it.forEach { projectsWithTasks ->
-                                    val projectId = projectsWithTasks.id
                                     val count = projectsWithTasks.tasks.size
                                     val timestamp = when(count > 0) {
                                         true -> {
@@ -61,11 +54,19 @@ class ProjectsViewModel(
                                     val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
 
                                     val completedTasks
-                                            = projectsWithTasks.tasks.filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }.count()
+                                            = projectsWithTasks.tasks
+                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }
+                                        .count()
+
                                     val progressTasks
-                                            = projectsWithTasks.tasks.filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_PROGRESS.stateID }.count()
+                                            = projectsWithTasks.tasks
+                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_PROGRESS.stateID }
+                                        .count()
+
                                     val thoughtTasks
-                                            = projectsWithTasks.tasks.filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_THOUGHT.stateID }.count()
+                                            = projectsWithTasks.tasks
+                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_THOUGHT.stateID }
+                                        .count()
 
                                     val countTasksByState = arrayOf(
                                         completedTasks,
@@ -90,8 +91,6 @@ class ProjectsViewModel(
                                     .flatten()
                                     .filter { taskEntity -> taskEntity.state == 0 }
                                     .count()
-
-                                Log.d("ProjectsViewModel", "PRE ACTION")
                                 sendAction(Action.NotEmptyList(_projects, allTasks, completedTasks))
                             }
                             false -> sendAction(Action.EmptyList)
@@ -100,45 +99,38 @@ class ProjectsViewModel(
                 }
 
                 is ResultWrapper.Error -> {
-                    Log.d("ProjectsViewModel", "ERROR")
+                    //TODO("Write")
                 }
             }
         }
     }
 
     override fun onReduceState(viewAction: Action): ViewState {
-        Log.d("ProjectsViewModel", "onReduceState")
         return when(viewAction) {
             is Action.Loading
             -> state.copy()
 
-            is Action.NotEmptyList -> {
-                Log.d("ProjectsViewModel", "onReduceState NotEmptyList")
-                state.copy(
+            is Action.NotEmptyList -> state.copy(
                     progressBarVisibility = false,
                     projectsAdapterVisibility = true,
+                    taskStatisticViewsVisibility = true,
                     projects = viewAction.projects,
                     allTasks = viewAction.allTasks,
                     completedTasks = viewAction.completedTasks
                 )
-            }
-
-            is Action.SetToolbar
-            -> state.copy(
-                title = viewAction.title,
-                subtitle = viewAction.subtitle
-            )
 
             is Action.EmptyList
             -> state.copy(
                 progressBarVisibility = false,
-                emptyListTextViewVisibility = true
+                emptyListTextViewVisibility = true,
+                taskStatisticViewsVisibility = false
             )
 
             is Action.Error
             -> state.copy(
                 progressBarVisibility = false,
-                errorTextViewVisibility = true
+                errorTextViewVisibility = true,
+                taskStatisticViewsVisibility = false
             )
         }
     }
@@ -223,8 +215,7 @@ class ProjectsViewModel(
 
     data class ViewState(
         val progressBarVisibility: Boolean = true,
-        val title: String = "",
-        val subtitle: String = "",
+        val taskStatisticViewsVisibility: Boolean = false,
         val emptyListTextViewVisibility: Boolean = false,
         val projectsAdapterVisibility: Boolean = false,
         val projects: List<Project> = emptyList(),
@@ -236,11 +227,6 @@ class ProjectsViewModel(
     sealed class Action : BaseAction {
 
         object Loading : Action()
-
-        class SetToolbar(
-            val title: String,
-            val subtitle: String
-        ) : Action()
 
         object EmptyList : Action()
 

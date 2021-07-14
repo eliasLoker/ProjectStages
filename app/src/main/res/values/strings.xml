@@ -36,6 +36,11 @@
 
     <string name="delete_title">Удаление</string>
     <string name="delete_message">Вы действительно хотите удалить проект "%1$s"?</string>
+    <string name="delete_success">Проект успешно удален</string>
+    <string name="delete_error">Ошибка удаления проекта</string>
+
+    <string name="update_success">Проект успешно изменен</string>
+    <string name="update_error">Ошибка изменения проекта</string>
 
     <string name="project_edit_category_title">Изменение категории\n\n</string>
     <string name="edit">Изменить</string>

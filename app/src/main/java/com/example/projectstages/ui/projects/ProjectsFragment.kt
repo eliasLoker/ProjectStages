@@ -48,9 +48,7 @@ class ProjectsFragment(
 
     override fun onAttach(context: Context) {
         val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
-        val title = requireContext().resources.getString(R.string.app_name)
-        val subtitle = requireContext().resources.getString(R.string.project_subtitle)
-        viewModelFactory = ProjectsFactory(title, subtitle, projectsInteractor)
+        viewModelFactory = ProjectsFactory(projectsInteractor)
         navigation = (activity) as ProjectsNavigationListener
         super.onAttach(context)
     }
@@ -108,19 +106,19 @@ class ProjectsFragment(
             -> showDeleteProjectDialog(viewEffect.name)
 
             is ProjectsViewModel.ViewEffect.SuccessDelete
-            -> showToast("Проект успешно удален")
+            -> showToast(getStringExt(R.string.delete_success))
 
             is ProjectsViewModel.ViewEffect.FailureDelete
-            -> showToast("Ошибка удаления проекта")
+            -> showToast(getStringExt(R.string.delete_error))
 
             is ProjectsViewModel.ViewEffect.ShowEditProjectDialog
             -> showEditProjectDialog(viewEffect.name, viewEffect.type)
 
             is ProjectsViewModel.ViewEffect.SuccessEdit
-            -> showToast("Проект успешно изменен")
+            -> showToast(getStringExt(R.string.update_success))
 
             is ProjectsViewModel.ViewEffect.FailureEdit
-            -> showToast("Ошибка изменения проекта")
+            -> showToast(getStringExt(R.string.update_error))
         }
     }
 
@@ -145,7 +143,7 @@ class ProjectsFragment(
     private fun showEditProjectDialog(name: String, type: Int) {
         val messageWithTitle = buildSpannedString {
             bold {
-                append(requireContext().getString(R.string.project_edit_category_title))
+                append(getStringExt(R.string.project_edit_category_title))
             }
         }
 
@@ -157,7 +155,6 @@ class ProjectsFragment(
 
         val horizontalLayout = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
-            setPadding(35)
             background = ContextCompat.getDrawable(requireContext(), R.color.blue_white)
             gravity = Gravity.CENTER_VERTICAL
         }
@@ -188,7 +185,7 @@ class ProjectsFragment(
         }
 
         val cancelButton = Button(requireContext()).apply {
-            text = requireContext().getString(R.string.cancel)
+            text = getStringExt(R.string.cancel)
         }
 
         val spinner = Spinner(requireContext())
@@ -406,6 +403,7 @@ class ProjectsFragment(
         dialog.show()
     }
 
+    /*
     private fun showGoToTasksDialog(id: Long) {
         //TODO("Maybe delete")
         val dialog = AlertDialog.Builder(requireContext())
@@ -420,4 +418,5 @@ class ProjectsFragment(
             .create()
         dialog.show()
     }
+    */
 }
