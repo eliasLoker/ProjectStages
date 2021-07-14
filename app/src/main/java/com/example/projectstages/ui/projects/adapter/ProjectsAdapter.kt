@@ -1,7 +1,10 @@
 package com.example.projectstages.ui.projects.adapter
 
+import android.content.Context
 import android.util.Log
+import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.example.projectstages.customview.ProgressItem
@@ -18,12 +21,16 @@ class ProjectsAdapter(
 
     private var projects = listOf<Project>()
 
+    private lateinit var context: Context
+
     fun setList(newProjects: List<Project>) {
+        Log.d("ProjectsViewModel", "SUCCESS setList")
         projects = newProjects
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
+        context = parent.context
         val backgroundColor = when(viewType) {
             Constants.RED_TYPE -> R.color.pale_red
             Constants.GREEN_TYPE -> R.color.pale_green
@@ -70,6 +77,25 @@ class ProjectsAdapter(
         )
         holder.itemView.setOnClickListener {
             listener.onItemClicked(projects[position].id)
+        }
+        holder.menuImageView.setOnClickListener {
+            val popup = PopupMenu(context, holder.menuImageView).apply {
+                    inflate(R.menu.menu_projects_item)
+                    setOnMenuItemClickListener {
+                        when(it.itemId) {
+                            R.id.menu_delete -> {
+                                listener.onPopupDeleteClicked(position)
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.menu_edit -> {
+                                listener.onPopupEditClicked(position)
+                                return@setOnMenuItemClickListener true
+                            }
+                            else -> return@setOnMenuItemClickListener false
+                        }
+                    }
+                }
+            popup.show()
         }
     }
 

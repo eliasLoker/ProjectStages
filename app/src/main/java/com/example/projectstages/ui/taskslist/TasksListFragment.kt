@@ -78,7 +78,7 @@ class TasksListFragment(
         }
     }
 
-    override fun showSingleEvent(viewEffect: TasksListViewModel.ViewEffect) {
+    override fun showViewEffect(viewEffect: TasksListViewModel.ViewEffect) {
         when(viewEffect) {
             is TasksListViewModel.ViewEffect.GoToTask
             -> navigation.goToTask(viewEffect.taskID)

@@ -7,6 +7,7 @@ import androidx.room.Query
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.data.entity.ProjectsWithTasks
 import com.example.projectstages.data.entity.TaskEntity
+import com.example.projectstages.ui.projects.model.Project
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,21 +18,17 @@ abstract class ProjectDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertProject(project: ProjectEntity) : Long
 
-//    @Query("SELECT * FROM projects ORDER BY id ASC")
-//    abstract fun getProjects() : Flow<List<ProjectEntity>>
-
     @Query("SELECT * FROM projects ORDER BY id ASC")
     abstract fun getProjects2() : Flow<List<ProjectsWithTasks>>
 
-//    @Query("SELECT COUNT(*) from tasks WHERE projectId = :projectID")
-//    abstract suspend fun countTasksByProjectId(projectID: Long) : Int
+//    @Query("SELECT * FROM projects WHERE id =:projectId")
+//    abstract fun getProjectById(projectId: Long) : Project
 
-//    @Query("SELECT COUNT(*) from tasks WHERE projectId = :projectID AND state =:taskState")
-//    abstract suspend fun countStatesTasksByProjectId(projectID: Long, taskState: Int) : Int
-//    //TODO(Think about name)
+    @Query("DELETE FROM projects WHERE id =:projectID")
+    abstract fun deleteProjectById(projectID: Long) : Int
 
-//    @Query("SELECT createdTimestamp FROM tasks WHERE projectId = :projectID ORDER BY id DESC LIMIT 1")
-//    abstract suspend fun getLastTaskTimestampsByProjectId(projectID: Long) : Long
+    @Query("UPDATE projects SET name=:name, type=:type WHERE id=:projectID ")
+    abstract fun updateProjectById(projectID: Long, name: String, type: Int) : Int
 
     @Query("SELECT * FROM tasks WHERE projectId =:projectId ORDER BY id")
     abstract fun getTasksByProjectId(projectId: Long) : Flow<List<TaskEntity>>

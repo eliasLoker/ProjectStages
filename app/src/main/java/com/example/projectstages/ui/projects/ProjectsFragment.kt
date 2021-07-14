@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -27,6 +28,7 @@ import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.AdapterItemDecorator
 import com.example.projectstages.utils.getStringExt
+import com.example.projectstages.utils.showToast
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
@@ -47,7 +49,7 @@ class ProjectsFragment(
     override fun onAttach(context: Context) {
         val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
         val title = requireContext().resources.getString(R.string.app_name)
-        val subtitle = requireContext().getString(R.string.project_subtitle)
+        val subtitle = requireContext().resources.getString(R.string.project_subtitle)
         viewModelFactory = ProjectsFactory(title, subtitle, projectsInteractor)
         navigation = (activity) as ProjectsNavigationListener
         super.onAttach(context)
@@ -64,28 +66,25 @@ class ProjectsFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-//        binding.toolbar.addQuestionMenuButton.setOnClickListener {
-//            viewModel.processViewEvent(
-//                ProjectsViewModel.ViewEvent.OnAddProjectClicked
-//            )
-//        }
+        binding.addProjectButton.setOnClickListener {
+            viewModel.processViewEvent(
+                ProjectsViewModel.ViewEvent.OnAddProjectClicked
+            )
+        }
     }
 
     override fun updateViewState(viewState: ProjectsViewModel.ViewState) {
+        Log.d("ProjectsViewModel", "updateViewState: $viewState")
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.projectsAdapterVisibility
             projectsAdapter.setList(viewState.projects)
-//            toolbar.toolbar.apply {
-//                title = viewState.title
-//                subtitle = viewState.subtitle
-//            }
             allTasksTextView.text = String.format(getStringExt(R.string.all_tasks), viewState.allTasks)
             completedTasksTextView.text = String.format(getStringExt(R.string.completed_tasks), viewState.completedTasks)
         }
     }
 
-    override fun showSingleEvent(viewEffect: ProjectsViewModel.ViewEffect) {
+    override fun showViewEffect(viewEffect: ProjectsViewModel.ViewEffect) {
         when(viewEffect) {
             is ProjectsViewModel.ViewEffect.ShowAddProjectDialog
             -> showAddProjectDialog()
@@ -104,6 +103,24 @@ class ProjectsFragment(
 
             is ProjectsViewModel.ViewEffect.GoToTaskList
             -> navigation.goToTaskFromProjects(viewEffect.projectID)
+
+            is ProjectsViewModel.ViewEffect.ShowDeleteProjectDialog
+            -> showDeleteProjectDialog(viewEffect.name)
+
+            is ProjectsViewModel.ViewEffect.SuccessDelete
+            -> showToast("Проект успешно удален")
+
+            is ProjectsViewModel.ViewEffect.FailureDelete
+            -> showToast("Ошибка удаления проекта")
+
+            is ProjectsViewModel.ViewEffect.ShowEditProjectDialog
+            -> showEditProjectDialog(viewEffect.name, viewEffect.type)
+
+            is ProjectsViewModel.ViewEffect.SuccessEdit
+            -> showToast("Проект успешно изменен")
+
+            is ProjectsViewModel.ViewEffect.FailureEdit
+            -> showToast("Ошибка изменения проекта")
         }
     }
 
@@ -111,6 +128,130 @@ class ProjectsFragment(
         viewModel.processViewEvent(
             ProjectsViewModel.ViewEvent.OnItemClicked(id)
         )
+    }
+
+    override fun onPopupEditClicked(position: Int) {
+        viewModel.processViewEvent(
+            ProjectsViewModel.ViewEvent.OnPopupEditClicked(position)
+        )
+    }
+
+    override fun onPopupDeleteClicked(position: Int) {
+        viewModel.processViewEvent(
+            ProjectsViewModel.ViewEvent.OnPopupDeleteClicked(position)
+        )
+    }
+
+    private fun showEditProjectDialog(name: String, type: Int) {
+        val messageWithTitle = buildSpannedString {
+            bold {
+                append(requireContext().getString(R.string.project_edit_category_title))
+            }
+        }
+
+        val mainVerticalLayout = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(35)
+            background = ContextCompat.getDrawable(requireContext(), R.color.blue_white)
+        }
+
+        val horizontalLayout = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(35)
+            background = ContextCompat.getDrawable(requireContext(), R.color.blue_white)
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        val marginParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        val messageTextView = TextView(requireContext()).apply {
+            text = messageWithTitle
+            textSize = 18f
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        }
+
+        val projectNameEditText = EditText(requireContext()).apply {
+            hint = requireContext().getString(R.string.project_name)
+            layoutParams = marginParams
+            textAlignment = View.TEXT_ALIGNMENT_CENTER
+            inputType = (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+            setText(name)
+        }
+
+        val addButton = Button(requireContext()).apply {
+            text = requireContext().getString(R.string.edit)
+            layoutParams = marginParams
+        }
+
+        val cancelButton = Button(requireContext()).apply {
+            text = requireContext().getString(R.string.cancel)
+        }
+
+        val spinner = Spinner(requireContext())
+
+        val drawableIds = arrayOf(
+            R.drawable.ic_file_yellow_mini,
+            R.drawable.ic_file_red_mini,
+            R.drawable.ic_file_green_mini,
+            R.drawable.ic_file_blue_mini,
+            R.drawable.ic_file_pink_mini,
+            R.drawable.ic_file_black_mini
+        )
+        val adapter = SpinnerAdapterWithImage(requireContext(), drawableIds)
+        spinner.adapter = adapter
+        spinner.setSelection(type)
+
+        horizontalLayout.apply {
+            addView(spinner)
+            addView(projectNameEditText)
+        }
+
+        mainVerticalLayout.apply {
+            addView(messageTextView)
+            addView(horizontalLayout)
+            addView(addButton)
+            addView(cancelButton)
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setCancelable(false)
+            .setView(mainVerticalLayout)
+            .create()
+        addButton.setOnClickListener {
+            viewModel.processViewEvent(
+                ProjectsViewModel.ViewEvent.OnAcceptEditProject(
+                    projectNameEditText.text.toString(),
+                    spinner.selectedItemPosition
+                )
+            )
+            dialog.dismiss()
+        }
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun showDeleteProjectDialog(projectName: String) {
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(getStringExt(R.string.delete_title))
+            .setMessage(String.format(getStringExt(R.string.delete_message), projectName))
+            .setCancelable(false)
+            .setPositiveButton(requireContext().getString(R.string.ok)) { dialog, _ ->
+                viewModel.processViewEvent(
+                    ProjectsViewModel.ViewEvent.OnAcceptDeleteProject
+                )
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        dialog.show()
     }
 
     private fun showSimpleDialog(title: String, message: String) {
@@ -251,12 +392,12 @@ class ProjectsFragment(
             .setView(mainVerticalLayout)
             .create()
         addButton.setOnClickListener {
-//            projectsViewModel.processViewEvent(
-//                ProjectsViewModel.ViewEvent.OnAcceptAddProjectClicked(
-//                    projectNameEditText.text.toString(),
-//                    spinner.selectedItemPosition
-//                )
-//            )
+            viewModel.processViewEvent(
+                ProjectsViewModel.ViewEvent.OnAcceptAddProjectClicked(
+                    projectNameEditText.text.toString(),
+                    spinner.selectedItemPosition
+                )
+            )
             dialog.dismiss()
         }
         cancelButton.setOnClickListener {

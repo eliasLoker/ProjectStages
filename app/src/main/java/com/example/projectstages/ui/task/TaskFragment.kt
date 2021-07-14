@@ -102,7 +102,7 @@ class TaskFragment(
         }
     }
 
-    override fun showSingleEvent(viewEffect: TaskViewModel.ViewEffect) {
+    override fun showViewEffect(viewEffect: TaskViewModel.ViewEffect) {
         TODO("Not yet implemented")
     }
 

@@ -33,4 +33,10 @@
 
     <string name="all_tasks">%1$s \nAll tasks</string>
     <string name="completed_tasks">%1$s\nCompleted tasks</string>
+
+    <string name="delete_title">Удаление</string>
+    <string name="delete_message">Вы действительно хотите удалить проект "%1$s"?</string>
+
+    <string name="project_edit_category_title">Изменение категории\n\n</string>
+    <string name="edit">Изменить</string>
 </resources>

@@ -19,6 +19,8 @@ class ProjectsHolders {
 
         abstract val colorsProgressBar: ColorsProgressBar
 
+        abstract val menuImageView: ImageView
+
         fun bind(
             projectName: String,
             update: String
@@ -38,6 +40,8 @@ class ProjectsHolders {
         override val updateTextView: TextView = binding.updateTextView
 
         override val colorsProgressBar: ColorsProgressBar = binding.customProgressBar
+
+        override val menuImageView: ImageView = binding.menuImageView
     }
 
 }

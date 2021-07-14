@@ -95,9 +95,11 @@ class TasksListViewModel(
 
     override fun processViewEvent(viewEvent: ViewEvent) {
         when(viewEvent) {
-            is ViewEvent.OnTaskClicked-> viewEffectChannel.sendViewEffect(ViewEffect.GoToTask(viewEvent.taskId))
+            is ViewEvent.OnTaskClicked
+            -> sendViewEffect(ViewEffect.GoToTask(viewEvent.taskId))
 
-            is ViewEvent.OnAddTaskClicked -> viewEffectChannel.sendViewEffect(ViewEffect.GoToAddTask(projectId))
+            is ViewEvent.OnAddTaskClicked
+            -> sendViewEffect(ViewEffect.GoToAddTask(projectId))
         }
     }
 

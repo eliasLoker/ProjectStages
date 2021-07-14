@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
@@ -40,9 +42,9 @@ abstract class BaseFragment<
 
     abstract var viewModelFactory: ViewModelProvider.Factory
     abstract val viewModelClass: KClass<out BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>>
-    internal lateinit var viewModel: BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
+    protected lateinit var viewModel: BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
 
-    private fun getViewModel() = ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
+    private fun getViewModels() = ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,8 +57,9 @@ abstract class BaseFragment<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = getViewModel()
-        subscribeToViewState(viewModel.stateFlow)
+        viewModel = getViewModels()
+//        subscribeToViewState(viewModel.stateFlow)
+        subscribeToViewState2(viewModel.stateLiveData)
         subscribeToViewEffect(viewModel.viewEffect)
     }
 
@@ -67,7 +70,13 @@ abstract class BaseFragment<
 
     abstract fun updateViewState(viewState: ViewState)
 
-    abstract fun showSingleEvent(viewEffect: ViewEffect)
+    abstract fun showViewEffect(viewEffect: ViewEffect)
+
+    private fun subscribeToViewState2(viewStateFlow: LiveData<ViewState>) {
+        viewStateFlow.observe(viewLifecycleOwner, Observer {
+            updateViewState(it)
+        })
+    }
 
     private fun subscribeToViewState(viewStateFlow: Flow<ViewState?>) {
         viewStateFlow.onEach {
@@ -79,7 +88,7 @@ abstract class BaseFragment<
     private fun subscribeToViewEffect(viewEffectFlow: Flow<ViewEffect?>) {
         viewEffectFlow.onEach {
             val viewEffectNotNull = it ?: return@onEach
-            showSingleEvent(viewEffectNotNull)
+            showViewEffect(viewEffectNotNull)
         }.launchWhenStartedWithCollect(this.lifecycleScope)
     }
 

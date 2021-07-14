@@ -8,6 +8,7 @@ import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -27,14 +28,16 @@ class ProjectsViewModel(
         (ViewState()) {
 
     init {
-        sendAction(Action.SetToolbar(title, subtitle))
+//        sendAction(Action.SetToolbar(title, subtitle))
         fetchProjects()
     }
 
     private val _projects = ArrayList<Project>()
+    private var positionProjectForDeleteOrEdit = 0
 
     private fun fetchProjects() {
-        viewModelScope.launch {
+        //TODO("Заметил, что на старте приложение сильно фризит, задебажить после реализации основного функционала")
+        viewModelScope.launch(Dispatchers.IO) {
             when(val projects = interactor.getProjects2()) {
                 is ResultWrapper.Success -> {
                     Log.d("ProjectsViewModel", "SUCCESS ResultWrapper")
@@ -88,6 +91,7 @@ class ProjectsViewModel(
                                     .filter { taskEntity -> taskEntity.state == 0 }
                                     .count()
 
+                                Log.d("ProjectsViewModel", "PRE ACTION")
                                 sendAction(Action.NotEmptyList(_projects, allTasks, completedTasks))
                             }
                             false -> sendAction(Action.EmptyList)
@@ -103,17 +107,21 @@ class ProjectsViewModel(
     }
 
     override fun onReduceState(viewAction: Action): ViewState {
+        Log.d("ProjectsViewModel", "onReduceState")
         return when(viewAction) {
             is Action.Loading
             -> state.copy()
 
-            is Action.NotEmptyList -> state.copy(
-                progressBarVisibility = false,
-                projectsAdapterVisibility = true,
-                projects = viewAction.projects,
-                allTasks = viewAction.allTasks,
-                completedTasks = viewAction.completedTasks
-            )
+            is Action.NotEmptyList -> {
+                Log.d("ProjectsViewModel", "onReduceState NotEmptyList")
+                state.copy(
+                    progressBarVisibility = false,
+                    projectsAdapterVisibility = true,
+                    projects = viewAction.projects,
+                    allTasks = viewAction.allTasks,
+                    completedTasks = viewAction.completedTasks
+                )
+            }
 
             is Action.SetToolbar
             -> state.copy(
@@ -137,25 +145,80 @@ class ProjectsViewModel(
 
     override fun processViewEvent(viewEvent: ViewEvent) {
         when(viewEvent) {
-            is ViewEvent.OnAddProjectClicked ->
-                viewEffectChannel.sendViewEffect(ViewEffect.ShowAddProjectDialog)
+            is ViewEvent.OnAddProjectClicked
+            -> sendViewEffect(ViewEffect.ShowAddProjectDialog)
 
-
-            is ViewEvent.OnAcceptAddProjectClicked -> {
-                viewModelScope.launch {
-                    val project = ProjectEntity(viewEvent.name, viewEvent.type, System.currentTimeMillis())
-                    val insertResult = interactor.insertProject(project)
-                    val event = when(insertResult > 0) {
-                        true -> ViewEffect.SuccessAddDialog
-                        false -> ViewEffect.FailureAddDialog
-                    }
-                    viewEffectChannel.sendViewEffect(event)
-                }
-            }
+            is ViewEvent.OnAcceptAddProjectClicked
+            -> addProject(viewEvent.name, viewEvent.type)
 
             is ViewEvent.OnItemClicked
-            -> viewEffectChannel.sendViewEffect(ViewEffect.GoToTaskList(viewEvent.id))
+            -> sendViewEffect(ViewEffect.GoToTaskList(viewEvent.id))
+
+            is ViewEvent.OnPopupDeleteClicked
+            -> onPopupDeleteClicked(viewEvent.position)
+
+            is ViewEvent.OnPopupEditClicked
+            -> onPopupEditClicked(viewEvent.position)
+
+            is ViewEvent.OnAcceptDeleteProject
+            -> deleteProject()
+
+            is ViewEvent.OnAcceptEditProject
+            -> updateProject(viewEvent.name, viewEvent.type)
         }
+    }
+
+    private fun updateProject(name: String, type: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val updateResult = interactor.updateProjectById(
+                _projects[positionProjectForDeleteOrEdit].id,
+                name,
+                type
+            )
+            val effect = when(updateResult > 0) {
+                true -> ViewEffect.SuccessEdit
+                false -> ViewEffect.FailureEdit
+            }
+            sendViewEffect(effect)
+        }
+    }
+
+    private fun deleteProject() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
+            val effect = when(deleteResult > 0) {
+                true -> ViewEffect.SuccessDelete
+                false -> ViewEffect.FailureDelete
+            }
+            sendViewEffect(effect)
+        }
+    }
+
+    private fun addProject(name: String, type: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val project = ProjectEntity(name, type, System.currentTimeMillis())
+            val insertResult = interactor.insertProject(project)
+            val effect = when(insertResult > 0) {
+                true -> ViewEffect.SuccessAddDialog
+                false -> ViewEffect.FailureAddDialog
+            }
+            sendViewEffect(effect)
+        }
+    }
+
+    private fun onPopupDeleteClicked(position: Int) {
+        positionProjectForDeleteOrEdit = position
+        sendViewEffect(ViewEffect.ShowDeleteProjectDialog(
+            _projects[position].name
+        ))
+    }
+
+    private fun onPopupEditClicked(position: Int) {
+        positionProjectForDeleteOrEdit = position
+        sendViewEffect(ViewEffect.ShowEditProjectDialog(
+            _projects[position].name,
+            _projects[position].type
+        ))
     }
 
     data class ViewState(
@@ -201,6 +264,23 @@ class ProjectsViewModel(
         ) : ViewEffect()
 
         object ShowAddProjectDialog : ViewEffect()
+
+        class ShowDeleteProjectDialog(
+            val name: String
+        ) : ViewEffect()
+
+        object SuccessDelete : ViewEffect()
+
+        object FailureDelete : ViewEffect()
+
+        class ShowEditProjectDialog(
+            val name: String,
+            var type: Int
+        ) : ViewEffect()
+
+        object SuccessEdit : ViewEffect()
+
+        object FailureEdit : ViewEffect()
     }
 
     sealed class ViewEvent : BaseViewEvent {
@@ -214,6 +294,21 @@ class ProjectsViewModel(
 
         class OnItemClicked(
             val id: Long
+        ) : ViewEvent()
+
+        class OnPopupDeleteClicked(
+            val position: Int
+        ) : ViewEvent()
+
+        class OnPopupEditClicked(
+            val position: Int
+        ) : ViewEvent()
+
+        object OnAcceptDeleteProject : ViewEvent()
+
+        class OnAcceptEditProject(
+            val name: String,
+            val type: Int
         ) : ViewEvent()
     }
 }
