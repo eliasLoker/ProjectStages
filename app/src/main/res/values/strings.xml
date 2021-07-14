@@ -11,6 +11,8 @@
     <string name="ok">OK</string>
     <string name="add">Добавить</string>
     <string name="cancel">Отмена</string>
+    <string name="completed">Завершено</string>
+    <string name="error">Ошибка</string>
 
     <string name="project_subtitle">Список проектов</string>
     <string name="project_success_add_title">Проект добавлен</string>
@@ -18,7 +20,7 @@
     <string name="project_error_add_title">Ошибка добавления проекта</string>
     <string name="project_error_add_message">"Возможно было указано неуникальное название"</string>
     <string name="project_add_category_title">Добавление категории\n\n</string>
-    <string name="project_add_category_message">Введите новое уникальное название проекта</string>
+    <string name="project_add_category_message">Введите новое уникальное название проекта не длиннее 20 символов</string>
     <string name="project_name">Название проекта</string>
 
     <string name="tasks_list_empty">Список задач пуст</string>

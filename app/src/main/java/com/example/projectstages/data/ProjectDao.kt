@@ -19,10 +19,7 @@ abstract class ProjectDao {
     abstract suspend fun insertProject(project: ProjectEntity) : Long
 
     @Query("SELECT * FROM projects ORDER BY id ASC")
-    abstract fun getProjects2() : Flow<List<ProjectsWithTasks>>
-
-//    @Query("SELECT * FROM projects WHERE id =:projectId")
-//    abstract fun getProjectById(projectId: Long) : Project
+    abstract fun getProjects() : Flow<List<ProjectsWithTasks>>
 
     @Query("DELETE FROM projects WHERE id =:projectID")
     abstract fun deleteProjectById(projectID: Long) : Int

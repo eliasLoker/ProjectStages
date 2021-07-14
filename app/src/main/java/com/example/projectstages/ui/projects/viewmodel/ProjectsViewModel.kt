@@ -34,7 +34,7 @@ class ProjectsViewModel(
     private fun fetchProjects() {
         //TODO("Заметил, что на старте приложение сильно фризит, задебажить после реализации основного функционала")
         viewModelScope.launch(Dispatchers.IO) {
-            when(val projects = interactor.getProjects2()) {
+            when(val projects = interactor.getProjects()) {
                 is ResultWrapper.Success -> {
                     projects.data.collectLatest { it ->
                         when(it.isNotEmpty()) {
@@ -99,7 +99,7 @@ class ProjectsViewModel(
                 }
 
                 is ResultWrapper.Error -> {
-                    //TODO("Write")
+                    sendAction(Action.Error)
                 }
             }
         }

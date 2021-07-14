@@ -3,8 +3,8 @@ package com.example.projectstages.ui.projects
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.text.InputFilter
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -26,9 +26,7 @@ import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
-import com.example.projectstages.utils.AdapterItemDecorator
-import com.example.projectstages.utils.getStringExt
-import com.example.projectstages.utils.showToast
+import com.example.projectstages.utils.*
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
@@ -72,13 +70,19 @@ class ProjectsFragment(
     }
 
     override fun updateViewState(viewState: ProjectsViewModel.ViewState) {
-        Log.d("ProjectsViewModel", "updateViewState: $viewState")
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.projectsAdapterVisibility
             projectsAdapter.setList(viewState.projects)
             allTasksTextView.text = String.format(getStringExt(R.string.all_tasks), viewState.allTasks)
             completedTasksTextView.text = String.format(getStringExt(R.string.completed_tasks), viewState.completedTasks)
+
+            placeholderView.isVisible = viewState.taskStatisticViewsVisibility
+            verticalSeparatorView.isVisible = viewState.taskStatisticViewsVisibility
+            allTasksTextView.isVisible = viewState.taskStatisticViewsVisibility
+            completedTasksTextView.isVisible = viewState.taskStatisticViewsVisibility
+
+            errorTextView.isVisible = viewState.errorTextViewVisibility
         }
     }
 
@@ -88,7 +92,7 @@ class ProjectsFragment(
             -> showAddProjectDialog()
 
             is ProjectsViewModel.ViewEffect.SuccessAddDialog
-            -> showSimpleDialog(
+            -> showSuccessDialog(
                 getStringExt(R.string.project_success_add_title),
                 getStringExt(R.string.project_success_add_message)
             )
@@ -106,19 +110,19 @@ class ProjectsFragment(
             -> showDeleteProjectDialog(viewEffect.name)
 
             is ProjectsViewModel.ViewEffect.SuccessDelete
-            -> showToast(getStringExt(R.string.delete_success))
+            -> showSuccessDialog(getStringExt(R.string.completed),getStringExt(R.string.delete_success))
 
             is ProjectsViewModel.ViewEffect.FailureDelete
-            -> showToast(getStringExt(R.string.delete_error))
+            -> showErrorDialog(getString(R.string.error),getStringExt(R.string.delete_error))
 
             is ProjectsViewModel.ViewEffect.ShowEditProjectDialog
             -> showEditProjectDialog(viewEffect.name, viewEffect.type)
 
             is ProjectsViewModel.ViewEffect.SuccessEdit
-            -> showToast(getStringExt(R.string.update_success))
+            -> showSuccessDialog(getStringExt(R.string.completed),getStringExt(R.string.update_success))
 
             is ProjectsViewModel.ViewEffect.FailureEdit
-            -> showToast(getStringExt(R.string.update_error))
+            -> showErrorDialog(getStringExt(R.string.error), getStringExt(R.string.update_error))
         }
     }
 
@@ -176,8 +180,10 @@ class ProjectsFragment(
             layoutParams = marginParams
             textAlignment = View.TEXT_ALIGNMENT_CENTER
             inputType = (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+            filters = arrayOf(InputFilter.LengthFilter(20))
             setText(name)
         }
+        //TODO("Add textInputLayout with symbol counter in future")
 
         val addButton = Button(requireContext()).apply {
             text = requireContext().getString(R.string.edit)
@@ -251,70 +257,14 @@ class ProjectsFragment(
         dialog.show()
     }
 
-    private fun showSimpleDialog(title: String, message: String) {
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setMessage(message)
-            .setCancelable(false)
-            .setPositiveButton(requireContext().getString(R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-        dialog.show()
-    }
-
-    private fun showErrorDialog(title: String, message: String) {
-        val titleAndMessage = buildSpannedString {
-            bold {
-                append("$title\n\n")
-            }
-            italic {
-                append(message)
-            }
-        }
-
-        val marginParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ).apply {
-            setMargins(16, 16, 16, 16)
-        }
-
-        val mainVerticalLayout = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-        }
-        val errorImageView = ImageView(requireContext()).apply {
-            setBackgroundResource(R.drawable.ic_decline)
-            layoutParams = marginParams
-        }
-        val messageTextView = TextView(requireContext()).apply {
-            text = titleAndMessage
-            textSize = 18f
-            textAlignment = View.TEXT_ALIGNMENT_CENTER
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            layoutParams = marginParams
-        }
-        mainVerticalLayout.addView(errorImageView)
-        mainVerticalLayout.addView(messageTextView)
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(mainVerticalLayout)
-            .setCancelable(false)
-            .setPositiveButton(requireContext().getString(R.string.ok)) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-        dialog.show()
-    }
 
     private fun showAddProjectDialog() {
         val messageWithTitle = buildSpannedString {
             bold {
-                append(requireContext().getString(R.string.project_add_category_title))
+                append(getStringExt(R.string.project_add_category_title))
             }
             italic {
-                append(requireContext().getString(R.string.project_add_category_message))
+                append(getStringExt(R.string.project_add_category_message))
             }
         }
 
@@ -348,7 +298,9 @@ class ProjectsFragment(
             layoutParams = marginParams
             textAlignment = View.TEXT_ALIGNMENT_CENTER
             inputType = (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
+            filters = arrayOf(InputFilter.LengthFilter(20))
         }
+        //TODO("Add textInputLayout with symbol counter in future")
 
         val addButton = Button(requireContext()).apply {
             text = requireContext().getString(R.string.add)
@@ -402,21 +354,4 @@ class ProjectsFragment(
         }
         dialog.show()
     }
-
-    /*
-    private fun showGoToTasksDialog(id: Long) {
-        //TODO("Maybe delete")
-        val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Какой экран открыть?")
-            .setPositiveButton("TasksList") { dialog, _ ->
-//                goToTasks(id)
-                dialog.dismiss()
-            }
-            .setNegativeButton("Отмена") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-        dialog.show()
-    }
-    */
 }

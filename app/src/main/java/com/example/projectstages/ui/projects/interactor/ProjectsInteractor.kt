@@ -3,7 +3,6 @@ package com.example.projectstages.ui.projects.interactor
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.data.entity.ProjectsWithTasks
-import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.flow.Flow
 
@@ -11,9 +10,9 @@ class ProjectsInteractor(
     private val projectDao: ProjectDao
 ) {
 
-    fun getProjects2() : ResultWrapper<Flow<List<ProjectsWithTasks>>> {
+    fun getProjects() : ResultWrapper<Flow<List<ProjectsWithTasks>>> {
         return try {
-            ResultWrapper.Success(projectDao.getProjects2())
+            ResultWrapper.Success(projectDao.getProjects())
         } catch (e: Exception) {
             ResultWrapper.Error(e)
         }
