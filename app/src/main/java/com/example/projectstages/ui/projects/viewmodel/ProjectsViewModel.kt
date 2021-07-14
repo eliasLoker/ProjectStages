@@ -10,6 +10,7 @@ import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -32,74 +33,74 @@ class ProjectsViewModel(
     private var positionProjectForDeleteOrEdit = 0
 
     private fun fetchProjects() {
-        //TODO("Заметил, что на старте приложение сильно фризит, задебажить после реализации основного функционала")
-        viewModelScope.launch(Dispatchers.IO) {
-            when(val projects = interactor.getProjects()) {
-                is ResultWrapper.Success -> {
-                    projects.data.collectLatest { it ->
-                        when(it.isNotEmpty()) {
-                            true -> {
-                                _projects.clear()
-                                it.forEach { projectsWithTasks ->
-                                    val count = projectsWithTasks.tasks.size
-                                    val timestamp = when(count > 0) {
-                                        true -> {
-//                                            it.map { it.tasks }.maxOf { it1 -> it1.createdTimestamp }
-                                            projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.createdTimestamp
-                                            //TODO(Противно использовать !!, подумать еще на досуге )
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                when(val projects = interactor.getProjects()) {
+                    is ResultWrapper.Success -> {
+                        projects.data.collectLatest { it ->
+                            when(it.isNotEmpty()) {
+                                true -> {
+                                    _projects.clear()
+                                    it.forEach { projectsWithTasks ->
+                                        val count = projectsWithTasks.tasks.size
+                                        val timestamp = when(count > 0) {
+                                            true -> {
+                                                projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.createdTimestamp
+                                                //TODO(Противно использовать !!, подумать еще на досуге )
+                                            }
+                                            false -> projectsWithTasks.createdTimestamp
                                         }
-                                        false -> projectsWithTasks.createdTimestamp
+
+                                        val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
+
+                                        val completedTasks
+                                                = projectsWithTasks.tasks
+                                            .filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }
+                                            .count()
+
+                                        val progressTasks
+                                                = projectsWithTasks.tasks
+                                            .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_PROGRESS.stateID }
+                                            .count()
+
+                                        val thoughtTasks
+                                                = projectsWithTasks.tasks
+                                            .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_THOUGHT.stateID }
+                                            .count()
+
+                                        val countTasksByState = arrayOf(
+                                            completedTasks,
+                                            progressTasks,
+                                            thoughtTasks
+                                        )
+
+                                        val project = Project(
+                                            projectsWithTasks.id,
+                                            projectsWithTasks.name,
+                                            projectsWithTasks.type,
+                                            formattedDate,
+                                            countTasksByState
+                                        )
+                                        _projects.add(project)
                                     }
-
-                                    val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
-
-                                    val completedTasks
-                                            = projectsWithTasks.tasks
-                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }
+                                    val allTasks  = it.map { list -> list.tasks }
+                                        .flatten()
                                         .count()
 
-                                    val progressTasks
-                                            = projectsWithTasks.tasks
-                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_PROGRESS.stateID }
+                                    val completedTasks  = it.map { list -> list.tasks }
+                                        .flatten()
+                                        .filter { taskEntity -> taskEntity.state == 0 }
                                         .count()
-
-                                    val thoughtTasks
-                                            = projectsWithTasks.tasks
-                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_THOUGHT.stateID }
-                                        .count()
-
-                                    val countTasksByState = arrayOf(
-                                        completedTasks,
-                                        progressTasks,
-                                        thoughtTasks
-                                    )
-
-                                    val project = Project(
-                                        projectsWithTasks.id,
-                                        projectsWithTasks.name,
-                                        projectsWithTasks.type,
-                                        formattedDate,
-                                        countTasksByState
-                                    )
-                                    _projects.add(project)
+                                    sendAction(Action.NotEmptyList(_projects, allTasks, completedTasks))
                                 }
-                                val allTasks  = it.map { list -> list.tasks }
-                                    .flatten()
-                                    .count()
-
-                                val completedTasks  = it.map { list -> list.tasks }
-                                    .flatten()
-                                    .filter { taskEntity -> taskEntity.state == 0 }
-                                    .count()
-                                sendAction(Action.NotEmptyList(_projects, allTasks, completedTasks))
+                                false -> sendAction(Action.EmptyList)
                             }
-                            false -> sendAction(Action.EmptyList)
                         }
                     }
-                }
 
-                is ResultWrapper.Error -> {
-                    sendAction(Action.Error)
+                    is ResultWrapper.Error -> {
+                        sendAction(Action.Error)
+                    }
                 }
             }
         }
