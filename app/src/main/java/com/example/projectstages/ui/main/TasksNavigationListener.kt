@@ -1,4 +1,4 @@
-package com.example.projectstages.ui.taskslist
+package com.example.projectstages.ui.main
 
 interface TasksNavigationListener {
 

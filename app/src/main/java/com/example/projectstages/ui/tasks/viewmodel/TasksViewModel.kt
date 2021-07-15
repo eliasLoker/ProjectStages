@@ -1,11 +1,11 @@
-package com.example.projectstages.ui.taskslist.viewmodel
+package com.example.projectstages.ui.tasks.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
-import com.example.projectstages.ui.taskslist.interactor.TasksListInteractor
-import com.example.projectstages.ui.taskslist.model.Task
+import com.example.projectstages.ui.tasks.interactor.TasksInteractor
+import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.flow.collectLatest
@@ -13,14 +13,14 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
-class TasksListViewModel(
+class TasksViewModel(
     private val projectId: Long,
-    private val tasksListInteractor: TasksListInteractor
+    private val tasksInteractor: TasksInteractor
 ) : BaseViewModel<
-        TasksListViewModel.ViewState,
-        TasksListViewModel.Action,
-        TasksListViewModel.ViewEffect,
-        TasksListViewModel.ViewEvent
+        TasksViewModel.ViewState,
+        TasksViewModel.Action,
+        TasksViewModel.ViewEffect,
+        TasksViewModel.ViewEvent
         >(ViewState()) {
 
     private val tasks = ArrayList<Task>()
@@ -28,24 +28,24 @@ class TasksListViewModel(
     init {
         Log.d("TasksListVM", "prid $projectId")
         viewModelScope.launch {
-            when(val tasks = tasksListInteractor.getTasks(projectId)) {
+            when(val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success -> {
                     tasks.data.collectLatest {
                         when(it.isNotEmpty()) {
                             true -> {
-                                this@TasksListViewModel.tasks.clear()
+                                this@TasksViewModel.tasks.clear()
                                 it.forEachIndexed { index, taskEntity ->
                                     val task = Task(
                                         taskEntity.id,
                                         taskEntity.description,
                                         Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
-                                        tasksListInteractor.getItemType(index),
+                                        tasksInteractor.getItemType(index),
                                         taskEntity.state
                                     )
-                                    this@TasksListViewModel.tasks.add(task)
+                                    this@TasksViewModel.tasks.add(task)
                                 }
-                                this@TasksListViewModel.tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(this@TasksListViewModel.tasks))
+                                this@TasksViewModel.tasks.sortBy { i -> i.state }
+                                sendAction(Action.NotEmptyList(this@TasksViewModel.tasks))
                             }
                             false -> sendAction(Action.EmptyList)
                         }
@@ -60,25 +60,25 @@ class TasksListViewModel(
     private fun fetchTasks() {
         viewModelScope.launch {
             //TODO("Flow не вываливается в Error, если указать несуществующий ProjectID")
-            when (val tasks = tasksListInteractor.getTasks(projectId)) {
+            when (val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success
                 -> {
                     tasks.data.collectLatest {
                         when (it.isNotEmpty()) {
                             true -> {
-                                this@TasksListViewModel.tasks.clear()
+                                this@TasksViewModel.tasks.clear()
                                 it.forEachIndexed { index, taskEntity ->
                                     val task = Task(
                                         taskEntity.id,
                                         taskEntity.description,
                                         Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
-                                        tasksListInteractor.getItemType(index),
+                                        tasksInteractor.getItemType(index),
                                         taskEntity.state
                                     )
-                                    this@TasksListViewModel.tasks.add(task)
+                                    this@TasksViewModel.tasks.add(task)
                                 }
-                                this@TasksListViewModel.tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(this@TasksListViewModel.tasks))
+                                this@TasksViewModel.tasks.sortBy { i -> i.state }
+                                sendAction(Action.NotEmptyList(this@TasksViewModel.tasks))
                             }
                             false -> {
                                 sendAction(Action.EmptyList)

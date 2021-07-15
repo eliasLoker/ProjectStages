@@ -1,15 +1,15 @@
-package com.example.projectstages.ui.taskslist.adapter
+package com.example.projectstages.ui.tasks.adapter
 
 import android.view.ViewGroup
 import com.example.projectstages.base.BaseAdapter
 import com.example.projectstages.databinding.ItemTasksCompletedBinding
 import com.example.projectstages.databinding.ItemTasksProgressBinding
 import com.example.projectstages.databinding.ItemTasksThoughtBinding
-import com.example.projectstages.ui.taskslist.model.Task
+import com.example.projectstages.ui.tasks.model.Task
 
-class TasksListAdapter(
-    private val listenerList: TasksListAdapterListener
-) : BaseAdapter<TasksListHolders.BaseHolder>() {
+class TasksAdapter(
+    private val listener: TasksAdapterListener
+) : BaseAdapter<TasksHolders.BaseHolder>() {
 
     private var tasks = listOf<Task>()
 
@@ -19,13 +19,13 @@ class TasksListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (viewType) {
-        0 -> TasksListHolders.CompletedType(parent.inflateBinding(ItemTasksCompletedBinding::inflate))
-        1 -> TasksListHolders.ProgressType(parent.inflateBinding(ItemTasksProgressBinding::inflate))
-        2 -> TasksListHolders.ThoughtType(parent.inflateBinding(ItemTasksThoughtBinding::inflate))
-        else -> TasksListHolders.CompletedType(parent.inflateBinding(ItemTasksCompletedBinding::inflate))
+        0 -> TasksHolders.CompletedType(parent.inflateBinding(ItemTasksCompletedBinding::inflate))
+        1 -> TasksHolders.ProgressType(parent.inflateBinding(ItemTasksProgressBinding::inflate))
+        2 -> TasksHolders.ThoughtType(parent.inflateBinding(ItemTasksThoughtBinding::inflate))
+        else -> TasksHolders.CompletedType(parent.inflateBinding(ItemTasksCompletedBinding::inflate))
     }
 
-    override fun onBindViewHolder(holder: TasksListHolders.BaseHolder, position: Int) {
+    override fun onBindViewHolder(holder: TasksHolders.BaseHolder, position: Int) {
         holder.bind(tasks[position].description, tasks[position].date)
 //        holder.deleteButton.setOnClickListener {
 //            listenerList.onDeleteButtonClicked(tasks[position].id)
@@ -34,7 +34,7 @@ class TasksListAdapter(
 //            listenerList.onEditButtonClicked(tasks[position].id)
 //        }
         holder.itemView.setOnClickListener {
-            listenerList.onTaskClicked(tasks[position].id)
+            listener.onTaskClicked(tasks[position].id)
         }
     }
 

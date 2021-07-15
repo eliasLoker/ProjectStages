@@ -20,9 +20,9 @@
     </fragment>
     <fragment
         android:id="@+id/tasksFragment"
-        android:name="com.example.projectstages.ui.taskslist.TasksListFragment"
+        android:name="com.example.projectstages.ui.tasks.TasksFragment"
         android:label="fragment_tasks"
-        tools:layout="@layout/fragment_tasks_list" >
+        tools:layout="@layout/fragment_tasks" >
         <action
             android:id="@+id/action_tasksFragment_to_taskFragment"
             app:destination="@id/taskFragment"

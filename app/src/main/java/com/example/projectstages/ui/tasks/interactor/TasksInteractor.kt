@@ -1,4 +1,4 @@
-package com.example.projectstages.ui.taskslist.interactor
+package com.example.projectstages.ui.tasks.interactor
 
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.entity.TaskEntity
@@ -6,7 +6,7 @@ import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.flow.Flow
 import java.lang.Exception
 
-class TasksListInteractor(
+class TasksInteractor(
     private val projectDao: ProjectDao
 ) {
 

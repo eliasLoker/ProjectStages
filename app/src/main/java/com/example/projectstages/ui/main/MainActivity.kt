@@ -7,10 +7,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.example.projectstages.R
 import com.example.projectstages.databinding.ActivityMainBinding
-import com.example.projectstages.ui.projects.ProjectsNavigationListener
 import com.example.projectstages.ui.task.TaskFragment
-import com.example.projectstages.ui.taskslist.TasksListFragment
-import com.example.projectstages.ui.taskslist.TasksNavigationListener
+import com.example.projectstages.ui.tasks.TasksFragment
 
 class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavigationListener {
 
@@ -52,7 +50,7 @@ class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavig
     }
 
     override fun goToTaskFromProjects(projectID: Long) {
-        val bundle = TasksListFragment.getBundle(projectID)
+        val bundle = TasksFragment.getBundle(projectID)
         navController.navigate(R.id.action_projectsFragment_to_tasksFragment, bundle)
     }
 

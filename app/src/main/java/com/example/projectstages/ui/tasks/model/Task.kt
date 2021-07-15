@@ -1,4 +1,4 @@
-package com.example.projectstages.ui.taskslist.model
+package com.example.projectstages.ui.tasks.model
 
 data class Task(
     val id: Long,

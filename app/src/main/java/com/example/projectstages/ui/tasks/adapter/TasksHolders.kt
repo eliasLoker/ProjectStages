@@ -1,6 +1,5 @@
-package com.example.projectstages.ui.taskslist.adapter
+package com.example.projectstages.ui.tasks.adapter
 
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -8,7 +7,7 @@ import com.example.projectstages.databinding.ItemTasksCompletedBinding
 import com.example.projectstages.databinding.ItemTasksProgressBinding
 import com.example.projectstages.databinding.ItemTasksThoughtBinding
 
-class TasksListHolders {
+class TasksHolders {
 
     abstract class BaseHolder(
         private val binding: ViewBinding

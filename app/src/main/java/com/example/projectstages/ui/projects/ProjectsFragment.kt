@@ -21,6 +21,7 @@ import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
+import com.example.projectstages.ui.main.ProjectsNavigationListener
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor

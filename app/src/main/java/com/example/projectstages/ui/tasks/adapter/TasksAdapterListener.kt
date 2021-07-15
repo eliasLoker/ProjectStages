@@ -1,6 +1,6 @@
-package com.example.projectstages.ui.taskslist.adapter
+package com.example.projectstages.ui.tasks.adapter
 
-interface TasksListAdapterListener {
+interface TasksAdapterListener {
 
 //    fun onDeleteButtonClicked(id: Long)
 

@@ -1,4 +1,4 @@
-package com.example.projectstages.ui.projects
+package com.example.projectstages.ui.main
 
 interface ProjectsNavigationListener {
 
