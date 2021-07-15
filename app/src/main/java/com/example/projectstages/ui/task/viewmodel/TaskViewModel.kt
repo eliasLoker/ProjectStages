@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.task.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.TaskEntity
@@ -88,10 +87,10 @@ class TaskViewModel(
             -> { taskType = viewEvent.position }
 
             is ViewEvent.OnDeleteButtonClicked
-            -> { }
+            -> sendViewEffect(ViewEffect.ShowDeleteDialog)
 
             is ViewEvent.OnAcceptDeleteClicked
-            -> { }
+            -> deleteTask()
         }
     }
 
@@ -111,6 +110,16 @@ class TaskViewModel(
             val effect = when(taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis()) > 0) {
                 true -> ViewEffect.GoToTaskList
                 false -> ViewEffect.FailureUpdate
+            }
+            sendViewEffect(effect)
+        }
+    }
+
+    private fun deleteTask() {
+        viewModelScope.launch {
+            val effect = when(taskInteractor.deleteTask(taskID) > 0) {
+                true -> ViewEffect.GoToTaskList
+                false -> ViewEffect.FailureDelete
             }
             sendViewEffect(effect)
         }

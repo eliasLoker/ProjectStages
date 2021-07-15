@@ -47,7 +47,6 @@ class TaskFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         val states = getStringArrayExt(R.array.task_types)
         val spinnerItems = ArrayList<SpinnerItem>().apply {
             add(SpinnerItem(states[0], R.drawable.ic_completed))
@@ -78,11 +77,9 @@ class TaskFragment(
             )
         }
 
-//        binding.toolbar.deleteQuestionMenuButton.setOnClickListener {
-//            viewModel.processViewEvent(
-//                TaskViewModel.ViewEvent.OnDeleteButtonClicked
-//            )
-//        }
+        binding.deleteButton.setOnClickListener {
+            viewModel.processViewEvent(TaskViewModel.ViewEvent.OnDeleteButtonClicked)
+        }
     }
 
     override fun updateViewState(viewState: TaskViewModel.ViewState) {
@@ -107,6 +104,9 @@ class TaskFragment(
         when(viewEffect) {
             is TaskViewModel.ViewEffect.GoToTaskList
             -> navigation.goToBack()
+
+            is TaskViewModel.ViewEffect.ShowDeleteDialog
+            -> showDeleteDialog()
         }
     }
 

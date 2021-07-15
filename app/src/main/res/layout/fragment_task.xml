@@ -24,16 +24,28 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="20dp"
         android:spinnerMode="dropdown"
         tools:listitem="@layout/item_spinner_with_text"
         android:background="@drawable/shape_outline"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/delete_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/description_text_input_layout"
         tools:visibility="visible"/>
 
+    <ImageView
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintTop_toTopOf="@id/state_spinner"
+        app:layout_constraintBottom_toBottomOf="@id/state_spinner"
+        app:layout_constraintEnd_toEndOf="@id/description_text_input_layout"/>
+
+    <!--
+    //TODO("Задать нормальный стиль EditText")
+    -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/description_text_input_layout"
         android:layout_width="0dp"
@@ -41,8 +53,10 @@
         android:visibility="gone"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="90dp"
-        app:layout_constraintEnd_toEndOf="@id/state_spinner"
-        app:layout_constraintStart_toStartOf="@id/state_spinner"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/save_button"
         app:counterEnabled="true"
