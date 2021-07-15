@@ -2,11 +2,9 @@ package com.example.projectstages.ui.projects.adapter
 
 import android.content.Context
 import android.util.Log
-import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import com.example.projectstages.customview.ProgressItem
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
@@ -47,7 +45,7 @@ class ProjectsAdapter(
             Constants.BLACK_TYPE -> R.drawable.ic_file_black
             else -> R.drawable.ic_file_yellow
         }
-        val view = ProjectsHolders.YellowType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
+        val view = ProjectsHolders.DefaultType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
         view.folderImageView.setImageDrawable(ContextCompat.getDrawable(parent.context, folderView))
         view.itemView.rootView.setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
         return view
@@ -76,7 +74,7 @@ class ProjectsAdapter(
             update = projects[position].updateDate
         )
         holder.itemView.setOnClickListener {
-            listener.onItemClicked(projects[position].id)
+            listener.onItemClicked(position)
         }
         holder.menuImageView.setOnClickListener {
             val popup = PopupMenu(context, holder.menuImageView).apply {

@@ -1,8 +1,10 @@
 package com.example.projectstages.ui.tasks.adapter
 
+import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.example.projectstages.databinding.ItemTaskBinding
 import com.example.projectstages.databinding.ItemTasksCompletedBinding
 import com.example.projectstages.databinding.ItemTasksProgressBinding
 import com.example.projectstages.databinding.ItemTasksThoughtBinding
@@ -15,6 +17,8 @@ class TasksHolders {
 
         abstract val descriptionTextView: TextView
 
+        abstract val verticalView: View
+
         abstract val dateTextView: TextView
 //        abstract val deleteButton: ImageView
 
@@ -24,31 +28,12 @@ class TasksHolders {
         }
     }
 
-    class CompletedType(binding: ItemTasksCompletedBinding) : BaseHolder(binding) {
+    class DefaultType(binding: ItemTaskBinding) : BaseHolder(binding) {
 
-        override val descriptionTextView: TextView = binding.projectNameTextView
+        override val descriptionTextView: TextView = binding.taskTextView
 
-        override val dateTextView: TextView = binding.dateTextView
+        override val dateTextView: TextView = binding.updatedDateTextView
 
-        //        override val deleteButton: ImageView = binding.deleteImageView
-
-    }
-
-    class ProgressType(binding: ItemTasksProgressBinding) : BaseHolder(binding) {
-
-        override val descriptionTextView: TextView = binding.projectNameTextView
-
-        override val dateTextView: TextView = binding.dateTextView
-//        override val deleteButton: ImageView = binding.deleteImageView
-
-    }
-
-    class ThoughtType(binding: ItemTasksThoughtBinding) : BaseHolder(binding) {
-
-        override val descriptionTextView: TextView = binding.projectNameTextView
-
-        override val dateTextView: TextView = binding.dateTextView
-//        override val deleteButton: ImageView = binding.deleteImageView
-
+        override val verticalView: View = binding.verticalView
     }
 }

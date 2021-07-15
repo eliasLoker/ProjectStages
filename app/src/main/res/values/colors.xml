@@ -20,6 +20,7 @@
     <color name="pale_blue">#E6FBFB</color>
     <color name="pale_pink">#FDF0FD</color>
     <color name="pale_grey">#EFECEC</color>
+    <color name="green_completed">#009A2B</color>
 
     <!--
     <color name="bright_red">#ff0000</color>
@@ -34,4 +35,6 @@
     <color name="pail_blue">#F9FBFF</color>
 
     <color name="pale_less_green">#30FF30</color>
+
+    <color name="silver_color">#C0C0C0</color>
 </resources>

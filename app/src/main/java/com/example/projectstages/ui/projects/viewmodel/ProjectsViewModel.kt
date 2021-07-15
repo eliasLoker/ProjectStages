@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.ProjectEntity
@@ -142,7 +143,13 @@ class ProjectsViewModel(
             -> addProject(viewEvent.name, viewEvent.type)
 
             is ViewEvent.OnItemClicked
-            -> sendViewEffect(ViewEffect.GoToTaskList(viewEvent.id))
+            -> {
+//                Log.d("ProjectsViewModel", "VE: ${viewEvent.position}")
+//                return
+                sendViewEffect(ViewEffect.GoToTaskList(
+                    _projects[viewEvent.position].id,
+                    _projects[viewEvent.position].name))
+            }
 
             is ViewEvent.OnPopupDeleteClicked
             -> onPopupDeleteClicked(viewEvent.position)
@@ -244,7 +251,8 @@ class ProjectsViewModel(
         object FailureAddDialog : ViewEffect()
 
         class GoToTaskList(
-            val projectID: Long
+            val projectID: Long,
+            val projectName: String
         ) : ViewEffect()
 
         object ShowAddProjectDialog : ViewEffect()
@@ -277,7 +285,7 @@ class ProjectsViewModel(
         ) : ViewEvent()
 
         class OnItemClicked(
-            val id: Long
+            val position: Int
         ) : ViewEvent()
 
         class OnPopupDeleteClicked(

@@ -31,7 +31,7 @@ class ProjectsHolders {
     }
 
 
-    class YellowType(binding: ItemProjectsDefaultBinding) : BaseHolder(binding) {
+    class DefaultType(binding: ItemProjectsDefaultBinding) : BaseHolder(binding) {
 
         override val folderImageView: ImageView = binding.folderImageView
 

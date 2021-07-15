@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -105,7 +106,7 @@ class ProjectsFragment(
             )
 
             is ProjectsViewModel.ViewEffect.GoToTaskList
-            -> navigation.goToTaskFromProjects(viewEffect.projectID)
+            -> navigation.goToTaskFromProjects(viewEffect.projectID, viewEffect.projectName)
 
             is ProjectsViewModel.ViewEffect.ShowDeleteProjectDialog
             -> showDeleteProjectDialog(viewEffect.name)
@@ -127,9 +128,10 @@ class ProjectsFragment(
         }
     }
 
-    override fun onItemClicked(id: Long) {
+    override fun onItemClicked(position: Int) {
+//        Log.d("ProjectsViewModel", "VE: ${position}")
         viewModel.processViewEvent(
-            ProjectsViewModel.ViewEvent.OnItemClicked(id)
+            ProjectsViewModel.ViewEvent.OnItemClicked(position)
         )
     }
 

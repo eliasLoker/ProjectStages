@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavig
         }
     }
 
-    override fun goToTaskFromProjects(projectID: Long) {
-        val bundle = TasksFragment.getBundle(projectID)
+    override fun goToTaskFromProjects(projectID: Long, projectName: String) {
+        val bundle = TasksFragment.getBundle(projectID, projectName)
         navController.navigate(R.id.action_projectsFragment_to_tasksFragment, bundle)
     }
 

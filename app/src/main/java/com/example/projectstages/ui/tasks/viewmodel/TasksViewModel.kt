@@ -15,6 +15,7 @@ import kotlin.collections.ArrayList
 
 class TasksViewModel(
     private val projectId: Long,
+    private val projectName: String,
     private val tasksInteractor: TasksInteractor
 ) : BaseViewModel<
         TasksViewModel.ViewState,
@@ -45,48 +46,12 @@ class TasksViewModel(
                                     this@TasksViewModel.tasks.add(task)
                                 }
                                 this@TasksViewModel.tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(this@TasksViewModel.tasks))
+                                sendAction(Action.NotEmptyList(this@TasksViewModel.tasks, projectName))
                             }
                             false -> sendAction(Action.EmptyList)
                         }
                     }
                 }
-                is ResultWrapper.Error
-                -> sendAction(Action.Error)
-            }
-        }
-    }
-
-    private fun fetchTasks() {
-        viewModelScope.launch {
-            //TODO("Flow не вываливается в Error, если указать несуществующий ProjectID")
-            when (val tasks = tasksInteractor.getTasks(projectId)) {
-                is ResultWrapper.Success
-                -> {
-                    tasks.data.collectLatest {
-                        when (it.isNotEmpty()) {
-                            true -> {
-                                this@TasksViewModel.tasks.clear()
-                                it.forEachIndexed { index, taskEntity ->
-                                    val task = Task(
-                                        taskEntity.id,
-                                        taskEntity.description,
-                                        Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
-                                        tasksInteractor.getItemType(index),
-                                        taskEntity.state
-                                    )
-                                    this@TasksViewModel.tasks.add(task)
-                                }
-                                this@TasksViewModel.tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(this@TasksViewModel.tasks))
-                            }
-                            false -> {
-                                sendAction(Action.EmptyList)
-                            }
-                        }
-                    }
-                }
-
                 is ResultWrapper.Error
                 -> sendAction(Action.Error)
             }
@@ -124,7 +89,8 @@ class TasksViewModel(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = false,
                 taskRecyclerVisibility = true,
-                tasks = viewAction.tasks
+                tasks = viewAction.tasks,
+                projectName = projectName
             )
 
             is Action.Error
@@ -144,7 +110,8 @@ class TasksViewModel(
         val taskRecyclerVisibility: Boolean = false,
         val tasks: List<Task> = emptyList(),
         val errorMessageTextViewType: Constants.EmptyList = Constants.EmptyList.ERROR,
-        val errorMessageTextViewVisibility: Boolean = false
+        val errorMessageTextViewVisibility: Boolean = false,
+        val projectName: String = ""
     ) : BaseViewState
 
     sealed class Action : BaseAction {
@@ -154,7 +121,8 @@ class TasksViewModel(
         object EmptyList : Action()
 
         class NotEmptyList(
-            val tasks: List<Task>
+            val tasks: List<Task>,
+            val projectName: String
         ) : Action()
 
         object Error : Action()

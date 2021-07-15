@@ -6,10 +6,11 @@ import com.example.projectstages.ui.tasks.interactor.TasksInteractor
 
 class TasksFactory(
     private val projectId: Long,
+    private val projectName: String,
     private val interactor: TasksInteractor
 ) : BaseFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return TasksViewModel(projectId, interactor) as T
+        return TasksViewModel(projectId, projectName,  interactor) as T
     }
 }
