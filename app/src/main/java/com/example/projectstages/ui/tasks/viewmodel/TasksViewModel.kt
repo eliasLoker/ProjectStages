@@ -8,6 +8,7 @@ import com.example.projectstages.ui.tasks.interactor.TasksInteractor
 import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -29,6 +30,7 @@ class TasksViewModel(
     init {
         Log.d("TasksListVM", "prid $projectId")
         viewModelScope.launch {
+            delay(1000)
             when(val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success -> {
                     tasks.data.collectLatest {
@@ -81,7 +83,9 @@ class TasksViewModel(
                 emptyListTextViewVisibility = true,
                 taskRecyclerVisibility = false,
                 errorMessageTextViewType = Constants.EmptyList.EMPTY,
-                errorMessageTextViewVisibility = true
+                errorMessageTextViewVisibility = true,
+                headerViewsVisibility = true,
+                addTaskButtonVisibility = true
             )
 
             is Action.NotEmptyList
@@ -90,7 +94,9 @@ class TasksViewModel(
                 emptyListTextViewVisibility = false,
                 taskRecyclerVisibility = true,
                 tasks = viewAction.tasks,
-                projectName = projectName
+                projectName = projectName,
+                headerViewsVisibility = true,
+                addTaskButtonVisibility = true
             )
 
             is Action.Error
@@ -106,12 +112,14 @@ class TasksViewModel(
 
     data class ViewState(
         val progressBarVisibility: Boolean = true,
+        val headerViewsVisibility: Boolean = false,
         val emptyListTextViewVisibility: Boolean = false,
         val taskRecyclerVisibility: Boolean = false,
         val tasks: List<Task> = emptyList(),
         val errorMessageTextViewType: Constants.EmptyList = Constants.EmptyList.ERROR,
         val errorMessageTextViewVisibility: Boolean = false,
-        val projectName: String = ""
+        val projectName: String = "",
+        val addTaskButtonVisibility: Boolean = false,
     ) : BaseViewState
 
     sealed class Action : BaseAction {

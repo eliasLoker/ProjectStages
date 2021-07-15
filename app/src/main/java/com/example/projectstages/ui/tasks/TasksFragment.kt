@@ -62,6 +62,11 @@ class TasksFragment(
 //                TasksListViewModel.ViewEvent.OnAddTaskClicked
 //            )
 //        }
+        binding.addTaskButton.setOnClickListener {
+            viewModel.processViewEvent(
+                TasksViewModel.ViewEvent.OnAddTaskClicked
+            )
+        }
     }
 
     override fun updateViewState(viewState: TasksViewModel.ViewState) {
@@ -78,6 +83,11 @@ class TasksFragment(
                 isVisible = viewState.errorMessageTextViewVisibility
             }
             projectNameTextView.text = viewState.projectName
+
+            placeholderView.isVisible = viewState.headerViewsVisibility
+            projectNameTextView.isVisible = viewState.headerViewsVisibility
+
+            addTaskButton.isVisible = viewState.addTaskButtonVisibility
         }
     }
 

@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.projects.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.ProjectEntity
@@ -9,6 +8,7 @@ import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -34,6 +34,7 @@ class ProjectsViewModel(
 
     private fun fetchProjects() {
         viewModelScope.launch {
+            delay(1000)
                 when(val projects = interactor.getProjects()) {
                     is ResultWrapper.Success -> {
                         projects.data.collectLatest { it ->
@@ -112,24 +113,26 @@ class ProjectsViewModel(
             is Action.NotEmptyList -> state.copy(
                     progressBarVisibility = false,
                     projectsAdapterVisibility = true,
-                    taskStatisticViewsVisibility = true,
+                    headerViewsVisibility = true,
                     projects = viewAction.projects,
                     allTasks = viewAction.allTasks,
-                    completedTasks = viewAction.completedTasks
+                    completedTasks = viewAction.completedTasks,
+                    addProjectButtonVisibility = true
                 )
 
             is Action.EmptyList
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
-                taskStatisticViewsVisibility = false
+                headerViewsVisibility = true,
+                addProjectButtonVisibility = true
             )
 
             is Action.Error
             -> state.copy(
                 progressBarVisibility = false,
                 errorTextViewVisibility = true,
-                taskStatisticViewsVisibility = false
+                headerViewsVisibility = false
             )
         }
     }
@@ -220,7 +223,8 @@ class ProjectsViewModel(
 
     data class ViewState(
         val progressBarVisibility: Boolean = true,
-        val taskStatisticViewsVisibility: Boolean = false,
+        val headerViewsVisibility: Boolean = false,
+        val addProjectButtonVisibility: Boolean = false,
         val emptyListTextViewVisibility: Boolean = false,
         val projectsAdapterVisibility: Boolean = false,
         val projects: List<Project> = emptyList(),

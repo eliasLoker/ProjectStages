@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -79,12 +78,13 @@ class ProjectsFragment(
             allTasksTextView.text = String.format(getStringExt(R.string.all_tasks), viewState.allTasks)
             completedTasksTextView.text = String.format(getStringExt(R.string.completed_tasks), viewState.completedTasks)
 
-            placeholderView.isVisible = viewState.taskStatisticViewsVisibility
-            verticalSeparatorView.isVisible = viewState.taskStatisticViewsVisibility
-            allTasksTextView.isVisible = viewState.taskStatisticViewsVisibility
-            completedTasksTextView.isVisible = viewState.taskStatisticViewsVisibility
+            placeholderView.isVisible = viewState.headerViewsVisibility
+            verticalSeparatorView.isVisible = viewState.headerViewsVisibility
+            allTasksTextView.isVisible = viewState.headerViewsVisibility
+            completedTasksTextView.isVisible = viewState.headerViewsVisibility
 
             errorTextView.isVisible = viewState.errorTextViewVisibility
+            addProjectButton.isVisible = viewState.addProjectButtonVisibility
         }
     }
 
@@ -129,7 +129,6 @@ class ProjectsFragment(
     }
 
     override fun onItemClicked(position: Int) {
-//        Log.d("ProjectsViewModel", "VE: ${position}")
         viewModel.processViewEvent(
             ProjectsViewModel.ViewEvent.OnItemClicked(position)
         )
