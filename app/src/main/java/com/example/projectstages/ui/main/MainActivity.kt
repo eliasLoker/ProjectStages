@@ -10,7 +10,7 @@ import com.example.projectstages.databinding.ActivityMainBinding
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.tasks.TasksFragment
 
-class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavigationListener {
+class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavigationListener, TaskNavigationListener {
 
     private lateinit var navController: NavController
 
@@ -62,5 +62,9 @@ class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavig
     override fun goToAddTask(projectID: Long) {
         val bundle = TaskFragment.getBundleForCreateTask(projectID)
         navController.navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
+    }
+
+    override fun goToBack() {
+        navController.popBackStack()
     }
 }

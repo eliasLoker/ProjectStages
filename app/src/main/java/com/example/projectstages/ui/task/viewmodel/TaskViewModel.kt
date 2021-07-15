@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class TaskViewModel(
     private val isEdit: Boolean,
     private val projectID: Long,
-    private val taskID: Long?,
+    private val taskID: Long,
     private val taskInteractor: TaskInteractor
 ) : BaseViewModel<
         TaskViewModel.ViewState,
@@ -21,7 +21,8 @@ class TaskViewModel(
         TaskViewModel.ViewEvent
         >(ViewState()) {
 
-    private var taskStringBuilder = StringBuilder()
+
+    private val taskDescription = StringBuilder()
     private var taskType = 0
 
     init {
@@ -30,28 +31,21 @@ class TaskViewModel(
 
     private fun fetchTask() {
         if (isEdit) {
-            taskID ?: throw IllegalArgumentException("TaskID is null, but fragment in edit mode")
-            sendAction(Action.SetTitle(Constants.TaskTitleType.EDIT))
             viewModelScope.launch {
-                Log.d("TaskDebug", "Req tID: $taskID")
                 val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskID) }
                 val resultState = async { taskInteractor.getTaskStateByTaskId(taskID) }
                 taskType = resultState.await()
                 val resDescr = resultDescription.await()
-                sendAction(Action.SuccessEdit(resDescr, taskType))
-                Log.d("TaskDebug", "Descr: $resDescr, TT: $taskType")
+                sendAction(Action.EditMode(resDescr, taskType))
             }
         } else {
-            sendAction(Action.SetTitle(Constants.TaskTitleType.ADD))
-            sendAction(Action.SuccessAdd)
+            sendAction(Action.AddMode)
         }
     }
 
     override fun onReduceState(viewAction: Action): ViewState {
         return when(viewAction) {
-            is Action.SetTitle -> state.copy(
-                taskTitleType = viewAction.titleType
-            )
+
             is Action.Loading -> state.copy(
                 progressBarVisibility = true,
                 stateSpinnerVisibility = false,
@@ -59,20 +53,22 @@ class TaskViewModel(
                 saveButtonVisibility = false,
             )
 
-            is Action.SuccessEdit -> state.copy(
+            is Action.EditMode -> state.copy(
                 progressBarVisibility = false,
                 stateSpinnerVisibility = true,
                 descriptionEditTextVisibility = true,
                 saveButtonVisibility = true,
                 descriptionEditTextText = viewAction.descriptionText,
-                stateSpinnerPosition = viewAction.state
+                stateSpinnerPosition = viewAction.state,
+                taskType = Constants.TaskTitleType.EDIT
             )
 
-            is Action.SuccessAdd -> state.copy(
+            is Action.AddMode -> state.copy(
                 progressBarVisibility = false,
                 stateSpinnerVisibility = true,
                 descriptionEditTextVisibility = true,
                 saveButtonVisibility = true,
+                taskType = Constants.TaskTitleType.ADD
             )
         }
     }
@@ -80,13 +76,16 @@ class TaskViewModel(
     override fun processViewEvent(viewEvent: ViewEvent) {
         when(viewEvent) {
             is ViewEvent.OnSaveButtonClicked
-            -> { }
+            -> if (isEdit) updateTask() else createTask()
 
             is ViewEvent.OnTextChangedDescription
-            -> { }
+            -> {
+                taskDescription.clear()
+                taskDescription.append(viewEvent.text)
+            }
 
             is ViewEvent.OnItemSelectedStateSpinner
-            -> { }
+            -> { taskType = viewEvent.position }
 
             is ViewEvent.OnDeleteButtonClicked
             -> { }
@@ -96,8 +95,29 @@ class TaskViewModel(
         }
     }
 
+    private fun createTask() {
+        viewModelScope.launch {
+            val taskEntity = TaskEntity(projectID, taskDescription.toString(), taskType, System.currentTimeMillis())
+            val effect = when(taskInteractor.insertTask(taskEntity) > 0) {
+                true -> ViewEffect.GoToTaskList
+                false -> ViewEffect.FailureAdd
+            }
+            sendViewEffect(effect)
+        }
+    }
+
+    private fun updateTask() {
+        viewModelScope.launch {
+            val effect = when(taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis()) > 0) {
+                true -> ViewEffect.GoToTaskList
+                false -> ViewEffect.FailureUpdate
+            }
+            sendViewEffect(effect)
+        }
+    }
+
     data class ViewState(
-        val taskTitleType: Constants.TaskTitleType = Constants.TaskTitleType.ADD,
+        val taskType: Constants.TaskTitleType = Constants.TaskTitleType.ADD,
         val progressBarVisibility: Boolean = true,
         val stateSpinnerVisibility: Boolean = false,
         val descriptionEditTextVisibility: Boolean = false,
@@ -108,18 +128,14 @@ class TaskViewModel(
 
     sealed class Action : BaseAction {
 
-        class SetTitle(
-            val titleType: Constants.TaskTitleType
-        ) : Action()
-
         object Loading : Action()
 
-        class SuccessEdit(
+        class EditMode(
             val descriptionText: String,
             val state: Int
         ) : Action()
 
-        object SuccessAdd : Action()
+        object AddMode : Action()
     }
 
     sealed class ViewEffect : BaseViewEffect {

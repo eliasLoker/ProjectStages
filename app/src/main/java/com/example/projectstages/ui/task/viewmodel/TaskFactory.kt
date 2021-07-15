@@ -8,7 +8,7 @@ import com.example.projectstages.ui.task.interactor.TaskInteractor
 class TaskFactory(
     private val isEdit: Boolean,
     private val projectID: Long,
-    private val taskID: Long?,
+    private val taskID: Long,
     private val taskInteractor: TaskInteractor
 ) : BaseFactory() {
 

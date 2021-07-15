@@ -34,7 +34,7 @@ class ProjectsViewModel(
 
     private fun fetchProjects() {
         viewModelScope.launch {
-            delay(1000)
+//            delay(1000)
                 when(val projects = interactor.getProjects()) {
                     is ResultWrapper.Success -> {
                         projects.data.collectLatest { it ->

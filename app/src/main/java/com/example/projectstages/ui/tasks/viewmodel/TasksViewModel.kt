@@ -25,30 +25,28 @@ class TasksViewModel(
         TasksViewModel.ViewEvent
         >(ViewState()) {
 
-    private val tasks = ArrayList<Task>()
+    private val _tasks = ArrayList<Task>()
 
     init {
-        Log.d("TasksListVM", "prid $projectId")
         viewModelScope.launch {
-            delay(1000)
+//            delay(1000)
             when(val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success -> {
                     tasks.data.collectLatest {
                         when(it.isNotEmpty()) {
                             true -> {
-                                this@TasksViewModel.tasks.clear()
-                                it.forEachIndexed { index, taskEntity ->
+                                this@TasksViewModel._tasks.clear()
+                                it.forEach { taskEntity ->
                                     val task = Task(
                                         taskEntity.id,
                                         taskEntity.description,
                                         Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
-                                        tasksInteractor.getItemType(index),
                                         taskEntity.state
                                     )
-                                    this@TasksViewModel.tasks.add(task)
+                                    _tasks.add(task)
                                 }
-                                this@TasksViewModel.tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(this@TasksViewModel.tasks, projectName))
+                                _tasks.sortBy { i -> i.state }
+                                sendAction(Action.NotEmptyList(_tasks, projectName))
                             }
                             false -> sendAction(Action.EmptyList)
                         }

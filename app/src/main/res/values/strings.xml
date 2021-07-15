@@ -30,8 +30,8 @@
     <string name="task_add_error">Не удалось добавить задачу</string>
     <string name="task_update_error">Не удалось обновить задачу</string>
     <string name="task_edit">Редактировать задачу</string>
-    <string name="task_save_task">Сохранить задачу</string>
-    <string name="task_save_changes">Сохранить изменения</string>
+    <string name="task_save_task">Save task</string>
+    <string name="task_save_changes">Save changes</string>
 
     <string name="all_tasks">%1$s \nAll tasks</string>
     <string name="completed_tasks">%1$s\nCompleted tasks</string>

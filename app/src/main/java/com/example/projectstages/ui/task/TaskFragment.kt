@@ -3,6 +3,7 @@ package com.example.projectstages.ui.task
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +13,8 @@ import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
+import com.example.projectstages.ui.main.ProjectsNavigationListener
+import com.example.projectstages.ui.main.TaskNavigationListener
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
@@ -29,6 +32,7 @@ class TaskFragment(
 
     override lateinit var viewModelFactory: ViewModelProvider.Factory
     override val viewModelClass = TaskViewModel::class
+    private lateinit var navigation: TaskNavigationListener
 
     override fun onAttach(context: Context) {
         val projectID = getLongFromBundleExt(PROJECT_ID)
@@ -36,6 +40,7 @@ class TaskFragment(
         val isEdit = getBooleanFromBundleExt(IS_EDIT)
         val interactor = TaskInteractor(requireContext().appComponent.projectDao)
         viewModelFactory = TaskFactory(isEdit, projectID, taskID, interactor)
+        navigation = (activity) as TaskNavigationListener
         super.onAttach(context)
     }
 
@@ -88,22 +93,21 @@ class TaskFragment(
             saveButton.isVisible = viewState.saveButtonVisibility
             descriptionTextInputEditText.setText(viewState.descriptionEditTextText)
             stateSpinner.setSelection(viewState.stateSpinnerPosition)
-            when(viewState.taskTitleType) {
-                Constants.TaskTitleType.ADD -> {
-//                    toolbar.toolbar.subtitle = getStringExt(R.string.task_add)
-                    saveButton.text = getStringExt(R.string.task_save_task)
-//                    toolbar.deleteQuestionMenuButton.isVisible = false
-                }
-                Constants.TaskTitleType.EDIT -> {
-//                    toolbar.toolbar.subtitle = getStringExt(R.string.task_edit)
-                    saveButton.text = getStringExt(R.string.task_save_changes)
-                }
+            when(viewState.taskType) {
+                Constants.TaskTitleType.ADD
+                -> saveButton.text = getStringExt(R.string.task_save_task)
+
+                Constants.TaskTitleType.EDIT
+                -> saveButton.text = getStringExt(R.string.task_save_changes)
             }
         }
     }
 
     override fun showViewEffect(viewEffect: TaskViewModel.ViewEffect) {
-        TODO("Not yet implemented")
+        when(viewEffect) {
+            is TaskViewModel.ViewEffect.GoToTaskList
+            -> navigation.goToBack()
+        }
     }
 
     private fun showDeleteDialog() {
