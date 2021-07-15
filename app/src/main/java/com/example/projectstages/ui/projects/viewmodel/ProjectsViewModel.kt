@@ -8,9 +8,8 @@ import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -34,7 +33,6 @@ class ProjectsViewModel(
 
     private fun fetchProjects() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
                 when(val projects = interactor.getProjects()) {
                     is ResultWrapper.Success -> {
                         projects.data.collectLatest { it ->
@@ -102,7 +100,6 @@ class ProjectsViewModel(
                         sendAction(Action.Error)
                     }
                 }
-            }
         }
     }
 
