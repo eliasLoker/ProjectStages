@@ -1,3 +1,3 @@
 # ProjectStages
 
-![alt text](https://raw.githubusercontent.com/eliasLoker/ProjectStages/eliasLoker-patch-1/scheme.png "Описание будет тут")
+![alt text](https://github.com/eliasLoker/ProjectStages/blob/master/scheme.png?raw=true "Описание будет тут")
