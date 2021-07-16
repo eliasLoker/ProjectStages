@@ -19,11 +19,11 @@ class TasksViewModel(
     private val projectName: String,
     private val tasksInteractor: TasksInteractor
 ) : BaseViewModel<
-        TasksViewModel.ViewState,
-        TasksViewModel.Action,
-        TasksViewModel.ViewEffect,
-        TasksViewModel.ViewEvent
-        >(ViewState()) {
+        TasksContract.ViewState,
+        TasksContract.Action,
+        TasksContract.ViewEffect,
+        TasksContract.ViewEvent
+        >(TasksContract.ViewState()) {
 
     private val _tasks = ArrayList<Task>()
 
@@ -46,36 +46,36 @@ class TasksViewModel(
                                     _tasks.add(task)
                                 }
                                 _tasks.sortBy { i -> i.state }
-                                sendAction(Action.NotEmptyList(_tasks, projectName))
+                                sendAction(TasksContract.Action.NotEmptyList(_tasks, projectName))
                             }
-                            false -> sendAction(Action.EmptyList)
+                            false -> sendAction(TasksContract.Action.EmptyList)
                         }
                     }
                 }
                 is ResultWrapper.Error
-                -> sendAction(Action.Error)
+                -> sendAction(TasksContract.Action.Error)
             }
         }
     }
 
-    override fun processViewEvent(viewEvent: ViewEvent) {
+    override fun processViewEvent(viewEvent: TasksContract.ViewEvent) {
         when(viewEvent) {
-            is ViewEvent.OnTaskClicked
-            -> sendViewEffect(ViewEffect.GoToTask(viewEvent.taskId))
+            is TasksContract.ViewEvent.OnTaskClicked
+            -> sendViewEffect(TasksContract.ViewEffect.GoToTask(viewEvent.taskId))
 
-            is ViewEvent.OnAddTaskClicked
-            -> sendViewEffect(ViewEffect.GoToAddTask(projectId))
+            is TasksContract.ViewEvent.OnAddTaskClicked
+            -> sendViewEffect(TasksContract.ViewEffect.GoToAddTask(projectId))
         }
     }
 
-    override fun onReduceState(viewAction: Action): ViewState {
+    override fun onReduceState(viewAction: TasksContract.Action): TasksContract.ViewState {
         return when (viewAction) {
-            is Action.Loading
+            is TasksContract.Action.Loading
             -> state.copy(
                 progressBarVisibility = true
             )
 
-            is Action.EmptyList
+            is TasksContract.Action.EmptyList
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
@@ -86,7 +86,7 @@ class TasksViewModel(
                 addTaskButtonVisibility = true
             )
 
-            is Action.NotEmptyList
+            is TasksContract.Action.NotEmptyList
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = false,
@@ -97,7 +97,7 @@ class TasksViewModel(
                 addTaskButtonVisibility = true
             )
 
-            is Action.Error
+            is TasksContract.Action.Error
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
@@ -106,51 +106,5 @@ class TasksViewModel(
                 errorMessageTextViewVisibility = true
             )
         }
-    }
-
-    data class ViewState(
-        val progressBarVisibility: Boolean = true,
-        val headerViewsVisibility: Boolean = false,
-        val emptyListTextViewVisibility: Boolean = false,
-        val taskRecyclerVisibility: Boolean = false,
-        val tasks: List<Task> = emptyList(),
-        val errorMessageTextViewType: Constants.EmptyList = Constants.EmptyList.ERROR,
-        val errorMessageTextViewVisibility: Boolean = false,
-        val projectName: String = "",
-        val addTaskButtonVisibility: Boolean = false,
-    ) : BaseViewState
-
-    sealed class Action : BaseAction {
-
-        object Loading : Action()
-
-        object EmptyList : Action()
-
-        class NotEmptyList(
-            val tasks: List<Task>,
-            val projectName: String
-        ) : Action()
-
-        object Error : Action()
-    }
-
-    sealed class ViewEffect : BaseViewEffect {
-
-        class GoToAddTask(
-            val projectId: Long
-        ) : ViewEffect()
-
-        class GoToTask(
-            val taskID: Long
-        ) : ViewEffect()
-    }
-
-    sealed class ViewEvent : BaseViewEvent {
-
-        object OnAddTaskClicked : ViewEvent()
-
-        class OnTaskClicked(
-            val taskId: Long
-        ) : ViewEvent()
     }
 }

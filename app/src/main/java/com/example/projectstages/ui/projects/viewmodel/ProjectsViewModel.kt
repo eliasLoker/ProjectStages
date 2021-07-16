@@ -5,6 +5,7 @@ import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.model.Project
+import com.example.projectstages.ui.projects.viewmodel.ProjectsContract.ViewEvent
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
@@ -18,12 +19,12 @@ class ProjectsViewModel(
     private val interactor: ProjectsInteractor
 ) :
     BaseViewModel<
-            ProjectsViewModel.ViewState,
-            ProjectsViewModel.Action,
-            ProjectsViewModel.ViewEffect,
-            ProjectsViewModel.ViewEvent
+            ProjectsContract.ViewState,
+            ProjectsContract.Action,
+            ProjectsContract.ViewEffect,
+            ViewEvent
             >
-        (ViewState()) {
+        (ProjectsContract.ViewState()) {
 
     init {
         fetchProjects()
@@ -91,26 +92,26 @@ class ProjectsViewModel(
                                         .flatten()
                                         .filter { taskEntity -> taskEntity.state == 0 }
                                         .count()
-                                    sendAction(Action.NotEmptyList(_projects, allTasks, completedTasks))
+                                    sendAction(ProjectsContract.Action.NotEmptyList(_projects, allTasks, completedTasks))
                                 }
-                                false -> sendAction(Action.EmptyList)
+                                false -> sendAction(ProjectsContract.Action.EmptyList)
                             }
                         }
                     }
 
                     is ResultWrapper.Error -> {
-                        sendAction(Action.Error)
+                        sendAction(ProjectsContract.Action.Error)
                     }
                 }
         }
     }
 
-    override fun onReduceState(viewAction: Action): ViewState {
+    override fun onReduceState(viewAction: ProjectsContract.Action): ProjectsContract.ViewState {
         return when(viewAction) {
-            is Action.Loading
+            is ProjectsContract.Action.Loading
             -> state.copy()
 
-            is Action.NotEmptyList -> state.copy(
+            is ProjectsContract.Action.NotEmptyList -> state.copy(
                     progressBarVisibility = false,
                     projectsAdapterVisibility = true,
                     headerViewsVisibility = true,
@@ -120,7 +121,7 @@ class ProjectsViewModel(
                     addProjectButtonVisibility = true
                 )
 
-            is Action.EmptyList
+            is ProjectsContract.Action.EmptyList
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
@@ -128,7 +129,7 @@ class ProjectsViewModel(
                 addProjectButtonVisibility = true
             )
 
-            is Action.Error
+            is ProjectsContract.Action.Error
             -> state.copy(
                 progressBarVisibility = false,
                 errorTextViewVisibility = true,
@@ -140,7 +141,7 @@ class ProjectsViewModel(
     override fun processViewEvent(viewEvent: ViewEvent) {
         when(viewEvent) {
             is ViewEvent.OnAddProjectClicked
-            -> sendViewEffect(ViewEffect.ShowAddProjectDialog)
+            -> sendViewEffect(ProjectsContract.ViewEffect.ShowAddProjectDialog)
 
             is ViewEvent.OnAcceptAddProjectClicked
             -> addProject(viewEvent.name, viewEvent.type)
@@ -149,7 +150,7 @@ class ProjectsViewModel(
             -> {
 //                Log.d("ProjectsViewModel", "VE: ${viewEvent.position}")
 //                return
-                sendViewEffect(ViewEffect.GoToTaskList(
+                sendViewEffect(ProjectsContract.ViewEffect.GoToTaskList(
                     _projects[viewEvent.position].id,
                     _projects[viewEvent.position].name))
             }
@@ -176,8 +177,8 @@ class ProjectsViewModel(
                 type
             )
             val effect = when(updateResult > 0) {
-                true -> ViewEffect.SuccessEdit
-                false -> ViewEffect.FailureEdit
+                true -> ProjectsContract.ViewEffect.SuccessEdit
+                false -> ProjectsContract.ViewEffect.FailureEdit
             }
             sendViewEffect(effect)
         }
@@ -187,8 +188,8 @@ class ProjectsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
             val effect = when(deleteResult > 0) {
-                true -> ViewEffect.SuccessDelete
-                false -> ViewEffect.FailureDelete
+                true -> ProjectsContract.ViewEffect.SuccessDelete
+                false -> ProjectsContract.ViewEffect.FailureDelete
             }
             sendViewEffect(effect)
         }
@@ -199,8 +200,8 @@ class ProjectsViewModel(
             val project = ProjectEntity(name, type, System.currentTimeMillis())
             val insertResult = interactor.insertProject(project)
             val effect = when(insertResult > 0) {
-                true -> ViewEffect.SuccessAddDialog
-                false -> ViewEffect.FailureAddDialog
+                true -> ProjectsContract.ViewEffect.SuccessAddDialog
+                false -> ProjectsContract.ViewEffect.FailureAddDialog
             }
             sendViewEffect(effect)
         }
@@ -208,111 +209,20 @@ class ProjectsViewModel(
 
     private fun onPopupDeleteClicked(position: Int) {
         positionProjectForDeleteOrEdit = position
-        sendViewEffect(ViewEffect.ShowDeleteProjectDialog(
+        sendViewEffect(
+            ProjectsContract.ViewEffect.ShowDeleteProjectDialog(
             _projects[position].name
         ))
     }
 
     private fun onPopupEditClicked(position: Int) {
         positionProjectForDeleteOrEdit = position
-        sendViewEffect(ViewEffect.ShowEditProjectDialog(
+        sendViewEffect(
+            ProjectsContract.ViewEffect.ShowEditProjectDialog(
             _projects[position].name,
             _projects[position].type
         ))
     }
 
-    data class ViewState(
-        val progressBarVisibility: Boolean = true,
-        val headerViewsVisibility: Boolean = false,
-        val addProjectButtonVisibility: Boolean = false,
-        val emptyListTextViewVisibility: Boolean = false,
-        val projectsAdapterVisibility: Boolean = false,
-        val projects: List<Project> = emptyList(),
-        val errorTextViewVisibility: Boolean = false,
-        val allTasks: Int = 0,
-        val completedTasks: Int = 0
-    ) : BaseViewState {
-        override fun equals(other: Any?): Boolean {
-            return super.equals(other)
-        }
 
-        override fun hashCode(): Int {
-            return super.hashCode()
-        }
-    }
-
-    sealed class Action : BaseAction {
-
-        object Loading : Action()
-
-        object EmptyList : Action()
-
-        class NotEmptyList(
-            val projects: List<Project>,
-            val allTasks: Int,
-            val completedTasks: Int
-        ) : Action()
-
-        object Error : Action()
-    }
-
-    sealed class ViewEffect : BaseViewEffect {
-
-        object SuccessAddDialog : ViewEffect()
-
-        object FailureAddDialog : ViewEffect()
-
-        class GoToTaskList(
-            val projectID: Long,
-            val projectName: String
-        ) : ViewEffect()
-
-        object ShowAddProjectDialog : ViewEffect()
-
-        class ShowDeleteProjectDialog(
-            val name: String
-        ) : ViewEffect()
-
-        object SuccessDelete : ViewEffect()
-
-        object FailureDelete : ViewEffect()
-
-        class ShowEditProjectDialog(
-            val name: String,
-            var type: Int
-        ) : ViewEffect()
-
-        object SuccessEdit : ViewEffect()
-
-        object FailureEdit : ViewEffect()
-    }
-
-    sealed class ViewEvent : BaseViewEvent {
-
-        object OnAddProjectClicked : ViewEvent()
-
-        class OnAcceptAddProjectClicked(
-            val name: String,
-            val type: Int
-        ) : ViewEvent()
-
-        class OnItemClicked(
-            val position: Int
-        ) : ViewEvent()
-
-        class OnPopupDeleteClicked(
-            val position: Int
-        ) : ViewEvent()
-
-        class OnPopupEditClicked(
-            val position: Int
-        ) : ViewEvent()
-
-        object OnAcceptDeleteProject : ViewEvent()
-
-        class OnAcceptEditProject(
-            val name: String,
-            val type: Int
-        ) : ViewEvent()
-    }
 }

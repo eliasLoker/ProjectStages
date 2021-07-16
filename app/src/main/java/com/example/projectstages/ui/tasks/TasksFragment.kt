@@ -16,6 +16,7 @@ import com.example.projectstages.ui.tasks.adapter.TasksAdapter
 import com.example.projectstages.ui.tasks.adapter.TasksAdapterListener
 import com.example.projectstages.ui.tasks.interactor.TasksInteractor
 import com.example.projectstages.ui.tasks.model.Task
+import com.example.projectstages.ui.tasks.viewmodel.TasksContract
 import com.example.projectstages.ui.tasks.viewmodel.TasksFactory
 import com.example.projectstages.ui.tasks.viewmodel.TasksViewModel
 import com.example.projectstages.utils.*
@@ -24,10 +25,10 @@ class TasksFragment(
     layoutID: Int = R.layout.fragment_tasks
 ) : BaseFragment<
         FragmentTasksBinding,
-        TasksViewModel.ViewState,
-        TasksViewModel.Action,
-        TasksViewModel.ViewEffect,
-        TasksViewModel.ViewEvent
+        TasksContract.ViewState,
+        TasksContract.Action,
+        TasksContract.ViewEffect,
+        TasksContract.ViewEvent
         >(layoutID, FragmentTasksBinding::inflate), TasksAdapterListener {
 
     override lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -49,7 +50,6 @@ class TasksFragment(
         super.onViewCreated(view, savedInstanceState)
 
         binding.recyclerView.apply {
-//            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             layoutManager = LinearLayoutManager(requireContext())
             tasksAdapter = TasksAdapter(this@TasksFragment)
             adapter = tasksAdapter
@@ -57,19 +57,14 @@ class TasksFragment(
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
-//        binding.toolbar.addQuestionMenuButton.setOnClickListener {
-//            viewModel.processViewEvent(
-//                TasksListViewModel.ViewEvent.OnAddTaskClicked
-//            )
-//        }
         binding.addTaskButton.setOnClickListener {
             viewModel.processViewEvent(
-                TasksViewModel.ViewEvent.OnAddTaskClicked
+                TasksContract.ViewEvent.OnAddTaskClicked
             )
         }
     }
 
-    override fun updateViewState(viewState: TasksViewModel.ViewState) {
+    override fun updateViewState(viewState: TasksContract.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.taskRecyclerVisibility
@@ -91,22 +86,23 @@ class TasksFragment(
         }
     }
 
-    override fun showViewEffect(viewEffect: TasksViewModel.ViewEffect) {
+    override fun showViewEffect(viewEffect: TasksContract.ViewEffect) {
         when(viewEffect) {
-            is TasksViewModel.ViewEffect.GoToTask
+            is TasksContract.ViewEffect.GoToTask
             -> navigation.goToTask(viewEffect.taskID)
 
-            is TasksViewModel.ViewEffect.GoToAddTask
+            is TasksContract.ViewEffect.GoToAddTask
             -> navigation.goToAddTask(viewEffect.projectId)
         }
     }
 
     override fun onTaskClicked(id: Long) {
         viewModel.processViewEvent(
-            TasksViewModel.ViewEvent.OnTaskClicked(id)
+            TasksContract.ViewEvent.OnTaskClicked(id)
         )
     }
 
+    /*
     private fun getSectionCallback(tasks: List<Task>): AdapterStickyItemDecorator2.SectionCallback {
         return object : AdapterStickyItemDecorator2.SectionCallback {
             override fun isSection(position: Int): Boolean {
@@ -119,6 +115,7 @@ class TasksFragment(
             }
         }
     }
+    */
 
     companion object {
 

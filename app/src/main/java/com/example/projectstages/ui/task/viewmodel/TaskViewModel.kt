@@ -14,11 +14,11 @@ class TaskViewModel(
     private val taskID: Long,
     private val taskInteractor: TaskInteractor
 ) : BaseViewModel<
-        TaskViewModel.ViewState,
-        TaskViewModel.Action,
-        TaskViewModel.ViewEffect,
-        TaskViewModel.ViewEvent
-        >(ViewState()) {
+        TaskContract.ViewState,
+        TaskContract.Action,
+        TaskContract.ViewEffect,
+        TaskContract.ViewEvent
+        >(TaskContract.ViewState()) {
 
 
     private val taskDescription = StringBuilder()
@@ -35,24 +35,24 @@ class TaskViewModel(
                 val resultState = async { taskInteractor.getTaskStateByTaskId(taskID) }
                 taskType = resultState.await()
                 val resDescr = resultDescription.await()
-                sendAction(Action.EditMode(resDescr, taskType))
+                sendAction(TaskContract.Action.EditMode(resDescr, taskType))
             }
         } else {
-            sendAction(Action.AddMode)
+            sendAction(TaskContract.Action.AddMode)
         }
     }
 
-    override fun onReduceState(viewAction: Action): ViewState {
+    override fun onReduceState(viewAction: TaskContract.Action): TaskContract.ViewState {
         return when(viewAction) {
 
-            is Action.Loading -> state.copy(
+            is TaskContract.Action.Loading -> state.copy(
                 progressBarVisibility = true,
                 stateSpinnerVisibility = false,
                 descriptionEditTextVisibility = false,
                 saveButtonVisibility = false,
             )
 
-            is Action.EditMode -> state.copy(
+            is TaskContract.Action.EditMode -> state.copy(
                 progressBarVisibility = false,
                 stateSpinnerVisibility = true,
                 descriptionEditTextVisibility = true,
@@ -62,7 +62,7 @@ class TaskViewModel(
                 taskType = Constants.TaskTitleType.EDIT
             )
 
-            is Action.AddMode -> state.copy(
+            is TaskContract.Action.AddMode -> state.copy(
                 progressBarVisibility = false,
                 stateSpinnerVisibility = true,
                 descriptionEditTextVisibility = true,
@@ -72,24 +72,24 @@ class TaskViewModel(
         }
     }
 
-    override fun processViewEvent(viewEvent: ViewEvent) {
+    override fun processViewEvent(viewEvent: TaskContract.ViewEvent) {
         when(viewEvent) {
-            is ViewEvent.OnSaveButtonClicked
+            is TaskContract.ViewEvent.OnSaveButtonClicked
             -> if (isEdit) updateTask() else createTask()
 
-            is ViewEvent.OnTextChangedDescription
+            is TaskContract.ViewEvent.OnTextChangedDescription
             -> {
                 taskDescription.clear()
                 taskDescription.append(viewEvent.text)
             }
 
-            is ViewEvent.OnItemSelectedStateSpinner
+            is TaskContract.ViewEvent.OnItemSelectedStateSpinner
             -> { taskType = viewEvent.position }
 
-            is ViewEvent.OnDeleteButtonClicked
-            -> sendViewEffect(ViewEffect.ShowDeleteDialog)
+            is TaskContract.ViewEvent.OnDeleteButtonClicked
+            -> sendViewEffect(TaskContract.ViewEffect.ShowDeleteDialog)
 
-            is ViewEvent.OnAcceptDeleteClicked
+            is TaskContract.ViewEvent.OnAcceptDeleteClicked
             -> deleteTask()
         }
     }
@@ -98,8 +98,8 @@ class TaskViewModel(
         viewModelScope.launch {
             val taskEntity = TaskEntity(projectID, taskDescription.toString(), taskType, System.currentTimeMillis())
             val effect = when(taskInteractor.insertTask(taskEntity) > 0) {
-                true -> ViewEffect.GoToTaskList
-                false -> ViewEffect.FailureAdd
+                true -> TaskContract.ViewEffect.GoToTaskList
+                false -> TaskContract.ViewEffect.FailureAdd
             }
             sendViewEffect(effect)
         }
@@ -108,8 +108,8 @@ class TaskViewModel(
     private fun updateTask() {
         viewModelScope.launch {
             val effect = when(taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis()) > 0) {
-                true -> ViewEffect.GoToTaskList
-                false -> ViewEffect.FailureUpdate
+                true -> TaskContract.ViewEffect.GoToTaskList
+                false -> TaskContract.ViewEffect.FailureUpdate
             }
             sendViewEffect(effect)
         }
@@ -118,62 +118,10 @@ class TaskViewModel(
     private fun deleteTask() {
         viewModelScope.launch {
             val effect = when(taskInteractor.deleteTask(taskID) > 0) {
-                true -> ViewEffect.GoToTaskList
-                false -> ViewEffect.FailureDelete
+                true -> TaskContract.ViewEffect.GoToTaskList
+                false -> TaskContract.ViewEffect.FailureDelete
             }
             sendViewEffect(effect)
         }
-    }
-
-    data class ViewState(
-        val taskType: Constants.TaskTitleType = Constants.TaskTitleType.ADD,
-        val progressBarVisibility: Boolean = true,
-        val stateSpinnerVisibility: Boolean = false,
-        val descriptionEditTextVisibility: Boolean = false,
-        val saveButtonVisibility: Boolean = false,
-        val descriptionEditTextText: String = "",
-        val stateSpinnerPosition: Int = 0
-    ) : BaseViewState
-
-    sealed class Action : BaseAction {
-
-        object Loading : Action()
-
-        class EditMode(
-            val descriptionText: String,
-            val state: Int
-        ) : Action()
-
-        object AddMode : Action()
-    }
-
-    sealed class ViewEffect : BaseViewEffect {
-
-        object GoToTaskList : ViewEffect()
-
-        object FailureAdd: ViewEffect()
-
-        object FailureUpdate: ViewEffect()
-
-        object FailureDelete: ViewEffect()
-
-        object ShowDeleteDialog: ViewEffect()
-    }
-
-    sealed class ViewEvent : BaseViewEvent {
-
-        object OnSaveButtonClicked : ViewEvent()
-
-        class OnTextChangedDescription(
-            val text: String
-        ) : ViewEvent()
-
-        class OnItemSelectedStateSpinner(
-            val position: Int
-        ) : ViewEvent()
-
-        object OnDeleteButtonClicked : ViewEvent()
-
-        object OnAcceptDeleteClicked : ViewEvent()
     }
 }

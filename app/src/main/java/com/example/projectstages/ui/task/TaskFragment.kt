@@ -16,6 +16,7 @@ import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.main.ProjectsNavigationListener
 import com.example.projectstages.ui.main.TaskNavigationListener
 import com.example.projectstages.ui.task.interactor.TaskInteractor
+import com.example.projectstages.ui.task.viewmodel.TaskContract
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.*
@@ -24,10 +25,10 @@ class TaskFragment(
     layoutID: Int = R.layout.fragment_task
 ) : BaseFragment<
         FragmentTaskBinding,
-        TaskViewModel.ViewState,
-        TaskViewModel.Action,
-        TaskViewModel.ViewEffect,
-        TaskViewModel.ViewEvent
+        TaskContract.ViewState,
+        TaskContract.Action,
+        TaskContract.ViewEffect,
+        TaskContract.ViewEvent
         >(layoutID, FragmentTaskBinding::inflate) {
 
     override lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -61,28 +62,28 @@ class TaskFragment(
 
         binding.saveButton.setOnClickListener {
             viewModel.processViewEvent(
-                TaskViewModel.ViewEvent.OnSaveButtonClicked
+                TaskContract.ViewEvent.OnSaveButtonClicked
             )
         }
 
         binding.descriptionTextInputEditText.onTextChanged {
             viewModel.processViewEvent(
-                TaskViewModel.ViewEvent.OnTextChangedDescription(it)
+                TaskContract.ViewEvent.OnTextChangedDescription(it)
             )
         }
 
         binding.stateSpinner.onItemSelected {
             viewModel.processViewEvent(
-                TaskViewModel.ViewEvent.OnItemSelectedStateSpinner(it)
+                TaskContract.ViewEvent.OnItemSelectedStateSpinner(it)
             )
         }
 
         binding.deleteButton.setOnClickListener {
-            viewModel.processViewEvent(TaskViewModel.ViewEvent.OnDeleteButtonClicked)
+            viewModel.processViewEvent(TaskContract.ViewEvent.OnDeleteButtonClicked)
         }
     }
 
-    override fun updateViewState(viewState: TaskViewModel.ViewState) {
+    override fun updateViewState(viewState: TaskContract.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             stateSpinner.isVisible = viewState.stateSpinnerVisibility
@@ -100,12 +101,12 @@ class TaskFragment(
         }
     }
 
-    override fun showViewEffect(viewEffect: TaskViewModel.ViewEffect) {
+    override fun showViewEffect(viewEffect: TaskContract.ViewEffect) {
         when(viewEffect) {
-            is TaskViewModel.ViewEffect.GoToTaskList
+            is TaskContract.ViewEffect.GoToTaskList
             -> navigation.goToBack()
 
-            is TaskViewModel.ViewEffect.ShowDeleteDialog
+            is TaskContract.ViewEffect.ShowDeleteDialog
             -> showDeleteDialog()
         }
     }
@@ -115,7 +116,7 @@ class TaskFragment(
             .setTitle("Вы действительно хотите удалить задачу?")
             .setPositiveButton("Да") { dialog, _ ->
                 viewModel.processViewEvent(
-                    TaskViewModel.ViewEvent.OnAcceptDeleteClicked
+                    TaskContract.ViewEvent.OnAcceptDeleteClicked
                 )
                 dialog.dismiss()
             }

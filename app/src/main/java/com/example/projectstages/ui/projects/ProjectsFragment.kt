@@ -25,6 +25,7 @@ import com.example.projectstages.ui.main.ProjectsNavigationListener
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
+import com.example.projectstages.ui.projects.viewmodel.ProjectsContract
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.*
@@ -33,10 +34,10 @@ class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
 ) : BaseFragment<
         FragmentProjectsBinding,
-        ProjectsViewModel.ViewState,
-        ProjectsViewModel.Action,
-        ProjectsViewModel.ViewEffect,
-        ProjectsViewModel.ViewEvent
+        ProjectsContract.ViewState,
+        ProjectsContract.Action,
+        ProjectsContract.ViewEffect,
+        ProjectsContract.ViewEvent
         >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
     override lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -65,12 +66,12 @@ class ProjectsFragment(
 
         binding.addProjectButton.setOnClickListener {
             viewModel.processViewEvent(
-                ProjectsViewModel.ViewEvent.OnAddProjectClicked
+                ProjectsContract.ViewEvent.OnAddProjectClicked
             )
         }
     }
 
-    override fun updateViewState(viewState: ProjectsViewModel.ViewState) {
+    override fun updateViewState(viewState: ProjectsContract.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.projectsAdapterVisibility
@@ -88,61 +89,61 @@ class ProjectsFragment(
         }
     }
 
-    override fun showViewEffect(viewEffect: ProjectsViewModel.ViewEffect) {
+    override fun showViewEffect(viewEffect: ProjectsContract.ViewEffect) {
         when(viewEffect) {
-            is ProjectsViewModel.ViewEffect.ShowAddProjectDialog
+            is ProjectsContract.ViewEffect.ShowAddProjectDialog
             -> showAddProjectDialog()
 
-            is ProjectsViewModel.ViewEffect.SuccessAddDialog
+            is ProjectsContract.ViewEffect.SuccessAddDialog
             -> showSuccessDialog(
                 getStringExt(R.string.project_success_add_title),
                 getStringExt(R.string.project_success_add_message)
             )
 
-            is ProjectsViewModel.ViewEffect.FailureAddDialog
+            is ProjectsContract.ViewEffect.FailureAddDialog
             -> showErrorDialog(
                 getStringExt(R.string.project_error_add_title),
                 getStringExt(R.string.project_error_add_message)
             )
 
-            is ProjectsViewModel.ViewEffect.GoToTaskList
+            is ProjectsContract.ViewEffect.GoToTaskList
             -> navigation.goToTaskFromProjects(viewEffect.projectID, viewEffect.projectName)
 
-            is ProjectsViewModel.ViewEffect.ShowDeleteProjectDialog
+            is ProjectsContract.ViewEffect.ShowDeleteProjectDialog
             -> showDeleteProjectDialog(viewEffect.name)
 
-            is ProjectsViewModel.ViewEffect.SuccessDelete
+            is ProjectsContract.ViewEffect.SuccessDelete
             -> showSuccessDialog(getStringExt(R.string.completed),getStringExt(R.string.delete_success))
 
-            is ProjectsViewModel.ViewEffect.FailureDelete
+            is ProjectsContract.ViewEffect.FailureDelete
             -> showErrorDialog(getString(R.string.error),getStringExt(R.string.delete_error))
 
-            is ProjectsViewModel.ViewEffect.ShowEditProjectDialog
+            is ProjectsContract.ViewEffect.ShowEditProjectDialog
             -> showEditProjectDialog(viewEffect.name, viewEffect.type)
 
-            is ProjectsViewModel.ViewEffect.SuccessEdit
+            is ProjectsContract.ViewEffect.SuccessEdit
             -> showSuccessDialog(getStringExt(R.string.completed),getStringExt(R.string.update_success))
 
-            is ProjectsViewModel.ViewEffect.FailureEdit
+            is ProjectsContract.ViewEffect.FailureEdit
             -> showErrorDialog(getStringExt(R.string.error), getStringExt(R.string.update_error))
         }
     }
 
     override fun onItemClicked(position: Int) {
         viewModel.processViewEvent(
-            ProjectsViewModel.ViewEvent.OnItemClicked(position)
+            ProjectsContract.ViewEvent.OnItemClicked(position)
         )
     }
 
     override fun onPopupEditClicked(position: Int) {
         viewModel.processViewEvent(
-            ProjectsViewModel.ViewEvent.OnPopupEditClicked(position)
+            ProjectsContract.ViewEvent.OnPopupEditClicked(position)
         )
     }
 
     override fun onPopupDeleteClicked(position: Int) {
         viewModel.processViewEvent(
-            ProjectsViewModel.ViewEvent.OnPopupDeleteClicked(position)
+            ProjectsContract.ViewEvent.OnPopupDeleteClicked(position)
         )
     }
 
@@ -228,7 +229,7 @@ class ProjectsFragment(
             .create()
         addButton.setOnClickListener {
             viewModel.processViewEvent(
-                ProjectsViewModel.ViewEvent.OnAcceptEditProject(
+                ProjectsContract.ViewEvent.OnAcceptEditProject(
                     projectNameEditText.text.toString(),
                     spinner.selectedItemPosition
                 )
@@ -248,7 +249,7 @@ class ProjectsFragment(
             .setCancelable(false)
             .setPositiveButton(requireContext().getString(R.string.ok)) { dialog, _ ->
                 viewModel.processViewEvent(
-                    ProjectsViewModel.ViewEvent.OnAcceptDeleteProject
+                    ProjectsContract.ViewEvent.OnAcceptDeleteProject
                 )
                 dialog.dismiss()
             }
@@ -344,7 +345,7 @@ class ProjectsFragment(
             .create()
         addButton.setOnClickListener {
             viewModel.processViewEvent(
-                ProjectsViewModel.ViewEvent.OnAcceptAddProjectClicked(
+                ProjectsContract.ViewEvent.OnAcceptAddProjectClicked(
                     projectNameEditText.text.toString(),
                     spinner.selectedItemPosition
                 )
