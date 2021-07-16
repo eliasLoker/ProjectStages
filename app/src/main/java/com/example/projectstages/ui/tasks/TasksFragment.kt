@@ -6,7 +6,6 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.app.App.Companion.appComponent
 import com.example.projectstages.base.BaseFragment
@@ -15,7 +14,6 @@ import com.example.projectstages.ui.main.TasksNavigationListener
 import com.example.projectstages.ui.tasks.adapter.TasksAdapter
 import com.example.projectstages.ui.tasks.adapter.TasksAdapterListener
 import com.example.projectstages.ui.tasks.interactor.TasksInteractor
-import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.ui.tasks.viewmodel.TasksContract
 import com.example.projectstages.ui.tasks.viewmodel.TasksFactory
 import com.example.projectstages.ui.tasks.viewmodel.TasksViewModel

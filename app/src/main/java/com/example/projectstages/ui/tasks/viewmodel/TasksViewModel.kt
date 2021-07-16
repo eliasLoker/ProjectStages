@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.tasks.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
@@ -8,7 +7,6 @@ import com.example.projectstages.ui.tasks.interactor.TasksInteractor
 import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*

@@ -107,7 +107,7 @@ class ProjectsFragment(
             )
 
             is ProjectsContract.ViewEffect.GoToTaskList
-            -> navigation.goToTaskFromProjects(viewEffect.projectID, viewEffect.projectName)
+            -> navigation.goToTasksFromProjects(viewEffect.projectID, viewEffect.projectName)
 
             is ProjectsContract.ViewEffect.ShowDeleteProjectDialog
             -> showDeleteProjectDialog(viewEffect.name)

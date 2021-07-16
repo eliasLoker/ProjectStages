@@ -1,11 +1,7 @@
 package com.example.projectstages.ui.tasks.adapter
 
-import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.R

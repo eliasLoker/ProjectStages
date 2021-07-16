@@ -1,16 +1,14 @@
 package com.example.projectstages.ui.projects.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import com.example.projectstages.customview.ProgressItem
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
+import com.example.projectstages.customview.ProgressItem
 import com.example.projectstages.databinding.ItemProjectsDefaultBinding
 import com.example.projectstages.ui.projects.model.Project
-import com.example.projectstages.utils.Constants
 
 
 class ProjectsAdapter(

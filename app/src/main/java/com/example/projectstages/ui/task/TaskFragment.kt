@@ -2,17 +2,8 @@ package com.example.projectstages.ui.task
 
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.TextWatcher
-import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.R
@@ -21,7 +12,6 @@ import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
-import com.example.projectstages.ui.main.ProjectsNavigationListener
 import com.example.projectstages.ui.main.TaskNavigationListener
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskContract
@@ -62,7 +52,7 @@ class TaskFragment(
             add(SpinnerItem(states[1], R.drawable.ic_progress))
             add(SpinnerItem(states[2], R.drawable.ic_thought))
         }
-        val spinnerAdapter = SpinnerAdapterWithImageAndText(requireContext().applicationContext, spinnerItems)
+        val spinnerAdapter = SpinnerAdapterWithImageAndText(requireContext(), spinnerItems)
 
         binding.stateSpinner.apply {
             adapter = spinnerAdapter
@@ -121,14 +111,14 @@ class TaskFragment(
 
     private fun showDeleteDialog() {
         val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Вы действительно хотите удалить задачу?")
-            .setPositiveButton("Да") { dialog, _ ->
+            .setTitle(getStringExt(R.string.task_delete_dialog))
+            .setPositiveButton(getStringExt(R.string.ok)) { dialog, _ ->
                 viewModel.processViewEvent(
                     TaskContract.ViewEvent.OnAcceptDeleteClicked
                 )
                 dialog.dismiss()
             }
-            .setNegativeButton("Нет") { dialog, _ ->
+            .setNegativeButton(getStringExt(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             .create()

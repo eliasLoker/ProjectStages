@@ -7,10 +7,7 @@ import androidx.room.Query
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.data.entity.ProjectsWithTasks
 import com.example.projectstages.data.entity.TaskEntity
-import com.example.projectstages.ui.projects.model.Project
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 
 @Dao
 abstract class ProjectDao {

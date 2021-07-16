@@ -2,5 +2,5 @@ package com.example.projectstages.ui.main
 
 interface ProjectsNavigationListener {
 
-    fun goToTaskFromProjects(projectID: Long, projectName: String)
+    fun goToTasksFromProjects(projectID: Long, projectName: String)
 }

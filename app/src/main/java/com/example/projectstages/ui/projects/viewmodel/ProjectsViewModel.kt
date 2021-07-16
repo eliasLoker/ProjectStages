@@ -1,7 +1,7 @@
 package com.example.projectstages.ui.projects.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.example.projectstages.base.viewmodel.*
+import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.model.Project
@@ -9,7 +9,6 @@ import com.example.projectstages.ui.projects.viewmodel.ProjectsContract.ViewEven
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -90,7 +89,7 @@ class ProjectsViewModel(
 
                                     val completedTasks  = it.map { list -> list.tasks }
                                         .flatten()
-                                        .filter { taskEntity -> taskEntity.state == 0 }
+                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }
                                         .count()
                                     sendAction(ProjectsContract.Action.NotEmptyList(_projects, allTasks, completedTasks))
                                 }

@@ -33,6 +33,8 @@
     <string name="task_save_task">Save task</string>
     <string name="task_save_changes">Save changes</string>
 
+    <string name="task_delete_dialog">Вы действительно хотите удалить задачу?</string>
+
     <string name="all_tasks">%1$s \nAll tasks</string>
     <string name="completed_tasks">%1$s\nCompleted tasks</string>
 
