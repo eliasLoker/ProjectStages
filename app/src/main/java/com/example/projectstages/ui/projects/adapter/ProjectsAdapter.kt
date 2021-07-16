@@ -22,37 +22,24 @@ class ProjectsAdapter(
     private lateinit var context: Context
 
     fun setList(newProjects: List<Project>) {
-        Log.d("ProjectsViewModel", "SUCCESS setList")
         projects = newProjects
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProjectsHolders.BaseHolder {
         context = parent.context
-        val backgroundColor = when(viewType) {
-            Constants.RED_TYPE -> R.color.pale_red
-            Constants.GREEN_TYPE -> R.color.pale_green
-            Constants.BLUE_TYPE -> R.color.pale_blue
-            Constants.PINK_TYPE -> R.color.pale_pink
-            Constants.BLACK_TYPE -> R.color.pale_grey
-            else -> R.color.pale_yellow
+        val backgroundColor = ProjectsHolders.getBackgroundColor(viewType)
+        val folderView = ProjectsHolders.getFolderView(viewType)
+        return ProjectsHolders.DefaultType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
+            .apply {
+            folderImageView.setImageDrawable(ContextCompat.getDrawable(parent.context, folderView))
+            itemView.rootView.setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
         }
-        val folderView = when(viewType) {
-            Constants.RED_TYPE -> R.drawable.ic_file_red
-            Constants.GREEN_TYPE -> R.drawable.ic_file_green
-            Constants.BLUE_TYPE -> R.drawable.ic_file_blue
-            Constants.PINK_TYPE -> R.drawable.ic_file_pink
-            Constants.BLACK_TYPE -> R.drawable.ic_file_black
-            else -> R.drawable.ic_file_yellow
-        }
-        val view = ProjectsHolders.DefaultType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
-        view.folderImageView.setImageDrawable(ContextCompat.getDrawable(parent.context, folderView))
-        view.itemView.rootView.setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
-        return view
     }
 
     override fun onBindViewHolder(holder: ProjectsHolders.BaseHolder, position: Int) {
         //TODO("Вероятно, в будущем нужно убрать эту расширяемость, тк излишняя и захардкодить три цвета внутри ColorsProgressBar")
+
         val colorsProgressBar = holder.colorsProgressBar
 
         val progressItemList = ArrayList<ProgressItem>().apply {
