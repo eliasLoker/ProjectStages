@@ -43,6 +43,6 @@
     <string name="update_success">Project successfully changed</string>
     <string name="update_error">Project change error</string>
 
-    <string name="project_edit_category_title">Change category\n\n</string>
+    <string name="project_edit_category_title">Edit category\n\n</string>
     <string name="edit">Edit</string>
 </resources>
