@@ -2,9 +2,17 @@ package com.example.projectstages.ui.task
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.R
@@ -66,7 +74,7 @@ class TaskFragment(
             )
         }
 
-        binding.descriptionTextInputEditText.onTextChanged {
+        binding.descriptionEditText.onTextChanged {
             viewModel.processViewEvent(
                 TaskContract.ViewEvent.OnTextChangedDescription(it)
             )
@@ -87,9 +95,9 @@ class TaskFragment(
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
             stateSpinner.isVisible = viewState.stateSpinnerVisibility
-            descriptionTextInputLayout.isVisible = viewState.descriptionEditTextVisibility
+//            descriptionTextInputLayout.isVisible = viewState.descriptionEditTextVisibility
             saveButton.isVisible = viewState.saveButtonVisibility
-            descriptionTextInputEditText.setText(viewState.descriptionEditTextText)
+            descriptionEditText.setText(viewState.descriptionEditTextText)
             stateSpinner.setSelection(viewState.stateSpinnerPosition)
             when(viewState.taskType) {
                 Constants.TaskTitleType.ADD
