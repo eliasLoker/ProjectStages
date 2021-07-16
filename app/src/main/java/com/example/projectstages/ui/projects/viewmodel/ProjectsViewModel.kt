@@ -231,7 +231,15 @@ class ProjectsViewModel(
         val errorTextViewVisibility: Boolean = false,
         val allTasks: Int = 0,
         val completedTasks: Int = 0
-    ) : BaseViewState
+    ) : BaseViewState {
+        override fun equals(other: Any?): Boolean {
+            return super.equals(other)
+        }
+
+        override fun hashCode(): Int {
+            return super.hashCode()
+        }
+    }
 
     sealed class Action : BaseAction {
 

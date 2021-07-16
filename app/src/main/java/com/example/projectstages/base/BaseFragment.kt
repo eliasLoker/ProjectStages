@@ -59,7 +59,7 @@ abstract class BaseFragment<
         super.onViewCreated(view, savedInstanceState)
         viewModel = getViewModels()
 //        subscribeToViewState(viewModel.stateFlow)
-        subscribeToViewState2(viewModel.stateLiveData)
+        subscribeToViewState(viewModel.stateFlow)
         subscribeToViewEffect(viewModel.viewEffect)
     }
 
@@ -71,12 +71,6 @@ abstract class BaseFragment<
     abstract fun updateViewState(viewState: ViewState)
 
     abstract fun showViewEffect(viewEffect: ViewEffect)
-
-    private fun subscribeToViewState2(viewStateFlow: LiveData<ViewState>) {
-        viewStateFlow.observe(viewLifecycleOwner, Observer {
-            updateViewState(it)
-        })
-    }
 
     private fun subscribeToViewState(viewStateFlow: Flow<ViewState?>) {
         viewStateFlow.onEach {

@@ -43,18 +43,13 @@ abstract class BaseViewModel<
     private val stateMutableLiveData = MutableLiveData<ViewState>()
     val stateLiveData = stateMutableLiveData.asLiveData()
     */
-    /*
-    //Last variant flow
+
     private val stateMutableFlow = MutableStateFlow<ViewState?>(null)
     val stateFlow: StateFlow<ViewState?> = stateMutableFlow.asStateFlow()
-    */
-    //TODO("Временно вернул LiveData и она работает корректноб но все равно перейти на Flow")
-    private val stateMutableLiveData = MutableLiveData<ViewState>()
-    val stateLiveData = stateMutableLiveData.asLiveData()
 
     protected var state by Delegates.observable(initialState) { _, old, new ->
-//        stateMutableFlow.value = new //Last variant flow
-        stateMutableLiveData.postValue(new)
+        stateMutableFlow.value = new
+//        stateMutableLiveData.postValue(new)
         //TODO("Заглянуть сюда и еще подумать")
         if (new != old) {
 //            addStateTransition(old, new)
@@ -77,6 +72,4 @@ abstract class BaseViewModel<
     abstract fun processViewEvent(viewEvent: ViewEvent)
 
 }
-
-fun <T> MutableLiveData<T>.asLiveData() = this as LiveData<T>
 
