@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.ProjectDatabase
 
-class AppComponent(context: Context) {
+class AppComponentOld(context: Context) {
 
     val projectDao: ProjectDao = Room
         .databaseBuilder(

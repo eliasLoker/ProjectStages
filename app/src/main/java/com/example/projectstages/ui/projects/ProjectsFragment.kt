@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -17,18 +18,22 @@ import androidx.core.view.setPadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponent
+import com.example.projectstages.app.App
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.main.ProjectsNavigationListener
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
+import com.example.projectstages.ui.projects.inject.ProjectComponent
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsContract
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.*
+import dagger.android.AndroidInjection
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
@@ -46,12 +51,50 @@ class ProjectsFragment(
     private lateinit var projectsAdapter: ProjectsAdapter
     private lateinit var navigation: ProjectsNavigationListener
 
+    private lateinit var projectComponent: ProjectComponent
+
+    @Inject lateinit var projectsInteractor: ProjectsInteractor
+
     override fun onAttach(context: Context) {
-        val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
-        viewModelFactory = ProjectsFactory(projectsInteractor)
-        navigation = (activity) as ProjectsNavigationListener
+
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
+        viewModelFactory = ProjectsFactory(projectsInteractor)
+        Log.d("DependecyInject", "onAttach Int: $projectsInteractor")
     }
+
+    //        projectComponent = (requireContext().applicationContext as App).appComponent
+//            .projectComponent()
+//            .fragment(this)
+//            .build()
+//        projectComponent.inject(this)
+
+    /*
+    override fun onAttach(context: Context) {
+        Log.d("DependecyInject", "onAttach")
+        navigation = (activity) as ProjectsNavigationListener
+
+
+        val appComp = (requireContext().applicationContext as App).appComponent
+//        databaseHelper = appComp.getDatabaseHelper()
+//        networkHelper = appComp.getNetworkUtils()
+//        appComp.injectFragment(this)
+//        val projectsInteractor = ProjectsInteractor(projectDao)
+//        val projectsInteractor = appComp.getProjectComponent().getProjectInteractor()
+
+        *//*
+        (requireContext().applicationContext as App).appComponent.injectProjectsFragment(projectsFragment = this)
+        val projectsComponent = projectComponentBuilder.fragment(this).build()
+        *//*
+        (requireContext().applicationContext as App).appComponent.injectProjectsFragment(this)
+//        viewModelFactory = ProjectsFactory(projectsComponent.getProjectsInteractor()) //works
+        viewModelFactory = ProjectsFactory(projectsInteractor)
+        super.onAttach(context)
+//        databaseHelper.getHello()
+//        networkHelper.getHello()
+    }
+    */
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

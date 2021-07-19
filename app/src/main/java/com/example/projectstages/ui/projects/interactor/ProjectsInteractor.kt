@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.interactor
 
+import android.util.Log
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.data.entity.ProjectsWithTasks
@@ -11,6 +12,10 @@ import kotlinx.coroutines.withContext
 class ProjectsInteractor(
     private val projectDao: ProjectDao
 ) {
+
+    init {
+        Log.d("DependecyInject", "init ProjectsInteractor")
+    }
 
     suspend fun getProjects() : ResultWrapper<Flow<List<ProjectsWithTasks>>> {
         return try {
