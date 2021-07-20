@@ -2,6 +2,7 @@ package com.example.projectstages.ui.projects.inject
 
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
+import com.example.projectstages.ui.projects.interactor.ProjectsInteractorImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,6 +14,6 @@ class ProjectsModule {
 
     @Provides
     fun providesProjectsInteractor(projectDao: ProjectDao) : ProjectsInteractor {
-        return ProjectsInteractor(projectDao)
+        return ProjectsInteractorImpl(projectDao)
     }
 }
