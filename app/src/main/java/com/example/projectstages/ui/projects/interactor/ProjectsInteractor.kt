@@ -13,10 +13,6 @@ class ProjectsInteractor(
     private val projectDao: ProjectDao
 ) {
 
-    init {
-        Log.d("DependecyInject", "init ProjectsInteractor")
-    }
-
     suspend fun getProjects() : ResultWrapper<Flow<List<ProjectsWithTasks>>> {
         return try {
             withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.getProjects()) }

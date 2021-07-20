@@ -21,5 +21,3 @@ interface AppComponent {
         fun build() : AppComponent
     }
 }
-
-//    fun injectProjectsFragment(projectsFragment: ProjectsFragment)

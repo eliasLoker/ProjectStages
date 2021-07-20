@@ -14,14 +14,10 @@ class App : Application(), HasAndroidInjector {
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
-    private lateinit var componentOld: AppComponentOld
-
     lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
-        componentOld = AppComponentOld(this)
-
         appComponent = initDagger(this)
         appComponent.inject(this)
     }
@@ -34,10 +30,5 @@ class App : Application(), HasAndroidInjector {
 
     override fun androidInjector(): AndroidInjector<Any> {
         return dispatchingAndroidInjector
-    }
-
-    companion object {
-        val Context.appComponentOld: AppComponentOld
-            get() = (this.applicationContext as App).componentOld
     }
 }

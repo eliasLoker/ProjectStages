@@ -9,10 +9,3 @@ interface ProjectsComponent {
 
     fun inject(projectsFragment: ProjectsFragment)
 }
-//    @Subcomponent.Factory
-//    interface Factory {
-//        @BindsInstance fun fragment(fragment: Fragment) : Factory
-//        fun build() : ProjectComponent
-//    }
-//
-//    fun inject(projectsFragment: ProjectsFragment)

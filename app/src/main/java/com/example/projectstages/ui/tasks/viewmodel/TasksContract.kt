@@ -16,7 +16,15 @@ class TasksContract : BaseContract{
         val errorMessageTextViewVisibility: Boolean = false,
         val projectName: String = "",
         val addTaskButtonVisibility: Boolean = false,
-    ) : BaseViewState
+    ) : BaseViewState {
+        override fun equals(other: Any?): Boolean {
+            return super.equals(other)
+        }
+
+        override fun hashCode(): Int {
+            return super.hashCode()
+        }
+    }
 
     sealed class Action : BaseAction {
 

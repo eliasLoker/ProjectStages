@@ -5,11 +5,8 @@ import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
-import com.example.projectstages.ui.tasks.TasksFragment
-import com.example.projectstages.ui.tasks.viewmodel.TasksFactory
 import com.example.projectstages.utils.getBooleanFromBundleExt
 import com.example.projectstages.utils.getLongFromBundleExt
-import com.example.projectstages.utils.getStringFromBundleExt
 import dagger.Module
 import dagger.Provides
 

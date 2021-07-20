@@ -46,45 +46,10 @@ class ProjectsFragment(
     private lateinit var navigation: ProjectsNavigationListener
 
     override fun onAttach(context: Context) {
-
+        navigation = (activity) as ProjectsNavigationListener
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-        navigation = (activity) as ProjectsNavigationListener
-//        Log.d("DependecyInject", "onAttach Int: $projectsInteractor")
     }
-
-    //        projectComponent = (requireContext().applicationContext as App).appComponent
-//            .projectComponent()
-//            .fragment(this)
-//            .build()
-//        projectComponent.inject(this)
-
-    /*
-    override fun onAttach(context: Context) {
-        Log.d("DependecyInject", "onAttach")
-        navigation = (activity) as ProjectsNavigationListener
-
-
-        val appComp = (requireContext().applicationContext as App).appComponent
-//        databaseHelper = appComp.getDatabaseHelper()
-//        networkHelper = appComp.getNetworkUtils()
-//        appComp.injectFragment(this)
-//        val projectsInteractor = ProjectsInteractor(projectDao)
-//        val projectsInteractor = appComp.getProjectComponent().getProjectInteractor()
-
-        *//*
-        (requireContext().applicationContext as App).appComponent.injectProjectsFragment(projectsFragment = this)
-        val projectsComponent = projectComponentBuilder.fragment(this).build()
-        *//*
-        (requireContext().applicationContext as App).appComponent.injectProjectsFragment(this)
-//        viewModelFactory = ProjectsFactory(projectsComponent.getProjectsInteractor()) //works
-        viewModelFactory = ProjectsFactory(projectsInteractor)
-        super.onAttach(context)
-//        databaseHelper.getHello()
-//        networkHelper.getHello()
-    }
-    */
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

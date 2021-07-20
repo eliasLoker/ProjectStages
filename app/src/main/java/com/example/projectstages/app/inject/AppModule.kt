@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
-import com.example.projectstages.app.App
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.ProjectDatabase
 import dagger.Module
@@ -19,9 +18,7 @@ class AppModule {
 
     @Provides
     @AppScope
-    fun providesDatabase(context: Context) : ProjectDatabase {
-        Log.d("DependecyInject", "init provideDatabase")
-        return Room
+    fun providesDatabase(context: Context) : ProjectDatabase = Room
             .databaseBuilder(
                 context,
                 ProjectDatabase::class.java,
@@ -29,11 +26,9 @@ class AppModule {
             )
             .fallbackToDestructiveMigration()
             .build()
-    }
 
     @Provides
     @AppScope
-    fun providesDao(projectDatabase: ProjectDatabase) : ProjectDao {
-        return projectDatabase.getProjectDao()
-    }
+    fun providesDao(projectDatabase: ProjectDatabase) : ProjectDao
+    = projectDatabase.getProjectDao()
 }

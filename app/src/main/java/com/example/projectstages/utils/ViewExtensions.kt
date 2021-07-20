@@ -43,15 +43,6 @@ fun Fragment.getStringExt(@StringRes resId: Int) : String
 fun Fragment.getStringArrayExt(resId: Int) : Array<String>
 = resources.getStringArray(resId)
 
-fun Fragment.getLongFromBundleExt(key: String) : Long
-= arguments?.getLong(key) ?: 0L
-
-fun Fragment.getBooleanFromBundleExt(key: String) : Boolean
-= arguments?.getBoolean(key) ?: false
-
-fun Fragment.getStringFromBundleExt(key: String) : String
-= arguments?.getString(key, "") ?: ""
-
 fun Bundle?.getLongFromBundleExt(key: String) : Long
 = this?.getLong(key) ?: 0L
 

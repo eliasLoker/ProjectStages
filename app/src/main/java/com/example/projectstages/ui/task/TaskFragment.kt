@@ -7,15 +7,12 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponentOld
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.main.TaskNavigationListener
-import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskContract
-import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.*
 import dagger.android.support.AndroidSupportInjection
@@ -35,16 +32,9 @@ class TaskFragment(
     override val viewModelClass = TaskViewModel::class
     private lateinit var navigation: TaskNavigationListener
 
-//    @Inject lateinit var taskInteractor: TaskInteractor
-
     override fun onAttach(context: Context) {
-//        val projectID = getLongFromBundleExt(PROJECT_ID)
-//        val taskID = getLongFromBundleExt(TASK_ID)
-//        val isEdit = getBooleanFromBundleExt(IS_EDIT)
-//        val interactor = TaskInteractor(requireContext().appComponentOld.projectDao)
-        AndroidSupportInjection.inject(this)
-//        viewModelFactory = TaskFactory(isEdit, projectID, taskID, taskInteractor)
         navigation = (activity) as TaskNavigationListener
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 
