@@ -18,6 +18,8 @@ import com.example.projectstages.ui.tasks.viewmodel.TasksContract
 import com.example.projectstages.ui.tasks.viewmodel.TasksFactory
 import com.example.projectstages.ui.tasks.viewmodel.TasksViewModel
 import com.example.projectstages.utils.*
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class TasksFragment(
     layoutID: Int = R.layout.fragment_tasks
@@ -35,11 +37,14 @@ class TasksFragment(
     private lateinit var tasksAdapter: TasksAdapter
     private lateinit var navigation: TasksNavigationListener
 
+    @Inject lateinit var tasksInteractor: TasksInteractor
+
     override fun onAttach(context: Context) {
         val id = getLongFromBundleExt(TAG_FOR_PROJECT_ID)
         val projectName = getStringFromBundleExt(TAG_FOR_PROJECT_NAME)
-        val interactor = TasksInteractor(requireContext().appComponentOld.projectDao)
-        viewModelFactory = TasksFactory(id,projectName, interactor)
+//        val interactor = TasksInteractor(requireContext().appComponentOld.projectDao)
+        AndroidSupportInjection.inject(this)
+        viewModelFactory = TasksFactory(id,projectName, tasksInteractor)
         navigation = activity as TasksNavigationListener
         super.onAttach(context)
     }
