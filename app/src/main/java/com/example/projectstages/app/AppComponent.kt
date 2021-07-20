@@ -16,7 +16,7 @@ import dagger.hilt.components.SingletonComponent
 class AppComponent {
 
     @Provides
-    fun provideProjectDao(@ApplicationContext context: Context) : ProjectDao = Room
+    fun providesProjectDao(@ApplicationContext context: Context) : ProjectDao = Room
         .databaseBuilder(
             context.applicationContext,
             ProjectDatabase::class.java,
@@ -25,9 +25,4 @@ class AppComponent {
         .fallbackToDestructiveMigration()
         .build()
         .getProjectDao()
-
-    @Provides
-    fun provideInteractor(projectDao: ProjectDao) : ProjectsInteractor {
-        return ProjectsInteractor(projectDao)
-    }
 }
