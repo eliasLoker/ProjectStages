@@ -14,11 +14,14 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponent
+import com.example.projectstages.app.App.Companion.appComponentOld
 import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.BaseFragment2
+import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.main.ProjectsNavigationListener
@@ -29,26 +32,27 @@ import com.example.projectstages.ui.projects.viewmodel.ProjectsContract
 import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
-) : BaseFragment<
+) : BaseFragment2<
         FragmentProjectsBinding,
         ProjectsContract.ViewState,
         ProjectsContract.Action,
         ProjectsContract.ViewEffect,
-        ProjectsContract.ViewEvent
+        ProjectsContract.ViewEvent,
+        ProjectsViewModel
         >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
-    override lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModelClass = ProjectsViewModel::class
-
+    override val viewModel: ProjectsViewModel by viewModels()
     private lateinit var projectsAdapter: ProjectsAdapter
     private lateinit var navigation: ProjectsNavigationListener
 
     override fun onAttach(context: Context) {
-        val projectsInteractor = ProjectsInteractor(requireContext().appComponent.projectDao)
-        viewModelFactory = ProjectsFactory(projectsInteractor)
+//        val projectsInteractor = ProjectsInteractor(requireContext().appComponentOld.projectDao)
+//        viewModelFactory = ProjectsFactory(projectsInteractor)
         navigation = (activity) as ProjectsNavigationListener
         super.onAttach(context)
     }

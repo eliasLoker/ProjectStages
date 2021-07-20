@@ -7,7 +7,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponent
+import com.example.projectstages.app.App.Companion.appComponentOld
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.databinding.FragmentTasksBinding
 import com.example.projectstages.ui.main.TasksNavigationListener
@@ -38,7 +38,7 @@ class TasksFragment(
     override fun onAttach(context: Context) {
         val id = getLongFromBundleExt(TAG_FOR_PROJECT_ID)
         val projectName = getStringFromBundleExt(TAG_FOR_PROJECT_NAME)
-        val interactor = TasksInteractor(requireContext().appComponent.projectDao)
+        val interactor = TasksInteractor(requireContext().appComponentOld.projectDao)
         viewModelFactory = TasksFactory(id,projectName, interactor)
         navigation = activity as TasksNavigationListener
         super.onAttach(context)

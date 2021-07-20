@@ -8,13 +8,16 @@ import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.ui.projects.viewmodel.ProjectsContract.ViewEvent
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class ProjectsViewModel(
+@HiltViewModel
+class ProjectsViewModel @Inject constructor(
     private val interactor: ProjectsInteractor
 ) :
     BaseViewModel<

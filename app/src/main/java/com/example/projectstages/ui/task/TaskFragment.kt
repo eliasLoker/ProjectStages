@@ -7,7 +7,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponent
+import com.example.projectstages.app.App.Companion.appComponentOld
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
@@ -37,7 +37,7 @@ class TaskFragment(
         val projectID = getLongFromBundleExt(PROJECT_ID)
         val taskID = getLongFromBundleExt(TASK_ID)
         val isEdit = getBooleanFromBundleExt(IS_EDIT)
-        val interactor = TaskInteractor(requireContext().appComponent.projectDao)
+        val interactor = TaskInteractor(requireContext().appComponentOld.projectDao)
         viewModelFactory = TaskFactory(isEdit, projectID, taskID, interactor)
         navigation = (activity) as TaskNavigationListener
         super.onAttach(context)

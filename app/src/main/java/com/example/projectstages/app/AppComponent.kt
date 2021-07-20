@@ -4,10 +4,19 @@ import android.content.Context
 import androidx.room.Room
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.ProjectDatabase
+import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
-class AppComponent(context: Context) {
+@Module
+@InstallIn(SingletonComponent::class)
+class AppComponent {
 
-    val projectDao: ProjectDao = Room
+    @Provides
+    fun provideProjectDao(@ApplicationContext context: Context) : ProjectDao = Room
         .databaseBuilder(
             context.applicationContext,
             ProjectDatabase::class.java,
@@ -16,4 +25,9 @@ class AppComponent(context: Context) {
         .fallbackToDestructiveMigration()
         .build()
         .getProjectDao()
+
+    @Provides
+    fun provideInteractor(projectDao: ProjectDao) : ProjectsInteractor {
+        return ProjectsInteractor(projectDao)
+    }
 }

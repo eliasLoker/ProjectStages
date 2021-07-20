@@ -7,8 +7,9 @@ import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ProjectsInteractor(
+class ProjectsInteractor @Inject constructor(
     private val projectDao: ProjectDao
 ) {
 
