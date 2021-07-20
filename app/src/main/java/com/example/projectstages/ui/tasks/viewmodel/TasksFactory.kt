@@ -3,6 +3,7 @@ package com.example.projectstages.ui.tasks.viewmodel
 import androidx.lifecycle.ViewModel
 import com.example.projectstages.base.viewmodel.BaseFactory
 import com.example.projectstages.ui.tasks.interactor.TasksInteractor
+import com.example.projectstages.ui.tasks.interactor.TasksInteractorImpl
 
 class TasksFactory(
     private val projectId: Long,

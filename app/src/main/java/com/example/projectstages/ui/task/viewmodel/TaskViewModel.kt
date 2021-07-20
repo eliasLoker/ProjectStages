@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.TaskEntity
 import com.example.projectstages.ui.task.interactor.TaskInteractor
+import com.example.projectstages.ui.task.interactor.TaskInteractorImpl
 import com.example.projectstages.utils.Constants
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch

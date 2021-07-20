@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.ui.tasks.TasksFragment
 import com.example.projectstages.ui.tasks.interactor.TasksInteractor
+import com.example.projectstages.ui.tasks.interactor.TasksInteractorImpl
 import com.example.projectstages.ui.tasks.viewmodel.TasksFactory
 import com.example.projectstages.utils.getLongFromBundleExt
 import com.example.projectstages.utils.getStringFromBundleExt
@@ -16,7 +17,7 @@ class TasksModule {
     @Provides
     @TasksScope
     fun providesTasksInteractor(projectDao: ProjectDao) : TasksInteractor {
-        return TasksInteractor(projectDao)
+        return TasksInteractorImpl(projectDao)
     }
 
     @Provides

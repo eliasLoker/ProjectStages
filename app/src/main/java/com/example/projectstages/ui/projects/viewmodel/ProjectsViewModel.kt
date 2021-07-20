@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
+import com.example.projectstages.ui.projects.interactor.ProjectsInteractorImpl
 import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.ui.projects.viewmodel.ProjectsContract.ViewEvent
 import com.example.projectstages.utils.Constants
@@ -15,7 +16,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ProjectsViewModel(
-    private val interactor: ProjectsInteractor
+    private val interactorImpl: ProjectsInteractor
 ) :
     BaseViewModel<
             ProjectsContract.ViewState,
@@ -34,8 +35,7 @@ class ProjectsViewModel(
 
     private fun fetchProjects() {
         viewModelScope.launch {
-//            delay(1000)
-                when(val projects = interactor.getProjects()) {
+                when(val projects = interactorImpl.getProjects()) {
                     is ResultWrapper.Success -> {
                         projects.data.collectLatest { it ->
                             when(it.isNotEmpty()) {
@@ -170,7 +170,7 @@ class ProjectsViewModel(
 
     private fun updateProject(name: String, type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val updateResult = interactor.updateProjectById(
+            val updateResult = interactorImpl.updateProjectById(
                 _projects[positionProjectForDeleteOrEdit].id,
                 name,
                 type
@@ -185,7 +185,7 @@ class ProjectsViewModel(
 
     private fun deleteProject() {
         viewModelScope.launch(Dispatchers.IO) {
-            val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
+            val deleteResult = interactorImpl.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
             val effect = when(deleteResult > 0) {
                 true -> ProjectsContract.ViewEffect.SuccessDelete
                 false -> ProjectsContract.ViewEffect.FailureDelete
@@ -197,7 +197,7 @@ class ProjectsViewModel(
     private fun addProject(name: String, type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val project = ProjectEntity(name, type, System.currentTimeMillis())
-            val insertResult = interactor.insertProject(project)
+            val insertResult = interactorImpl.insertProject(project)
             val effect = when(insertResult > 0) {
                 true -> ProjectsContract.ViewEffect.SuccessAddDialog
                 false -> ProjectsContract.ViewEffect.FailureAddDialog
