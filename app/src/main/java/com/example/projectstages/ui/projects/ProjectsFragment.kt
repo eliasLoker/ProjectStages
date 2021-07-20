@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -18,20 +17,15 @@ import androidx.core.view.setPadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.app.App
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.main.ProjectsNavigationListener
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapter
 import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
-import com.example.projectstages.ui.projects.inject.ProjectComponent
-import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.viewmodel.ProjectsContract
-import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.*
-import dagger.android.AndroidInjection
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -45,22 +39,18 @@ class ProjectsFragment(
         ProjectsContract.ViewEvent
         >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
-    override lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject override lateinit var viewModelFactory: ViewModelProvider.Factory
     override val viewModelClass = ProjectsViewModel::class
 
     private lateinit var projectsAdapter: ProjectsAdapter
     private lateinit var navigation: ProjectsNavigationListener
 
-    private lateinit var projectComponent: ProjectComponent
-
-    @Inject lateinit var projectsInteractor: ProjectsInteractor
-
     override fun onAttach(context: Context) {
 
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-        viewModelFactory = ProjectsFactory(projectsInteractor)
-        Log.d("DependecyInject", "onAttach Int: $projectsInteractor")
+        navigation = (activity) as ProjectsNavigationListener
+//        Log.d("DependecyInject", "onAttach Int: $projectsInteractor")
     }
 
     //        projectComponent = (requireContext().applicationContext as App).appComponent

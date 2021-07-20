@@ -15,11 +15,11 @@ class AppModule {
 
     @Provides
     @AppScope
-    fun provideApplicationContext(app: Application): Context = app
+    fun providesApplicationContext(app: Application): Context = app
 
     @Provides
     @AppScope
-    fun provideDatabase(context: Context) : ProjectDatabase {
+    fun providesDatabase(context: Context) : ProjectDatabase {
         Log.d("DependecyInject", "init provideDatabase")
         return Room
             .databaseBuilder(
@@ -33,7 +33,7 @@ class AppModule {
 
     @Provides
     @AppScope
-    fun provideDao(projectDatabase: ProjectDatabase) : ProjectDao {
+    fun providesDao(projectDatabase: ProjectDatabase) : ProjectDao {
         return projectDatabase.getProjectDao()
     }
 }
