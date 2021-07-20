@@ -1,6 +1,7 @@
 package com.example.projectstages.utils
 
 import android.app.AlertDialog
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
@@ -50,6 +51,12 @@ fun Fragment.getBooleanFromBundleExt(key: String) : Boolean
 
 fun Fragment.getStringFromBundleExt(key: String) : String
 = arguments?.getString(key, "") ?: ""
+
+fun Bundle?.getLongFromBundleExt(key: String) : Long
+= this?.getLong(key) ?: 0L
+
+fun Bundle?.getStringFromBundleExt(key: String) : String
+        = this?.getString(key, "") ?: ""
 
 fun Fragment.showToast(message: String, length: Int = Toast.LENGTH_SHORT) =
     Toast.makeText(requireContext(), message, length).show()

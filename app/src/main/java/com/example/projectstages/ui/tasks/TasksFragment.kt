@@ -122,8 +122,8 @@ class TasksFragment(
 
     companion object {
 
-        private const val TAG_FOR_PROJECT_ID = "PROJECT_ID"
-        private const val TAG_FOR_PROJECT_NAME = "PROJECT_NAME"
+        const val TAG_FOR_PROJECT_ID = "PROJECT_ID"
+        const val TAG_FOR_PROJECT_NAME = "PROJECT_NAME"
 
         @JvmStatic
         fun getBundle(projectID: Long, projectName: String) = Bundle().apply {
