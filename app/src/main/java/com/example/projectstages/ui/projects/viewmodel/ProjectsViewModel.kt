@@ -149,13 +149,9 @@ class ProjectsViewModel @Inject constructor(
             -> addProject(viewEvent.name, viewEvent.type)
 
             is ViewEvent.OnItemClicked
-            -> {
-//                Log.d("ProjectsViewModel", "VE: ${viewEvent.position}")
-//                return
-                sendViewEffect(ProjectsContract.ViewEffect.GoToTaskList(
+            -> sendViewEffect(ProjectsContract.ViewEffect.GoToTaskList(
                     _projects[viewEvent.position].id,
                     _projects[viewEvent.position].name))
-            }
 
             is ViewEvent.OnPopupDeleteClicked
             -> onPopupDeleteClicked(viewEvent.position)
@@ -225,6 +221,5 @@ class ProjectsViewModel @Inject constructor(
             _projects[position].type
         ))
     }
-
 
 }

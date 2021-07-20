@@ -13,7 +13,6 @@ import dagger.hilt.components.SingletonComponent
 class TaskModule {
 
     @Provides
-    fun providesTaskInteractor(projectDao: ProjectDao) : TaskInteractor {
-        return TaskInteractorImpl(projectDao)
-    }
+    fun providesTaskInteractor(projectDao: ProjectDao) : TaskInteractor
+    = TaskInteractorImpl(projectDao)
 }

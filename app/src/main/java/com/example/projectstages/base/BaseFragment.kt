@@ -20,7 +20,7 @@ private typealias FragmentViewBindingInflater<VB> = (
     attachToParent: Boolean
 ) -> VB
 
-abstract class BaseFragment2<
+abstract class BaseFragment<
         VB : ViewBinding,
         ViewState : BaseViewState,
         Action : BaseAction,

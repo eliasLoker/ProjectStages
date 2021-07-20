@@ -7,7 +7,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.example.projectstages.R
-import com.example.projectstages.base.BaseFragment2
+import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
-) : BaseFragment2<
+) : BaseFragment<
         FragmentTaskBinding,
         TaskContract.ViewState,
         TaskContract.Action,

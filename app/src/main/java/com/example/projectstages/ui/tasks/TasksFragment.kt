@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.base.BaseFragment2
+import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.databinding.FragmentTasksBinding
 import com.example.projectstages.ui.main.TasksNavigationListener
 import com.example.projectstages.ui.tasks.adapter.TasksAdapter
@@ -16,12 +15,11 @@ import com.example.projectstages.ui.tasks.adapter.TasksAdapterListener
 import com.example.projectstages.ui.tasks.viewmodel.*
 import com.example.projectstages.utils.*
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TasksFragment(
     layoutID: Int = R.layout.fragment_tasks
-) : BaseFragment2<
+) : BaseFragment<
         FragmentTasksBinding,
         TasksContract.ViewState,
         TasksContract.Action,

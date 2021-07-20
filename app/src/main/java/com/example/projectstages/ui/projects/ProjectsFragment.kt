@@ -17,7 +17,7 @@ import androidx.core.view.setPadding
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.base.BaseFragment2
+import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.SpinnerAdapterWithImage
 import com.example.projectstages.databinding.FragmentProjectsBinding
 import com.example.projectstages.ui.main.ProjectsNavigationListener
@@ -31,7 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
-) : BaseFragment2<
+) : BaseFragment<
         FragmentProjectsBinding,
         ProjectsContract.ViewState,
         ProjectsContract.Action,

@@ -13,7 +13,6 @@ import dagger.hilt.components.SingletonComponent
 class ProjectsModule {
 
     @Provides
-    fun providesProjectsInteractor(projectDao: ProjectDao) : ProjectsInteractor {
-        return ProjectsInteractorImpl(projectDao)
-    }
+    fun providesProjectsInteractor(projectDao: ProjectDao) : ProjectsInteractor
+    = ProjectsInteractorImpl(projectDao)
 }
