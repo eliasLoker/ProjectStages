@@ -9,7 +9,9 @@ import com.example.projectstages.R
 import com.example.projectstages.databinding.ActivityMainBinding
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.tasks.TasksFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavigationListener, TaskNavigationListener {
 
     private lateinit var navController: NavController

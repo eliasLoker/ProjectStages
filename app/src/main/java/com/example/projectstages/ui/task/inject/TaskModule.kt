@@ -1,33 +1,18 @@
 package com.example.projectstages.ui.task.inject
 
-import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.data.ProjectDao
-import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.interactor.TaskInteractorImpl
-import com.example.projectstages.ui.task.viewmodel.TaskFactory
-import com.example.projectstages.utils.getBooleanFromBundleExt
-import com.example.projectstages.utils.getLongFromBundleExt
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 @Module
+@InstallIn(SingletonComponent::class)
 class TaskModule {
 
-    @TaskScope
     @Provides
-    fun providesInteractor(projectDao: ProjectDao) : TaskInteractor {
-        return TaskInteractorImpl(projectDao)
-    }
-
-    @Provides
-    @TaskScope
-    fun providesTaskFactory(tasksFragment: TaskFragment, taskInteractor: TaskInteractor) : ViewModelProvider.Factory {
-        return TaskFactory(
-            tasksFragment.arguments.getBooleanFromBundleExt(TaskFragment.IS_EDIT),
-            tasksFragment.arguments.getLongFromBundleExt(TaskFragment.PROJECT_ID),
-            tasksFragment.arguments.getLongFromBundleExt(TaskFragment.TASK_ID),
-            taskInteractor
-        )
-    }
+    fun providesTaskInteractor(projectDao: ProjectDao) : TaskInteractor
+    = TaskInteractorImpl(projectDao)
 }

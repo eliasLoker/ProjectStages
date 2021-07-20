@@ -1,6 +1,5 @@
 package com.example.projectstages.ui.projects.interactor
 
-import android.util.Log
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.data.entity.ProjectsWithTasks
@@ -8,8 +7,9 @@ import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ProjectsInteractorImpl(
+class ProjectsInteractorImpl @Inject constructor(
     private val projectDao: ProjectDao
 ) : ProjectsInteractor {
 

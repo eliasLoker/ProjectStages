@@ -1,25 +1,18 @@
 package com.example.projectstages.ui.projects.inject
 
-import androidx.lifecycle.ViewModelProvider
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractorImpl
-import com.example.projectstages.ui.projects.viewmodel.ProjectsFactory
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 @Module
+@InstallIn(SingletonComponent::class)
 class ProjectsModule {
 
     @Provides
-    @ProjectsScope
-    fun providesProjectsInteractor(projectDao: ProjectDao) : ProjectsInteractor {
-        return ProjectsInteractorImpl(projectDao)
-    }
-
-    @Provides
-    @ProjectsScope
-    fun providesProjectsFactory(projectsInteractor: ProjectsInteractor) : ViewModelProvider.Factory {
-        return ProjectsFactory(projectsInteractor)
-    }
+    fun providesProjectsInteractor(projectDao: ProjectDao) : ProjectsInteractor
+    = ProjectsInteractorImpl(projectDao)
 }

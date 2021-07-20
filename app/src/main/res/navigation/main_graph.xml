@@ -30,10 +30,31 @@
             app:exitAnim="@anim/to_left_out"
             app:popEnterAnim="@anim/to_right_in"
             app:popExitAnim="@anim/to_right_out"/>
+        <argument
+            android:name="projectID"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="projectName"
+            app:argType="string"
+            android:defaultValue=" " />
     </fragment>
     <fragment
         android:id="@+id/taskFragment"
         android:name="com.example.projectstages.ui.task.TaskFragment"
         android:label="fragment_task"
-        tools:layout="@layout/fragment_task" />
+        tools:layout="@layout/fragment_task" >
+        <argument
+            android:name="isEdit"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="projectID"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="taskID"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
 </navigation>

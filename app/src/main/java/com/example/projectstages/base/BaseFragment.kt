@@ -7,14 +7,12 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.base.viewmodel.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
-import kotlin.reflect.KClass
 
 private typealias FragmentViewBindingInflater<VB> = (
     inflater: LayoutInflater,
@@ -27,7 +25,8 @@ abstract class BaseFragment<
         ViewState : BaseViewState,
         Action : BaseAction,
         ViewEffect: BaseViewEffect,
-        ViewEvent : BaseViewEvent
+        ViewEvent : BaseViewEvent,
+        ViewModel : BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
         >(
     @LayoutRes
     private val layoutID: Int,
@@ -38,11 +37,13 @@ abstract class BaseFragment<
 
     protected val binding get() = _binding!!
 
-    abstract var viewModelFactory: ViewModelProvider.Factory
-    abstract val viewModelClass: KClass<out BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>>
-    protected lateinit var viewModel: BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
+    abstract val viewModel : ViewModel
 
-    private fun getViewModels() = ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
+//    abstract var viewModelFactory: ViewModelProvider.Factory
+//    abstract val viewModelClass: KClass<out BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>>
+//    protected lateinit var viewModel: BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
+
+//    private fun getViewModels() : BaseViewModel<ViewState, Action, ViewEffect, ViewEvent> = ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
 
     final override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,8 +56,10 @@ abstract class BaseFragment<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = getViewModels()
+//        viewModel = getViewModels()
 //        subscribeToViewState(viewModel.stateFlow)
+//        subscribeToViewState(viewModel.stateFlow)
+//        subscribeToViewEffect(viewModel.viewEffect)
         subscribeToViewState(viewModel.stateFlow)
         subscribeToViewEffect(viewModel.viewEffect)
     }

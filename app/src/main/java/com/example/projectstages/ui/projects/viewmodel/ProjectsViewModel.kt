@@ -4,19 +4,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
-import com.example.projectstages.ui.projects.interactor.ProjectsInteractorImpl
 import com.example.projectstages.ui.projects.model.Project
 import com.example.projectstages.ui.projects.viewmodel.ProjectsContract.ViewEvent
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class ProjectsViewModel(
-    private val interactorImpl: ProjectsInteractor
+@HiltViewModel
+class ProjectsViewModel @Inject constructor(
+    private val interactor: ProjectsInteractor
 ) :
     BaseViewModel<
             ProjectsContract.ViewState,
@@ -35,7 +37,8 @@ class ProjectsViewModel(
 
     private fun fetchProjects() {
         viewModelScope.launch {
-                when(val projects = interactorImpl.getProjects()) {
+//            delay(1000)
+                when(val projects = interactor.getProjects()) {
                     is ResultWrapper.Success -> {
                         projects.data.collectLatest { it ->
                             when(it.isNotEmpty()) {
@@ -146,13 +149,9 @@ class ProjectsViewModel(
             -> addProject(viewEvent.name, viewEvent.type)
 
             is ViewEvent.OnItemClicked
-            -> {
-//                Log.d("ProjectsViewModel", "VE: ${viewEvent.position}")
-//                return
-                sendViewEffect(ProjectsContract.ViewEffect.GoToTaskList(
+            -> sendViewEffect(ProjectsContract.ViewEffect.GoToTaskList(
                     _projects[viewEvent.position].id,
                     _projects[viewEvent.position].name))
-            }
 
             is ViewEvent.OnPopupDeleteClicked
             -> onPopupDeleteClicked(viewEvent.position)
@@ -170,7 +169,7 @@ class ProjectsViewModel(
 
     private fun updateProject(name: String, type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val updateResult = interactorImpl.updateProjectById(
+            val updateResult = interactor.updateProjectById(
                 _projects[positionProjectForDeleteOrEdit].id,
                 name,
                 type
@@ -185,7 +184,7 @@ class ProjectsViewModel(
 
     private fun deleteProject() {
         viewModelScope.launch(Dispatchers.IO) {
-            val deleteResult = interactorImpl.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
+            val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
             val effect = when(deleteResult > 0) {
                 true -> ProjectsContract.ViewEffect.SuccessDelete
                 false -> ProjectsContract.ViewEffect.FailureDelete
@@ -197,7 +196,7 @@ class ProjectsViewModel(
     private fun addProject(name: String, type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val project = ProjectEntity(name, type, System.currentTimeMillis())
-            val insertResult = interactorImpl.insertProject(project)
+            val insertResult = interactor.insertProject(project)
             val effect = when(insertResult > 0) {
                 true -> ProjectsContract.ViewEffect.SuccessAddDialog
                 false -> ProjectsContract.ViewEffect.FailureAddDialog
@@ -222,6 +221,5 @@ class ProjectsViewModel(
             _projects[position].type
         ))
     }
-
 
 }

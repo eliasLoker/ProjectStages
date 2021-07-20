@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseFragment
@@ -12,12 +12,11 @@ import com.example.projectstages.databinding.FragmentTasksBinding
 import com.example.projectstages.ui.main.TasksNavigationListener
 import com.example.projectstages.ui.tasks.adapter.TasksAdapter
 import com.example.projectstages.ui.tasks.adapter.TasksAdapterListener
-import com.example.projectstages.ui.tasks.viewmodel.TasksContract
-import com.example.projectstages.ui.tasks.viewmodel.TasksViewModel
+import com.example.projectstages.ui.tasks.viewmodel.*
 import com.example.projectstages.utils.*
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TasksFragment(
     layoutID: Int = R.layout.fragment_tasks
 ) : BaseFragment<
@@ -25,17 +24,16 @@ class TasksFragment(
         TasksContract.ViewState,
         TasksContract.Action,
         TasksContract.ViewEffect,
-        TasksContract.ViewEvent
+        TasksContract.ViewEvent,
+        TasksViewModel
         >(layoutID, FragmentTasksBinding::inflate), TasksAdapterListener {
 
-    @Inject override lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModelClass = TasksViewModel::class
+    override val viewModel  by viewModels<TasksViewModel>()
 
     private lateinit var tasksAdapter: TasksAdapter
     private lateinit var navigation: TasksNavigationListener
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
         navigation = activity as TasksNavigationListener
         super.onAttach(context)
     }

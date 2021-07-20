@@ -14,7 +14,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseFragment
@@ -26,9 +26,9 @@ import com.example.projectstages.ui.projects.adapter.ProjectsAdapterListener
 import com.example.projectstages.ui.projects.viewmodel.ProjectsContract
 import com.example.projectstages.ui.projects.viewmodel.ProjectsViewModel
 import com.example.projectstages.utils.*
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProjectsFragment(
     layoutId: Int = R.layout.fragment_projects
 ) : BaseFragment<
@@ -36,18 +36,18 @@ class ProjectsFragment(
         ProjectsContract.ViewState,
         ProjectsContract.Action,
         ProjectsContract.ViewEffect,
-        ProjectsContract.ViewEvent
+        ProjectsContract.ViewEvent,
+        ProjectsViewModel
         >(layoutId, FragmentProjectsBinding::inflate), ProjectsAdapterListener {
 
-    @Inject override lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModelClass = ProjectsViewModel::class
-
+    override val viewModel: ProjectsViewModel by viewModels()
     private lateinit var projectsAdapter: ProjectsAdapter
     private lateinit var navigation: ProjectsNavigationListener
 
     override fun onAttach(context: Context) {
+//        val projectsInteractor = ProjectsInteractor(requireContext().appComponentOld.projectDao)
+//        viewModelFactory = ProjectsFactory(projectsInteractor)
         navigation = (activity) as ProjectsNavigationListener
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 

@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseFragment
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
@@ -15,9 +15,9 @@ import com.example.projectstages.ui.main.TaskNavigationListener
 import com.example.projectstages.ui.task.viewmodel.TaskContract
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.*
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
 ) : BaseFragment<
@@ -25,16 +25,16 @@ class TaskFragment(
         TaskContract.ViewState,
         TaskContract.Action,
         TaskContract.ViewEffect,
-        TaskContract.ViewEvent
+        TaskContract.ViewEvent,
+        TaskViewModel
         >(layoutID, FragmentTaskBinding::inflate) {
 
-    @Inject override lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModelClass = TaskViewModel::class
+    override val viewModel by viewModels<TaskViewModel>()
+
     private lateinit var navigation: TaskNavigationListener
 
     override fun onAttach(context: Context) {
         navigation = (activity) as TaskNavigationListener
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 

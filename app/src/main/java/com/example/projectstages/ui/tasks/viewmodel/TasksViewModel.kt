@@ -1,21 +1,24 @@
 package com.example.projectstages.ui.tasks.viewmodel
 
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
+import com.example.projectstages.ui.tasks.TasksFragment
 import com.example.projectstages.ui.tasks.interactor.TasksInteractor
 import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class TasksViewModel(
-    private val projectId: Long,
-    private val projectName: String,
-    private val tasksInteractor: TasksInteractor
+@HiltViewModel
+class TasksViewModel @Inject constructor(
+    private val tasksInteractor: TasksInteractor,
+    savedStateHandle: SavedStateHandle
 ) : BaseViewModel<
         TasksContract.ViewState,
         TasksContract.Action,
@@ -24,10 +27,13 @@ class TasksViewModel(
         >(TasksContract.ViewState()) {
 
     private val _tasks = ArrayList<Task>()
+    private var projectId: Long = 0L
+    private var projectName: String = ""
 
     init {
+        projectId = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_ID, 0L).value ?: 0L
+        projectName = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_NAME, "").value ?: ""
         viewModelScope.launch {
-//            delay(1000)
             when(val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success -> {
                     tasks.data.collectLatest {
