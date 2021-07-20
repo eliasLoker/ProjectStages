@@ -31,20 +31,20 @@ class TasksFragment(
         TasksContract.ViewEvent
         >(layoutID, FragmentTasksBinding::inflate), TasksAdapterListener {
 
-    override lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject override lateinit var viewModelFactory: ViewModelProvider.Factory
     override val viewModelClass = TasksViewModel::class
 
     private lateinit var tasksAdapter: TasksAdapter
     private lateinit var navigation: TasksNavigationListener
 
-    @Inject lateinit var tasksInteractor: TasksInteractor
+//    @Inject lateinit var tasksInteractor: TasksInteractor
 
     override fun onAttach(context: Context) {
         val id = getLongFromBundleExt(TAG_FOR_PROJECT_ID)
         val projectName = getStringFromBundleExt(TAG_FOR_PROJECT_NAME)
 //        val interactor = TasksInteractor(requireContext().appComponentOld.projectDao)
         AndroidSupportInjection.inject(this)
-        viewModelFactory = TasksFactory(id,projectName, tasksInteractor)
+//        viewModelFactory = TasksFactory(id,projectName, tasksInteractor)
         navigation = activity as TasksNavigationListener
         super.onAttach(context)
     }
