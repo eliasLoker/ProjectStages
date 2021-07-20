@@ -1,9 +1,5 @@
 package com.example.projectstages.ui.tasks.viewmodel
 
-import androidx.annotation.MainThread
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.createViewModelLazy
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
@@ -12,11 +8,7 @@ import com.example.projectstages.ui.tasks.interactor.TasksInteractor
 import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.internal.Factory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -26,7 +18,7 @@ import kotlin.collections.ArrayList
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     private val tasksInteractor: TasksInteractor,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : BaseViewModel<
         TasksContract.ViewState,
         TasksContract.Action,
@@ -39,8 +31,8 @@ class TasksViewModel @Inject constructor(
     private var projectName: String = ""
 
     init {
-        projectId = savedStateHandle.getLiveData<Long>(TasksFragment.TAG_FOR_PROJECT_ID, 0L).value!!
-        projectName = savedStateHandle.getLiveData<String>(TasksFragment.TAG_FOR_PROJECT_NAME, "").value!!
+        projectId = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_ID, 0L).value ?: 0L
+        projectName = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_NAME, "").value ?: ""
         viewModelScope.launch {
             when(val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success -> {

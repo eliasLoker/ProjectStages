@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.ProjectDatabase
-import com.example.projectstages.ui.projects.interactor.ProjectsInteractor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +15,7 @@ import dagger.hilt.components.SingletonComponent
 class AppComponent {
 
     @Provides
-    fun providesProjectDao(@ApplicationContext context: Context) : ProjectDao = Room
+    fun providesProjectDatabase(@ApplicationContext context: Context) : ProjectDatabase = Room
         .databaseBuilder(
             context.applicationContext,
             ProjectDatabase::class.java,
@@ -24,5 +23,8 @@ class AppComponent {
         )
         .fallbackToDestructiveMigration()
         .build()
-        .getProjectDao()
+
+    @Provides
+    fun providesProjectDao(projectDatabase: ProjectDatabase) : ProjectDao
+    = projectDatabase.getProjectDao()
 }

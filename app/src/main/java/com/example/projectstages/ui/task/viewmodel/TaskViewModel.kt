@@ -1,18 +1,21 @@
 package com.example.projectstages.ui.task.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.TaskEntity
+import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.utils.Constants
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskViewModel(
-    private val isEdit: Boolean,
-    private val projectID: Long,
-    private val taskID: Long,
-    private val taskInteractor: TaskInteractor
+@HiltViewModel
+class TaskViewModel @Inject constructor(
+    private val taskInteractor: TaskInteractor,
+    savedStateHandle: SavedStateHandle
 ) : BaseViewModel<
         TaskContract.ViewState,
         TaskContract.Action,
@@ -23,8 +26,14 @@ class TaskViewModel(
 
     private val taskDescription = StringBuilder()
     private var taskType = 0
+    private var isEdit = false
+    private var projectID = 0L
+    private var taskID = 0L
 
     init {
+        isEdit = savedStateHandle.getLiveData<Boolean>(TaskFragment.IS_EDIT, false).value ?: false
+        projectID = savedStateHandle.getLiveData<Long>(TaskFragment.PROJECT_ID, 0L).value ?: 0L
+        taskID = savedStateHandle.getLiveData<Long>(TaskFragment.TASK_ID, 0L).value ?: 0L
         fetchTask()
     }
 

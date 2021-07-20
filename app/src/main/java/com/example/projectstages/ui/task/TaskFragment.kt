@@ -5,40 +5,35 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponentOld
-import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.BaseFragment2
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerAdapterWithImageAndText
 import com.example.projectstages.customview.spinnerwithimageandtext.SpinnerItem
 import com.example.projectstages.databinding.FragmentTaskBinding
 import com.example.projectstages.ui.main.TaskNavigationListener
-import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.ui.task.viewmodel.TaskContract
-import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
-) : BaseFragment<
+) : BaseFragment2<
         FragmentTaskBinding,
         TaskContract.ViewState,
         TaskContract.Action,
         TaskContract.ViewEffect,
-        TaskContract.ViewEvent
+        TaskContract.ViewEvent,
+        TaskViewModel
         >(layoutID, FragmentTaskBinding::inflate) {
 
-    override lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModelClass = TaskViewModel::class
+    override val viewModel by viewModels<TaskViewModel>()
+
     private lateinit var navigation: TaskNavigationListener
 
     override fun onAttach(context: Context) {
-        val projectID = getLongFromBundleExt(PROJECT_ID)
-        val taskID = getLongFromBundleExt(TASK_ID)
-        val isEdit = getBooleanFromBundleExt(IS_EDIT)
-        val interactor = TaskInteractor(requireContext().appComponentOld.projectDao)
-        viewModelFactory = TaskFactory(isEdit, projectID, taskID, interactor)
         navigation = (activity) as TaskNavigationListener
         super.onAttach(context)
     }
@@ -127,9 +122,9 @@ class TaskFragment(
 
     companion object {
 
-        private const val PROJECT_ID = "PROJECT_ID"
-        private const val TASK_ID = "TASK_ID"
-        private const val IS_EDIT = "IS_EDIT"
+        const val PROJECT_ID = "PROJECT_ID"
+        const val TASK_ID = "TASK_ID"
+        const val IS_EDIT = "IS_EDIT"
 
         @JvmStatic
         fun getBundleForEditTask(taskID: Long) = Bundle().apply {

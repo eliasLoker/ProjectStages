@@ -1,4 +1,4 @@
-package com.example.projectstages.ui.tasks
+package com.example.projectstages.ui.tasks.inject
 
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.ui.tasks.interactor.TasksInteractor
