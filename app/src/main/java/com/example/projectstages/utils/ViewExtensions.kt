@@ -58,6 +58,9 @@ fun Bundle?.getLongFromBundleExt(key: String) : Long
 fun Bundle?.getStringFromBundleExt(key: String) : String
         = this?.getString(key, "") ?: ""
 
+fun Bundle?.getBooleanFromBundleExt(key: String) : Boolean
+        = this?.getBoolean(key) ?: false
+
 fun Fragment.showToast(message: String, length: Int = Toast.LENGTH_SHORT) =
     Toast.makeText(requireContext(), message, length).show()
 

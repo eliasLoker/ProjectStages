@@ -18,6 +18,8 @@ import com.example.projectstages.ui.task.viewmodel.TaskContract
 import com.example.projectstages.ui.task.viewmodel.TaskFactory
 import com.example.projectstages.ui.task.viewmodel.TaskViewModel
 import com.example.projectstages.utils.*
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class TaskFragment(
     layoutID: Int = R.layout.fragment_task
@@ -29,16 +31,19 @@ class TaskFragment(
         TaskContract.ViewEvent
         >(layoutID, FragmentTaskBinding::inflate) {
 
-    override lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject override lateinit var viewModelFactory: ViewModelProvider.Factory
     override val viewModelClass = TaskViewModel::class
     private lateinit var navigation: TaskNavigationListener
 
+//    @Inject lateinit var taskInteractor: TaskInteractor
+
     override fun onAttach(context: Context) {
-        val projectID = getLongFromBundleExt(PROJECT_ID)
-        val taskID = getLongFromBundleExt(TASK_ID)
-        val isEdit = getBooleanFromBundleExt(IS_EDIT)
-        val interactor = TaskInteractor(requireContext().appComponentOld.projectDao)
-        viewModelFactory = TaskFactory(isEdit, projectID, taskID, interactor)
+//        val projectID = getLongFromBundleExt(PROJECT_ID)
+//        val taskID = getLongFromBundleExt(TASK_ID)
+//        val isEdit = getBooleanFromBundleExt(IS_EDIT)
+//        val interactor = TaskInteractor(requireContext().appComponentOld.projectDao)
+        AndroidSupportInjection.inject(this)
+//        viewModelFactory = TaskFactory(isEdit, projectID, taskID, taskInteractor)
         navigation = (activity) as TaskNavigationListener
         super.onAttach(context)
     }
@@ -127,9 +132,9 @@ class TaskFragment(
 
     companion object {
 
-        private const val PROJECT_ID = "PROJECT_ID"
-        private const val TASK_ID = "TASK_ID"
-        private const val IS_EDIT = "IS_EDIT"
+        const val PROJECT_ID = "PROJECT_ID"
+        const val TASK_ID = "TASK_ID"
+        const val IS_EDIT = "IS_EDIT"
 
         @JvmStatic
         fun getBundleForEditTask(taskID: Long) = Bundle().apply {
