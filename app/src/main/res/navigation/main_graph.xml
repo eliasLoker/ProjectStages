@@ -30,6 +30,14 @@
             app:exitAnim="@anim/to_left_out"
             app:popEnterAnim="@anim/to_right_in"
             app:popExitAnim="@anim/to_right_out"/>
+        <argument
+            android:name="projectID"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="projectName"
+            app:argType="string"
+            android:defaultValue=" " />
     </fragment>
     <fragment
         android:id="@+id/taskFragment"

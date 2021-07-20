@@ -6,8 +6,9 @@ import com.example.projectstages.utils.ResultWrapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class TasksInteractor(
+class TasksInteractor @Inject constructor(
     private val projectDao: ProjectDao
 ) {
 

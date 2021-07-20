@@ -4,42 +4,38 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectstages.R
-import com.example.projectstages.app.App.Companion.appComponentOld
-import com.example.projectstages.base.BaseFragment
+import com.example.projectstages.base.BaseFragment2
 import com.example.projectstages.databinding.FragmentTasksBinding
 import com.example.projectstages.ui.main.TasksNavigationListener
 import com.example.projectstages.ui.tasks.adapter.TasksAdapter
 import com.example.projectstages.ui.tasks.adapter.TasksAdapterListener
-import com.example.projectstages.ui.tasks.interactor.TasksInteractor
-import com.example.projectstages.ui.tasks.viewmodel.TasksContract
-import com.example.projectstages.ui.tasks.viewmodel.TasksFactory
-import com.example.projectstages.ui.tasks.viewmodel.TasksViewModel
+import com.example.projectstages.ui.tasks.viewmodel.*
 import com.example.projectstages.utils.*
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TasksFragment(
     layoutID: Int = R.layout.fragment_tasks
-) : BaseFragment<
+) : BaseFragment2<
         FragmentTasksBinding,
         TasksContract.ViewState,
         TasksContract.Action,
         TasksContract.ViewEffect,
-        TasksContract.ViewEvent
+        TasksContract.ViewEvent,
+        TasksViewModel
         >(layoutID, FragmentTasksBinding::inflate), TasksAdapterListener {
 
-    override lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModelClass = TasksViewModel::class
+    override val viewModel  by viewModels<TasksViewModel>()
 
     private lateinit var tasksAdapter: TasksAdapter
     private lateinit var navigation: TasksNavigationListener
 
     override fun onAttach(context: Context) {
-        val id = getLongFromBundleExt(TAG_FOR_PROJECT_ID)
-        val projectName = getStringFromBundleExt(TAG_FOR_PROJECT_NAME)
-        val interactor = TasksInteractor(requireContext().appComponentOld.projectDao)
-        viewModelFactory = TasksFactory(id,projectName, interactor)
         navigation = activity as TasksNavigationListener
         super.onAttach(context)
     }
@@ -117,8 +113,8 @@ class TasksFragment(
 
     companion object {
 
-        private const val TAG_FOR_PROJECT_ID = "PROJECT_ID"
-        private const val TAG_FOR_PROJECT_NAME = "PROJECT_NAME"
+        const val TAG_FOR_PROJECT_ID = "PROJECT_ID"
+        const val TAG_FOR_PROJECT_NAME = "PROJECT_NAME"
 
         @JvmStatic
         fun getBundle(projectID: Long, projectName: String) = Bundle().apply {
