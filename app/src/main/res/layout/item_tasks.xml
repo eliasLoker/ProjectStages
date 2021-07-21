@@ -4,6 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="75dp"
     android:background="@color/pale_green"
+    android:focusable="true"
+    android:clickable="true"
+    android:foreground="@drawable/ripple_custom"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <View

@@ -5,7 +5,7 @@ import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
-import com.example.projectstages.databinding.ItemTaskBinding
+import com.example.projectstages.databinding.ItemTasksBinding
 import com.example.projectstages.ui.tasks.model.Task
 
 class TasksAdapter(
@@ -22,7 +22,7 @@ class TasksAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) : TasksHolders.BaseHolder {
         val backgroundColor = TasksHolders.getBackgroundColor(viewType)
         val viewColor = TasksHolders.getViewColor(viewType)
-        return TasksHolders.DefaultType(parent.inflateBinding(ItemTaskBinding::inflate))
+        return TasksHolders.DefaultType(parent.inflateBinding(ItemTasksBinding::inflate))
             .apply {
             verticalView.setBackgroundColor(ContextCompat.getColor(parent.context, viewColor))
             itemView.rootView.setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))

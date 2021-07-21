@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.R
-import com.example.projectstages.databinding.ItemTaskBinding
+import com.example.projectstages.databinding.ItemTasksBinding
 import com.example.projectstages.utils.Constants
 
 class TasksHolders {
@@ -26,7 +26,7 @@ class TasksHolders {
         }
     }
 
-    class DefaultType(binding: ItemTaskBinding) : BaseHolder(binding) {
+    class DefaultType(binding: ItemTasksBinding) : BaseHolder(binding) {
 
         override val descriptionTextView: TextView = binding.taskTextView
 

@@ -52,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/add_task_button"
-        tools:listitem="@layout/item_task"
+        tools:listitem="@layout/item_tasks"
         tools:visibility="visible"/>
 
     <Button
