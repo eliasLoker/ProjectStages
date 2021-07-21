@@ -2,12 +2,13 @@ package com.example.projectstages.ui.projects.adapter
 
 import android.content.Context
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
 import com.example.projectstages.customview.ProgressItem
-import com.example.projectstages.databinding.ItemProjectsDefaultBinding
+import com.example.projectstages.databinding.ItemProjectsBinding
 import com.example.projectstages.ui.projects.model.Project
 
 
@@ -28,7 +29,7 @@ class ProjectsAdapter(
         context = parent.context
         val backgroundColor = ProjectsHolders.getBackgroundColor(viewType)
         val folderView = ProjectsHolders.getFolderView(viewType)
-        return ProjectsHolders.DefaultType(parent.inflateBinding(ItemProjectsDefaultBinding::inflate))
+        return ProjectsHolders.DefaultType(parent.inflateBinding(ItemProjectsBinding::inflate))
             .apply {
             folderImageView.setImageDrawable(ContextCompat.getDrawable(parent.context, folderView))
             itemView.rootView.setBackgroundColor(ContextCompat.getColor(parent.context, backgroundColor))
@@ -36,8 +37,9 @@ class ProjectsAdapter(
     }
 
     override fun onBindViewHolder(holder: ProjectsHolders.BaseHolder, position: Int) {
-        //TODO("Вероятно, в будущем нужно убрать эту расширяемость, тк излишняя и захардкодить три цвета внутри ColorsProgressBar")
+        holder.itemView.animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.recycler_anim)
 
+        //TODO("Вероятно, в будущем нужно убрать эту расширяемость, тк излишняя и захардкодить три цвета внутри ColorsProgressBar")
         val colorsProgressBar = holder.colorsProgressBar
 
         val progressItemList = ArrayList<ProgressItem>().apply {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+    Top example with animations
+    -->
+    <!--
+    <translate
+        android:fromYDelta="100%"
+        android:toYDelta="0%"
+        android:duration="500"
+        />
+
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0"
+        android:duration="500"/>
+
+    <scale
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:fromXScale="0.5"
+        android:fromYScale="0.5"
+        android:toXScale="1"
+        android:toYScale="1"
+        android:duration="500"
+
+        />
+    -->
+    <!--
+    <translate
+        android:fromXDelta="200%"
+        android:toYDelta="0%"
+        android:duration="500"
+        />
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="3.0"
+        android:duration="2500"/>
+    -->
+    <translate
+        android:fromXDelta="200%"
+        android:toYDelta="0%"
+        android:duration="500"
+        />
+
+    <scale
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:fromXScale="0"
+        android:fromYScale="0"
+        android:toXScale="1"
+        android:toYScale="1"
+        android:duration="500"
+
+        />
+</set>

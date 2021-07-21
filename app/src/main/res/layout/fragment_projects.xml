@@ -73,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/add_project_button"
-        tools:listitem="@layout/item_projects_default"
+        tools:listitem="@layout/item_projects"
         tools:visibility="visible"/>
 
     <Button

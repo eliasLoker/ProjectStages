@@ -1,7 +1,9 @@
 package com.example.projectstages.ui.tasks.adapter
 
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
+import com.example.projectstages.R
 import com.example.projectstages.base.BaseAdapter
 import com.example.projectstages.databinding.ItemTaskBinding
 import com.example.projectstages.ui.tasks.model.Task
@@ -28,6 +30,7 @@ class TasksAdapter(
     }
 
     override fun onBindViewHolder(holder: TasksHolders.BaseHolder, position: Int) {
+        holder.itemView.animation = AnimationUtils.loadAnimation(holder.itemView.context, R.anim.recycler_anim)
         holder.bind(tasks[position].description, tasks[position].date)
         holder.itemView.setOnClickListener {
             listener.onTaskClicked(tasks[position].id)

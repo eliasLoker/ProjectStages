@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.example.projectstages.R
 import com.example.projectstages.customview.ColorsProgressBar
-import com.example.projectstages.databinding.ItemProjectsDefaultBinding
+import com.example.projectstages.databinding.ItemProjectsBinding
 import com.example.projectstages.utils.Constants
 
 class ProjectsHolders {
@@ -33,7 +33,7 @@ class ProjectsHolders {
     }
 
 
-    class DefaultType(binding: ItemProjectsDefaultBinding) : BaseHolder(binding) {
+    class DefaultType(binding: ItemProjectsBinding) : BaseHolder(binding) {
 
         override val folderImageView: ImageView = binding.folderImageView
 
