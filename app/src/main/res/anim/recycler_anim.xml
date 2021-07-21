@@ -2,6 +2,7 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android">
     <!--
     Top example with animations
+    https://levelup.gitconnected.com/android-recyclerview-animations-in-kotlin-1e323ffd39be
     -->
     <!--
     <translate
