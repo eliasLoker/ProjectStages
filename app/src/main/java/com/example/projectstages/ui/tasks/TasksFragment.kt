@@ -61,9 +61,9 @@ class TasksFragment(
             progressBar.isVisible = viewState.progressBarVisibility
             recyclerView.isVisible = viewState.taskRecyclerVisibility
             tasksAdapter.setList(viewState.tasks)
-            val errorText = when(viewState.errorMessageTextViewType) {
-                Constants.EmptyList.EMPTY -> requireContext().getString(R.string.tasks_list_empty)
-                Constants.EmptyList.ERROR -> requireContext().getString(R.string.tasks_list_error)
+            val errorText = when(viewState.failureType) {
+                Constants.FailureType.EMPTY_LIST -> requireContext().getString(R.string.tasks_list_empty)
+                Constants.FailureType.ERROR -> requireContext().getString(R.string.tasks_list_error)
             }
             errorTextView.apply {
                 text = errorText

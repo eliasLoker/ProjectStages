@@ -27,9 +27,9 @@ class Constants {
         ADD, EDIT
     }
 
-    enum class EmptyList {
-        EMPTY, ERROR
-    }
+//    enum class EmptyList {
+//        EMPTY, ERROR
+//    }
 
     enum class FailureType {
         EMPTY_LIST,

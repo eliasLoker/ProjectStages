@@ -84,7 +84,7 @@ class TasksViewModel @Inject constructor(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
                 taskRecyclerVisibility = false,
-                errorMessageTextViewType = Constants.EmptyList.EMPTY,
+                failureType = Constants.FailureType.EMPTY_LIST,
                 errorMessageTextViewVisibility = true,
                 headerViewsVisibility = true,
                 addTaskButtonVisibility = true
@@ -98,7 +98,8 @@ class TasksViewModel @Inject constructor(
                 tasks = viewAction.tasks,
                 projectName = projectName,
                 headerViewsVisibility = true,
-                addTaskButtonVisibility = true
+                addTaskButtonVisibility = true,
+                errorMessageTextViewVisibility = false
             )
 
             is TasksContract.Action.Error
@@ -106,7 +107,7 @@ class TasksViewModel @Inject constructor(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
                 taskRecyclerVisibility = false,
-                errorMessageTextViewType = Constants.EmptyList.ERROR,
+                failureType = Constants.FailureType.ERROR,
                 errorMessageTextViewVisibility = true
             )
         }

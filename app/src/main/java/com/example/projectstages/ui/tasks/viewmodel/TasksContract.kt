@@ -12,7 +12,7 @@ class TasksContract : BaseContract{
         val emptyListTextViewVisibility: Boolean = false,
         val taskRecyclerVisibility: Boolean = false,
         val tasks: List<Task> = emptyList(),
-        val errorMessageTextViewType: Constants.EmptyList = Constants.EmptyList.ERROR,
+        val failureType: Constants.FailureType = Constants.FailureType.ERROR,
         val errorMessageTextViewVisibility: Boolean = false,
         val projectName: String = "",
         val addTaskButtonVisibility: Boolean = false,

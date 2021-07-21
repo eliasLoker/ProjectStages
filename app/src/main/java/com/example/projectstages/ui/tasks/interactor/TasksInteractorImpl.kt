@@ -12,11 +12,10 @@ class TasksInteractorImpl @Inject constructor(
     private val projectDao: ProjectDao
 ) : TasksInteractor {
 
-    override suspend fun getTasks(projectID: Long) : ResultWrapper<Flow<List<TaskEntity>>> {
-        return try {
-            withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.getTasksByProjectId(projectID)) }
-        } catch (e: Exception) {
-            ResultWrapper.Error(e)
-        }
+    override suspend fun getTasks(projectID: Long) : ResultWrapper<Flow<List<TaskEntity>>>
+    = try {
+        withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.getTasksByProjectId(projectID)) }
+    } catch (e: Exception) {
+        ResultWrapper.Error(e)
     }
 }
