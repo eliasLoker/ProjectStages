@@ -34,17 +34,17 @@ class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavig
             when (destinationID) {
                 R.id.projectsFragment -> {
                     projectNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.pale_less_green))
-                    tasksNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
-                    taskNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
+                    tasksNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.mate_blue))
+                    taskNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.mate_blue))
                 }
                 R.id.tasksFragment -> {
-                    projectNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
+                    projectNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.mate_blue))
                     tasksNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.pale_less_green))
-                    taskNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
+                    taskNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.mate_blue))
                 }
                 else -> {
-                    projectNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
-                    tasksNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
+                    projectNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.mate_blue))
+                    tasksNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.mate_blue))
                     taskNameTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.pale_less_green))
                 }
             }

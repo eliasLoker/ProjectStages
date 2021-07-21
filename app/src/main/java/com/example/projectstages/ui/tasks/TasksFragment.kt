@@ -45,7 +45,7 @@ class TasksFragment(
             layoutManager = LinearLayoutManager(requireContext())
             tasksAdapter = TasksAdapter(this@TasksFragment)
             adapter = tasksAdapter
-            val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
+            val margin = requireContext().resources.getDimension(R.dimen.margin_default).toInt()
             addItemDecoration(AdapterItemDecorator(margin))
         }
 

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="margin_adapter">16dp</dimen>
+    <dimen name="margin_default">16dp</dimen>
+    <dimen name="height_top_view">90dp</dimen>
+    <dimen name="margin_top_recycler_or_edit_text">70dp</dimen>
 </resources>

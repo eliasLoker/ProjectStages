@@ -58,7 +58,7 @@ class ProjectsFragment(
             layoutManager = LinearLayoutManager(requireContext())
             projectsAdapter = ProjectsAdapter(this@ProjectsFragment)
             adapter = projectsAdapter
-            val margin = requireContext().resources.getDimension(R.dimen.margin_adapter).toInt()
+            val margin = requireContext().resources.getDimension(R.dimen.margin_default).toInt()
             addItemDecoration(AdapterItemDecorator(margin))
         }
 
