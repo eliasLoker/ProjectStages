@@ -48,7 +48,7 @@ class ProjectsViewModel @Inject constructor(
                                         val count = projectsWithTasks.tasks.size
                                         val timestamp = when(count > 0) {
                                             true -> {
-                                                projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.createdTimestamp
+                                                projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.updatedTimestamp
                                                 //TODO(Противно использовать !!, подумать еще на досуге )
                                             }
                                             false -> projectsWithTasks.createdTimestamp
@@ -127,15 +127,19 @@ class ProjectsViewModel @Inject constructor(
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
-                headerViewsVisibility = true,
-                addProjectButtonVisibility = true
+                headerViewsVisibility = false,
+                addProjectButtonVisibility = true,
+                errorTextViewVisibility = true,
+                failureType = Constants.FailureType.EMPTY_LIST
             )
 
             is ProjectsContract.Action.Error
             -> state.copy(
                 progressBarVisibility = false,
                 errorTextViewVisibility = true,
-                headerViewsVisibility = false
+                addProjectButtonVisibility = true,
+                headerViewsVisibility = false,
+                failureType = Constants.FailureType.ERROR
             )
         }
     }
@@ -169,39 +173,59 @@ class ProjectsViewModel @Inject constructor(
 
     private fun updateProject(name: String, type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val updateResult = interactor.updateProjectById(
+            when(val updateResult = interactor.updateProjectById(
                 _projects[positionProjectForDeleteOrEdit].id,
                 name,
                 type
-            )
-            val effect = when(updateResult > 0) {
-                true -> ProjectsContract.ViewEffect.SuccessEdit
-                false -> ProjectsContract.ViewEffect.FailureEdit
+            )) {
+                is ResultWrapper.Success-> {
+                    val effect = when(updateResult.data > 0) {
+                        true -> ProjectsContract.ViewEffect.SuccessEdit
+                        false -> ProjectsContract.ViewEffect.FailureEdit
+                    }
+                    sendViewEffect(effect)
+                }
+
+                is ResultWrapper.Error
+                -> sendViewEffect(ProjectsContract.ViewEffect.FailureEdit)
             }
-            sendViewEffect(effect)
+
         }
     }
 
     private fun deleteProject() {
         viewModelScope.launch(Dispatchers.IO) {
-            val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
-            val effect = when(deleteResult > 0) {
-                true -> ProjectsContract.ViewEffect.SuccessDelete
-                false -> ProjectsContract.ViewEffect.FailureDelete
+            when(val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)) {
+                is ResultWrapper.Success -> {
+                    val effect = when(deleteResult.data > 0) {
+                        true -> ProjectsContract.ViewEffect.SuccessDelete
+                        false -> ProjectsContract.ViewEffect.FailureDelete
+                    }
+                    sendViewEffect(effect)
+                }
+
+                is ResultWrapper.Error
+                -> sendViewEffect(ProjectsContract.ViewEffect.FailureDelete)
             }
-            sendViewEffect(effect)
+
         }
     }
 
     private fun addProject(name: String, type: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val project = ProjectEntity(name, type, System.currentTimeMillis())
-            val insertResult = interactor.insertProject(project)
-            val effect = when(insertResult > 0) {
-                true -> ProjectsContract.ViewEffect.SuccessAddDialog
-                false -> ProjectsContract.ViewEffect.FailureAddDialog
+            when(val insertResult = interactor.insertProject(project)) {
+                is ResultWrapper.Success -> {
+                    val effect = when(insertResult.data > 0) {
+                        true -> ProjectsContract.ViewEffect.SuccessAddDialog
+                        false -> ProjectsContract.ViewEffect.FailureAddDialog
+                    }
+                    sendViewEffect(effect)
+                }
+
+                is ResultWrapper.Error
+                -> sendViewEffect(ProjectsContract.ViewEffect.FailureAddDialog)
             }
-            sendViewEffect(effect)
         }
     }
 

@@ -9,9 +9,9 @@ interface ProjectsInteractor {
 
     suspend fun getProjects() : ResultWrapper<Flow<List<ProjectsWithTasks>>>
 
-    suspend fun insertProject(projectEntity: ProjectEntity) : Long
+    suspend fun insertProject(projectEntity: ProjectEntity) : ResultWrapper<Long>
 
-    suspend fun deleteProjectById(projectId: Long) : Int
+    suspend fun deleteProjectById(projectId: Long) : ResultWrapper<Int>
 
-    suspend fun updateProjectById(projectId: Long, name: String, type: Int) : Int
+    suspend fun updateProjectById(projectId: Long, name: String, type: Int) : ResultWrapper<Int>
 }

@@ -82,8 +82,14 @@ class ProjectsFragment(
             allTasksTextView.isVisible = viewState.headerViewsVisibility
             completedTasksTextView.isVisible = viewState.headerViewsVisibility
 
-            errorTextView.isVisible = viewState.errorTextViewVisibility
             addProjectButton.isVisible = viewState.addProjectButtonVisibility
+//            val ds = viewState.failureType.type
+            val textFailure = when(viewState.failureType) {
+                Constants.FailureType.EMPTY_LIST -> getStringExt(R.string.projects_empty)
+                Constants.FailureType.ERROR -> getStringExt(R.string.projects_error)
+            }
+            errorTextView.text = textFailure
+            errorTextView.isVisible = viewState.errorTextViewVisibility
         }
     }
 

@@ -16,15 +16,15 @@ import androidx.room.PrimaryKey
             onDelete = CASCADE,
         )
     ],
-    indices = [Index(value = ["projectId"])]
+indices = [Index("projectId"), Index("description", unique = true)]
+
 )
 data class TaskEntity(
     var projectId: Long,
     var description: String,
     var state: Int,
-    var createdTimestamp: Long
+    var updatedTimestamp: Long
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 }
-//TODO("Переименовать createdTimestamp, тк при редактировании будет обновляться")

@@ -2,6 +2,7 @@ package com.example.projectstages.ui.projects.viewmodel
 
 import com.example.projectstages.base.viewmodel.*
 import com.example.projectstages.ui.projects.model.Project
+import com.example.projectstages.utils.Constants
 
 class ProjectsContract : BaseContract{
 
@@ -14,7 +15,8 @@ class ProjectsContract : BaseContract{
         val projects: List<Project> = emptyList(),
         val errorTextViewVisibility: Boolean = false,
         val allTasks: Int = 0,
-        val completedTasks: Int = 0
+        val completedTasks: Int = 0,
+        val failureType: Constants.FailureType = Constants.FailureType.EMPTY_LIST
     ) : BaseViewState {
         override fun equals(other: Any?): Boolean {
             return super.equals(other)

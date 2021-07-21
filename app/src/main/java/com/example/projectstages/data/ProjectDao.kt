@@ -33,7 +33,7 @@ abstract class ProjectDao {
     @Query("DELETE FROM tasks WHERE id =:id")
     abstract suspend fun deleteTaskById(id: Long) : Int
 
-    @Query("UPDATE tasks SET description =:description, state=:type, createdTimestamp=:timestamp WHERE id=:id")
+    @Query("UPDATE tasks SET description =:description, state=:type, updatedTimestamp=:timestamp WHERE id=:id")
     abstract suspend fun updateTaskById(id: Long, description: String, type: Int, timestamp: Long) : Int
 
     @Query("SELECT description FROM tasks WHERE id =:taskID")

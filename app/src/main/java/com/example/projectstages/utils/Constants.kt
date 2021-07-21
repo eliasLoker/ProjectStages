@@ -30,5 +30,10 @@ class Constants {
     enum class EmptyList {
         EMPTY, ERROR
     }
+
+    enum class FailureType {
+        EMPTY_LIST,
+        ERROR
+    }
 }
 

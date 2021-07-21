@@ -19,6 +19,8 @@
     <string name="project_add_category_title">Adding a category\n\n</string>
     <string name="project_add_category_message">Enter a new unique project name no longer than 20 characters</string>
     <string name="project_name">Project name</string>
+    <string name="projects_empty">The list of projects is empty</string>
+    <string name="projects_error">Error while searching the list of projects</string>
 
     <string name="tasks_list_empty">The task list is empty</string>
     <string name="tasks_list_error">Error getting task list</string>

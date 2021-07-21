@@ -44,7 +44,7 @@ class TasksViewModel @Inject constructor(
                                     val task = Task(
                                         taskEntity.id,
                                         taskEntity.description,
-                                        Constants.userFormatTasks.format(Date(taskEntity.createdTimestamp)),
+                                        Constants.userFormatTasks.format(Date(taskEntity.updatedTimestamp)),
                                         taskEntity.state
                                     )
                                     _tasks.add(task)
