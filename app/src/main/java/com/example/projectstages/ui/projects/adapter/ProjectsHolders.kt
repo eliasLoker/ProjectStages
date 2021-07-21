@@ -65,6 +65,15 @@ class ProjectsHolders {
             Constants.BLACK_TYPE -> R.drawable.ic_file_black
             else -> R.drawable.ic_file_yellow
         }
+
+        fun getColorForEmptyTask(viewType: Int) = when(viewType) {
+            Constants.RED_TYPE -> R.color.color_red_folder
+            Constants.GREEN_TYPE -> R.color.color_green_folder
+            Constants.BLUE_TYPE -> R.color.color_blue_folder
+            Constants.PINK_TYPE -> R.color.color_pink_folder
+            Constants.BLACK_TYPE -> R.color.color_black_folder
+            else -> R.color.color_yellow_folder
+        }
     }
 
 }

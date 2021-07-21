@@ -50,7 +50,7 @@ class ProjectsAdapter(
                     add(ProgressItem(R.color.bright_yellow, projects[position].countTasksByState[2].toFloat()))
                 }
                 false -> {
-                    add(ProgressItem(R.color.bright_blue, 1.0f))
+                    add(ProgressItem(ProjectsHolders.getColorForEmptyTask(projects[position].type), 1.0F))
                 }
             }
         }

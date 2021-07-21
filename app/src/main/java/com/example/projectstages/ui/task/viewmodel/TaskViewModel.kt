@@ -84,7 +84,7 @@ class TaskViewModel @Inject constructor(
                 descriptionEditTextVisibility = true,
                 saveButtonVisibility = true,
                 taskType = Constants.TaskTitleType.ADD,
-                deleteButtonVisibility = true
+//                deleteButtonVisibility = true
             )
 
             is TaskContract.Action.Error -> state.copy(

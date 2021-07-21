@@ -93,6 +93,7 @@ class TaskFragment(
                 -> saveButton.text = getStringExt(R.string.task_save_changes)
             }
             errorTextView.isVisible = viewState.errorTextViewVisibility
+            deleteButton.isVisible = viewState.deleteButtonVisibility
         }
     }
 

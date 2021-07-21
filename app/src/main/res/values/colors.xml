@@ -38,4 +38,11 @@
 
     <color name="silver_color">#C0C0C0</color>
     <color name="mate_blue">#6A5ACD</color>
+
+    <color name="color_black_folder">#373737</color>
+    <color name="color_blue_folder">#6385f6</color>
+    <color name="color_green_folder">#6cf663</color>
+    <color name="color_pink_folder">#f663f1</color>
+    <color name="color_red_folder">#f66363</color>
+    <color name="color_yellow_folder">#f6c863</color>
 </resources>
