@@ -1,13 +1,14 @@
 package com.example.projectstages.ui.task.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.TaskEntity
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.task.interactor.TaskInteractor
-import com.example.projectstages.ui.task.interactor.TaskInteractorImpl
 import com.example.projectstages.utils.Constants
+import com.example.projectstages.utils.ResultWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -41,11 +42,14 @@ class TaskViewModel @Inject constructor(
     private fun fetchTask() {
         if (isEdit) {
             viewModelScope.launch {
-                val resultDescription = async { taskInteractor.getTaskDescriptionByTaskId(taskID) }
-                val resultState = async { taskInteractor.getTaskStateByTaskId(taskID) }
-                taskType = resultState.await()
-                val resDescr = resultDescription.await()
-                sendAction(TaskContract.Action.EditMode(resDescr, taskType))
+                when(val result = taskInteractor.getTaskByTaskId(taskID)) {
+                    is ResultWrapper.Success -> {
+                        sendAction(TaskContract.Action.EditMode(result.data.description, result.data.state))
+                    }
+
+                    is ResultWrapper.Error
+                    -> sendAction(TaskContract.Action.Error)
+                }
             }
         } else {
             sendAction(TaskContract.Action.AddMode)
@@ -60,6 +64,7 @@ class TaskViewModel @Inject constructor(
                 stateSpinnerVisibility = false,
                 descriptionEditTextVisibility = false,
                 saveButtonVisibility = false,
+                deleteButtonVisibility = false
             )
 
             is TaskContract.Action.EditMode -> state.copy(
@@ -69,7 +74,8 @@ class TaskViewModel @Inject constructor(
                 saveButtonVisibility = true,
                 descriptionEditTextText = viewAction.descriptionText,
                 stateSpinnerPosition = viewAction.state,
-                taskType = Constants.TaskTitleType.EDIT
+                taskType = Constants.TaskTitleType.EDIT,
+                deleteButtonVisibility = true
             )
 
             is TaskContract.Action.AddMode -> state.copy(
@@ -77,7 +83,17 @@ class TaskViewModel @Inject constructor(
                 stateSpinnerVisibility = true,
                 descriptionEditTextVisibility = true,
                 saveButtonVisibility = true,
-                taskType = Constants.TaskTitleType.ADD
+                taskType = Constants.TaskTitleType.ADD,
+                deleteButtonVisibility = true
+            )
+
+            is TaskContract.Action.Error -> state.copy(
+                progressBarVisibility = false,
+                stateSpinnerVisibility = false,
+                descriptionEditTextVisibility = false,
+                saveButtonVisibility = false,
+                errorTextViewVisibility = true,
+                deleteButtonVisibility = false
             )
         }
     }
@@ -85,7 +101,7 @@ class TaskViewModel @Inject constructor(
     override fun processViewEvent(viewEvent: TaskContract.ViewEvent) {
         when(viewEvent) {
             is TaskContract.ViewEvent.OnSaveButtonClicked
-            -> if (isEdit) updateTask() else createTask()
+            -> if (isEdit) updateTask() else insertTask()
 
             is TaskContract.ViewEvent.OnTextChangedDescription
             -> {
@@ -104,34 +120,56 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    private fun createTask() {
+    private fun insertTask() {
         viewModelScope.launch {
             val taskEntity = TaskEntity(projectID, taskDescription.toString(), taskType, System.currentTimeMillis())
-            val effect = when(taskInteractor.insertTask(taskEntity) > 0) {
-                true -> TaskContract.ViewEffect.GoToTaskList
-                false -> TaskContract.ViewEffect.FailureAdd
+            when(val resultInsert = taskInteractor.insertTask(taskEntity)) {
+                is ResultWrapper.Success -> {
+                    val effect = when(resultInsert.data > 0) {
+                        true -> TaskContract.ViewEffect.GoToTaskList
+                        false -> TaskContract.ViewEffect.FailureAdd
+                    }
+                    sendViewEffect(effect)
+                }
+
+                is ResultWrapper.Error
+                -> sendViewEffect(TaskContract.ViewEffect.FailureAdd)
             }
-            sendViewEffect(effect)
         }
     }
 
     private fun updateTask() {
         viewModelScope.launch {
-            val effect = when(taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis()) > 0) {
-                true -> TaskContract.ViewEffect.GoToTaskList
-                false -> TaskContract.ViewEffect.FailureUpdate
+            when(val resultUpdate = taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis())) {
+                is ResultWrapper.Success -> {
+                    val effect = when(resultUpdate.data > 0) {
+                        true -> TaskContract.ViewEffect.GoToTaskList
+                        false -> TaskContract.ViewEffect.FailureUpdate
+                    }
+                    sendViewEffect(effect)
+                }
+
+                is ResultWrapper.Error
+                -> sendViewEffect(TaskContract.ViewEffect.FailureUpdate)
             }
-            sendViewEffect(effect)
+
         }
     }
 
     private fun deleteTask() {
         viewModelScope.launch {
-            val effect = when(taskInteractor.deleteTask(taskID) > 0) {
-                true -> TaskContract.ViewEffect.GoToTaskList
-                false -> TaskContract.ViewEffect.FailureDelete
+            when(val resultDelete = taskInteractor.deleteTask(taskID)) {
+                is ResultWrapper.Success -> {
+                    val effect = when(resultDelete.data > 0) {
+                        true -> TaskContract.ViewEffect.GoToTaskList
+                        false -> TaskContract.ViewEffect.FailureDelete
+                    }
+                    sendViewEffect(effect)
+                }
+
+                is ResultWrapper.Error
+                -> sendViewEffect(TaskContract.ViewEffect.FailureDelete)
             }
-            sendViewEffect(effect)
         }
     }
 }

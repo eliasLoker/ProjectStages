@@ -36,9 +36,6 @@ abstract class ProjectDao {
     @Query("UPDATE tasks SET description =:description, state=:type, updatedTimestamp=:timestamp WHERE id=:id")
     abstract suspend fun updateTaskById(id: Long, description: String, type: Int, timestamp: Long) : Int
 
-    @Query("SELECT description FROM tasks WHERE id =:taskID")
-    abstract suspend fun getTaskDescriptionByTaskId(taskID: Long) : String
-
-    @Query("SELECT state FROM tasks WHERE id =:taskID")
-    abstract suspend fun getTaskStateByTaskId(taskID: Long) : Int
+    @Query("SELECT * FROM tasks WHERE id =:taskID")
+    abstract fun getDescriptionAndStateByTaskId(taskID: Long) : TaskEntity
 }

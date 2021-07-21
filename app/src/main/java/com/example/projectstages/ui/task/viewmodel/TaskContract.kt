@@ -12,7 +12,9 @@ class TaskContract : BaseContract {
         val descriptionEditTextVisibility: Boolean = false,
         val saveButtonVisibility: Boolean = false,
         val descriptionEditTextText: String = "",
-        val stateSpinnerPosition: Int = 0
+        val stateSpinnerPosition: Int = 0,
+        val errorTextViewVisibility: Boolean = false,
+        val deleteButtonVisibility: Boolean = false
     ) : BaseViewState
 
     sealed class Action : BaseAction {
@@ -25,6 +27,8 @@ class TaskContract : BaseContract {
         ) : Action()
 
         object AddMode : Action()
+
+        object Error: Action()
     }
 
     sealed class ViewEffect : BaseViewEffect {

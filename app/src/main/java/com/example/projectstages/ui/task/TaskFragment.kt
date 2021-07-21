@@ -83,6 +83,7 @@ class TaskFragment(
 //            descriptionTextInputLayout.isVisible = viewState.descriptionEditTextVisibility
             saveButton.isVisible = viewState.saveButtonVisibility
             descriptionEditText.setText(viewState.descriptionEditTextText)
+            descriptionEditText.isVisible = viewState.descriptionEditTextVisibility
             stateSpinner.setSelection(viewState.stateSpinnerPosition)
             when(viewState.taskType) {
                 Constants.TaskTitleType.ADD
@@ -91,6 +92,7 @@ class TaskFragment(
                 Constants.TaskTitleType.EDIT
                 -> saveButton.text = getStringExt(R.string.task_save_changes)
             }
+            errorTextView.isVisible = viewState.errorTextViewVisibility
         }
     }
 
