@@ -22,14 +22,9 @@ class Constants {
         IN_THOUGHT(2)
     }
 
-    //TODO("Додумать. Решение с enum-ами не нравится")
     enum class TaskTitleType {
         ADD, EDIT
     }
-
-//    enum class EmptyList {
-//        EMPTY, ERROR
-//    }
 
     enum class FailureType {
         EMPTY_LIST,
