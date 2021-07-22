@@ -30,7 +30,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         app:layout_constraintTop_toTopOf="@id/folder_image_view"
         app:layout_constraintStart_toEndOf="@id/folder_image_view"
         app:layout_constraintEnd_toStartOf="@id/menu_image_view"
@@ -56,10 +55,12 @@
 
     <ImageView
         android:id="@+id/menu_image_view"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/ic_menu_item"
         android:layout_marginEnd="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="10dp"
         app:layout_constraintTop_toTopOf="@id/folder_image_view"
         app:layout_constraintEnd_toEndOf="parent"/>
 
