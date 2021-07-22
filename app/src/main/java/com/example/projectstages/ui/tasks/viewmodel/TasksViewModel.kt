@@ -51,7 +51,7 @@ class TasksViewModel @Inject constructor(
                                     )
                                     _tasks.add(task)
                                 }
-                                _tasks = _tasks.sortedWith(compareBy<Task> {it.state}.thenBy { it.date }).toList() as ArrayList<Task>
+                                _tasks = _tasks.sortedWith(compareBy<Task> {it.state}.thenBy { it.date }).toMutableList() as ArrayList<Task>
                                 sendAction(TasksContract.Action.NotEmptyList(_tasks, projectName))
                             }
                             false -> sendAction(TasksContract.Action.EmptyList)
