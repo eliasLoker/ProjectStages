@@ -18,40 +18,16 @@ abstract class BaseViewModel<
         ViewEvent : BaseViewEvent
         >(initialState : ViewState) : ViewModel() {
 
-    /*
-      private val _viewEffect: SingleLiveEvent<ViewEffect> = SingleLiveEvent()
-      val viewEffect = _viewEffect
-      */
-    /*
-    https://stackoverflow.com/questions/59002902/singleliveevent-with-buffer-with-coroutines
-    Подумать над оптимизацией этого решения доставки единичных Event'ов
-
-    Альтернативный вариант замены SingleLiveEvent на Flow для LiveData:
-    https://proandroiddev.com/android-singleliveevent-redux-with-kotlin-flow-b755c70bb055
-
-    Вариант BroadcastChannel<ViewEffect?>(Channel.BUFFERED) копил все таки event'ы, даже с
-    единичным capacity.
-    //TODO("Разобраться детальнее")
-    https://github.com/Kotlin/kotlinx.coroutines/issues/2005
-    */
     private val viewEffectChannel = Channel<ViewEffect?>(Channel.BUFFERED)
     val viewEffect = viewEffectChannel.receiveAsFlow()
-
-    /*
-    private val stateMutableLiveData = MutableLiveData<ViewState>()
-    val stateLiveData = stateMutableLiveData.asLiveData()
-    */
 
     private val stateMutableFlow = MutableStateFlow<ViewState?>(null)
     val stateFlow: StateFlow<ViewState?> = stateMutableFlow.asStateFlow()
 
     protected var state by Delegates.observable(initialState) { _, old, new ->
         stateMutableFlow.value = new
-//        stateMutableLiveData.postValue(new)
-        //TODO("Заглянуть сюда и еще подумать")
         if (new != old) {
-//            addStateTransition(old, new)
-//            logLast()
+            //TODO("Заглянуть сюда и еще подумать")
         }
     }
 

@@ -1,4 +1,3 @@
 package com.example.projectstages.base.viewmodel
 
-interface BaseContract {
-}
+interface BaseContract

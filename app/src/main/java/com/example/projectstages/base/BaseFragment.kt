@@ -39,12 +39,6 @@ abstract class BaseFragment<
 
     abstract val viewModel : ViewModel
 
-//    abstract var viewModelFactory: ViewModelProvider.Factory
-//    abstract val viewModelClass: KClass<out BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>>
-//    protected lateinit var viewModel: BaseViewModel<ViewState, Action, ViewEffect, ViewEvent>
-
-//    private fun getViewModels() : BaseViewModel<ViewState, Action, ViewEffect, ViewEvent> = ViewModelProvider(this, viewModelFactory)[viewModelClass.java]
-
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,10 +50,6 @@ abstract class BaseFragment<
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        viewModel = getViewModels()
-//        subscribeToViewState(viewModel.stateFlow)
-//        subscribeToViewState(viewModel.stateFlow)
-//        subscribeToViewEffect(viewModel.viewEffect)
         subscribeToViewState(viewModel.stateFlow)
         subscribeToViewEffect(viewModel.viewEffect)
     }
