@@ -1,1 +1,1 @@
-include(":app", ":ProjectStages")
+include(":app")
