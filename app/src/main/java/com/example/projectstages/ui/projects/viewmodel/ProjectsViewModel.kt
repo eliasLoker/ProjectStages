@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.ProjectEntity
@@ -120,13 +121,15 @@ class ProjectsViewModel @Inject constructor(
                     projects = viewAction.projects,
                     allTasks = viewAction.allTasks,
                     completedTasks = viewAction.completedTasks,
-                    addProjectButtonVisibility = true
+                    addProjectButtonVisibility = true,
+                    errorTextViewVisibility = false,
                 )
 
             is ProjectsContract.Action.EmptyList
             -> state.copy(
                 progressBarVisibility = false,
                 emptyListTextViewVisibility = true,
+                projectsAdapterVisibility = false,
                 headerViewsVisibility = false,
                 addProjectButtonVisibility = true,
                 errorTextViewVisibility = true,
@@ -205,7 +208,10 @@ class ProjectsViewModel @Inject constructor(
                 }
 
                 is ResultWrapper.Error
-                -> sendViewEffect(ProjectsContract.ViewEffect.FailureDelete)
+                -> {
+                    Log.d("ProjectsViewModel", "E: ${deleteResult.exception}")
+                    sendViewEffect(ProjectsContract.ViewEffect.FailureDelete)
+                }
             }
 
         }

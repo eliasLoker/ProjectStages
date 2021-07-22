@@ -59,7 +59,10 @@ class TasksFragment(
     override fun updateViewState(viewState: TasksContract.ViewState) {
         binding.apply {
             progressBar.isVisible = viewState.progressBarVisibility
-            recyclerView.isVisible = viewState.taskRecyclerVisibility
+            recyclerView.visibility = when(viewState.taskRecyclerVisibility) {
+                true -> View.VISIBLE
+                false -> View.INVISIBLE
+            }
             tasksAdapter.setList(viewState.tasks)
             val errorText = when(viewState.failureType) {
                 Constants.FailureType.EMPTY_LIST -> requireContext().getString(R.string.tasks_list_empty)
