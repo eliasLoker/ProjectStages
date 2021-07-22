@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
             onDelete = CASCADE,
         )
     ],
-indices = [Index("projectId"), Index("description", unique = true)]
+indices = [Index("projectId", "description",  unique = true)]
 
 )
 data class TaskEntity(

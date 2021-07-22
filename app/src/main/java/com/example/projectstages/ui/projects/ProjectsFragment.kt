@@ -45,8 +45,6 @@ class ProjectsFragment(
     private lateinit var navigation: ProjectsNavigationListener
 
     override fun onAttach(context: Context) {
-//        val projectsInteractor = ProjectsInteractor(requireContext().appComponentOld.projectDao)
-//        viewModelFactory = ProjectsFactory(projectsInteractor)
         navigation = (activity) as ProjectsNavigationListener
         super.onAttach(context)
     }
