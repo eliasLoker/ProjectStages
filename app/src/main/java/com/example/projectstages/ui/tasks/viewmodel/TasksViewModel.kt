@@ -1,5 +1,7 @@
 package com.example.projectstages.ui.tasks.viewmodel
 
+import android.app.Person
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
@@ -26,7 +28,7 @@ class TasksViewModel @Inject constructor(
         TasksContract.ViewEvent
         >(TasksContract.ViewState()) {
 
-    private val _tasks = ArrayList<Task>()
+    private var _tasks = ArrayList<Task>()
     private var projectId: Long = 0L
     private var projectName: String = ""
 
@@ -36,11 +38,11 @@ class TasksViewModel @Inject constructor(
         viewModelScope.launch {
             when(val tasks = tasksInteractor.getTasks(projectId)) {
                 is ResultWrapper.Success -> {
-                    tasks.data.collectLatest {
-                        when(it.isNotEmpty()) {
+                    tasks.data.collectLatest { tasksList ->
+                        when(tasksList.isNotEmpty()) {
                             true -> {
                                 this@TasksViewModel._tasks.clear()
-                                it.forEach { taskEntity ->
+                                tasksList.forEach { taskEntity ->
                                     val task = Task(
                                         taskEntity.id,
                                         taskEntity.description,
@@ -49,7 +51,7 @@ class TasksViewModel @Inject constructor(
                                     )
                                     _tasks.add(task)
                                 }
-                                _tasks.sortBy { i -> i.state }
+                                _tasks = _tasks.sortedWith(compareBy<Task> {it.state}.thenBy { it.date }).toList() as ArrayList<Task>
                                 sendAction(TasksContract.Action.NotEmptyList(_tasks, projectName))
                             }
                             false -> sendAction(TasksContract.Action.EmptyList)
