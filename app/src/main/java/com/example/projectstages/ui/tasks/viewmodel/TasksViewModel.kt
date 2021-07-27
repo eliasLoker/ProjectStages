@@ -34,10 +34,10 @@ class TasksViewModel @Inject constructor(
     init {
         projectId = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_ID, 0L).value ?: 0L
         projectName = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_NAME, "").value ?: ""
-        fetchTasks(projectId, projectName)
+        fetchTasks()
     }
 
-    private fun fetchTasks(projectId: Long, projectName: String) {
+    private fun fetchTasks() {
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
             sendAction(TasksContract.Action.Error)
         }

@@ -5,11 +5,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.projectstages.base.viewmodel.BaseViewModel
 import com.example.projectstages.data.entity.TaskEntity
+import com.example.projectstages.ui.projects.viewmodel.ProjectsContract
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.task.interactor.TaskInteractor
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,15 +43,12 @@ class TaskViewModel @Inject constructor(
 
     private fun fetchTask() {
         if (isEdit) {
-            viewModelScope.launch {
-                when(val result = taskInteractor.getTaskByTaskId(taskID)) {
-                    is ResultWrapper.Success -> {
-                        sendAction(TaskContract.Action.EditMode(result.data.description, result.data.state))
-                    }
-
-                    is ResultWrapper.Error
-                    -> sendAction(TaskContract.Action.Error)
-                }
+            val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+                sendAction(TaskContract.Action.Error)
+            }
+            viewModelScope.launch(exceptionHandler) {
+                val result = taskInteractor.getTaskByTaskId(taskID)
+                sendAction(TaskContract.Action.EditMode(result.description, result.state))
             }
         } else {
             sendAction(TaskContract.Action.AddMode)
@@ -84,7 +83,6 @@ class TaskViewModel @Inject constructor(
                 descriptionEditTextVisibility = true,
                 saveButtonVisibility = true,
                 taskType = Constants.TaskTitleType.ADD,
-//                deleteButtonVisibility = true
             )
 
             is TaskContract.Action.Error -> state.copy(
@@ -121,6 +119,21 @@ class TaskViewModel @Inject constructor(
     }
 
     private fun insertTask() {
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendViewEffect(TaskContract.ViewEffect.FailureAdd)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val taskEntity = TaskEntity(projectID, taskDescription.toString(), taskType, System.currentTimeMillis())
+            val resultInsert = taskInteractor.insertTask(taskEntity)
+            val effect = when(resultInsert > 0) {
+                true -> TaskContract.ViewEffect.GoToTaskList
+                false -> TaskContract.ViewEffect.FailureAdd
+            }
+            sendViewEffect(effect)
+        }
+    }
+    /*
+    private fun insertTask() {
         viewModelScope.launch {
             val taskEntity = TaskEntity(projectID, taskDescription.toString(), taskType, System.currentTimeMillis())
             when(val resultInsert = taskInteractor.insertTask(taskEntity)) {
@@ -137,7 +150,22 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
+    */
 
+    private fun updateTask() {
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendViewEffect(TaskContract.ViewEffect.FailureUpdate)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val resultUpdate = taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis())
+            val effect = when(resultUpdate > 0) {
+                true -> TaskContract.ViewEffect.GoToTaskList
+                false -> TaskContract.ViewEffect.FailureUpdate
+            }
+            sendViewEffect(effect)
+        }
+    }
+    /*
     private fun updateTask() {
         viewModelScope.launch {
             when(val resultUpdate = taskInteractor.updateTask(taskID, taskDescription.toString(), taskType, System.currentTimeMillis())) {
@@ -155,21 +183,18 @@ class TaskViewModel @Inject constructor(
 
         }
     }
-
+    */
     private fun deleteTask() {
-        viewModelScope.launch {
-            when(val resultDelete = taskInteractor.deleteTask(taskID)) {
-                is ResultWrapper.Success -> {
-                    val effect = when(resultDelete.data > 0) {
-                        true -> TaskContract.ViewEffect.GoToTaskList
-                        false -> TaskContract.ViewEffect.FailureDelete
-                    }
-                    sendViewEffect(effect)
-                }
-
-                is ResultWrapper.Error
-                -> sendViewEffect(TaskContract.ViewEffect.FailureDelete)
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendViewEffect(TaskContract.ViewEffect.FailureDelete)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val resultDelete = taskInteractor.deleteTask(taskID)
+            val effect = when(resultDelete > 0) {
+                true -> TaskContract.ViewEffect.GoToTaskList
+                false -> TaskContract.ViewEffect.FailureDelete
             }
+            sendViewEffect(effect)
         }
     }
 }

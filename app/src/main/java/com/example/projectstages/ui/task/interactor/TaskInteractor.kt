@@ -5,11 +5,11 @@ import com.example.projectstages.utils.ResultWrapper
 
 interface TaskInteractor {
 
-    suspend fun getTaskByTaskId(taskID: Long) : ResultWrapper<TaskEntity>
+    suspend fun getTaskByTaskId(taskID: Long) : TaskEntity
 
-    suspend fun insertTask(taskEntity: TaskEntity) : ResultWrapper<Long>
+    suspend fun insertTask(taskEntity: TaskEntity) : Long
 
-    suspend fun updateTask(id: Long, description: String, type: Int, timestamp: Long) : ResultWrapper<Int>
+    suspend fun updateTask(id: Long, description: String, type: Int, timestamp: Long) : Int
 
-    suspend fun deleteTask(id: Long) : ResultWrapper<Int>
+    suspend fun deleteTask(id: Long) : Int
 }
