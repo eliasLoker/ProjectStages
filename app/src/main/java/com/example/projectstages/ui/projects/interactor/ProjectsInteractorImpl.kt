@@ -1,5 +1,6 @@
 package com.example.projectstages.ui.projects.interactor
 
+import com.example.projectstages.base.viewmodel.BaseInteractor
 import com.example.projectstages.data.ProjectDao
 import com.example.projectstages.data.entity.ProjectEntity
 import com.example.projectstages.data.entity.ProjectsWithTasks
@@ -11,34 +12,17 @@ import javax.inject.Inject
 
 class ProjectsInteractorImpl @Inject constructor(
     private val projectDao: ProjectDao
-) : ProjectsInteractor {
+) : BaseInteractor(), ProjectsInteractor {
 
-    override suspend fun getProjects() : ResultWrapper<Flow<List<ProjectsWithTasks>>>
-    = try {
-        withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.getProjects()) }
-    } catch (e: Exception) {
-        ResultWrapper.Error(e)
-    }
+    override suspend fun getProjects() : Flow<List<ProjectsWithTasks>>
+    = withContext(defaultInteractorDispatcher) { projectDao.getProjects() }
 
+    override suspend fun insertProject(projectEntity: ProjectEntity) : Long
+    = withContext(defaultInteractorDispatcher) { projectDao.insertProject(projectEntity) }
 
-    override suspend fun insertProject(projectEntity: ProjectEntity) : ResultWrapper<Long>
-    = try {
-        withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.insertProject(projectEntity)) }
-    } catch (e: Exception) {
-        ResultWrapper.Error(e)
-    }
+    override suspend fun deleteProjectById(projectId: Long) : Int
+    = withContext(defaultInteractorDispatcher){ projectDao.deleteProjectById(projectId) }
 
-    override suspend fun deleteProjectById(projectId: Long) : ResultWrapper<Int>
-    = try {
-        withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.deleteProjectById(projectId)) }
-    } catch (e: Exception) {
-        ResultWrapper.Error(e)
-    }
-
-    override suspend fun updateProjectById(projectId: Long, name: String, type: Int) : ResultWrapper<Int>
-    = try {
-        withContext(Dispatchers.IO) { ResultWrapper.Success(projectDao.updateProjectById(projectId, name, type)) }
-    } catch (e: Exception) {
-        ResultWrapper.Error(e)
-    }
+    override suspend fun updateProjectById(projectId: Long, name: String, type: Int) : Int
+    = withContext(defaultInteractorDispatcher){ projectDao.updateProjectById(projectId, name, type) }
 }

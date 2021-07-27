@@ -10,6 +10,7 @@ import com.example.projectstages.ui.projects.viewmodel.ProjectsContract.ViewEven
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -37,75 +38,72 @@ class ProjectsViewModel @Inject constructor(
     private var positionProjectForDeleteOrEdit = 0
 
     private fun fetchProjects() {
-        viewModelScope.launch {
-//            delay(1000)
-                when(val projects = interactor.getProjects()) {
-                    is ResultWrapper.Success -> {
-                        projects.data.collectLatest { it ->
-                            when(it.isNotEmpty()) {
+        val completedStateID = Constants.TaskStates.COMPLETED.stateID
+        val inProgressStateID = Constants.TaskStates.IN_PROGRESS.stateID
+        val inThoughtStateID = Constants.TaskStates.IN_THOUGHT.stateID
+
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendAction(ProjectsContract.Action.Error)
+        }
+
+        viewModelScope.launch(exceptionHandler) {
+            val projects = interactor.getProjects()
+            projects.collectLatest { it ->
+                when(it.isNotEmpty()) {
+                    true -> {
+                        _projects.clear()
+                        it.forEach { projectsWithTasks ->
+                            val count = projectsWithTasks.tasks.size
+                            val timestamp = when(count > 0) {
                                 true -> {
-                                    _projects.clear()
-                                    it.forEach { projectsWithTasks ->
-                                        val count = projectsWithTasks.tasks.size
-                                        val timestamp = when(count > 0) {
-                                            true -> {
-                                                projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.updatedTimestamp
-                                                //TODO(Противно использовать !!, подумать еще на досуге )
-                                            }
-                                            false -> projectsWithTasks.createdTimestamp
-                                        }
-
-                                        val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
-
-                                        val completedTasks
-                                                = projectsWithTasks.tasks
-                                            .filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }
-                                            .count()
-
-                                        val progressTasks
-                                                = projectsWithTasks.tasks
-                                            .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_PROGRESS.stateID }
-                                            .count()
-
-                                        val thoughtTasks
-                                                = projectsWithTasks.tasks
-                                            .filter { taskEntity -> taskEntity.state == Constants.TaskStates.IN_THOUGHT.stateID }
-                                            .count()
-
-                                        val countTasksByState = arrayOf(
-                                            completedTasks,
-                                            progressTasks,
-                                            thoughtTasks
-                                        )
-
-                                        val project = Project(
-                                            projectsWithTasks.id,
-                                            projectsWithTasks.name,
-                                            projectsWithTasks.type,
-                                            formattedDate,
-                                            countTasksByState
-                                        )
-                                        _projects.add(project)
-                                    }
-                                    val allTasks  = it.map { list -> list.tasks }
-                                        .flatten()
-                                        .count()
-
-                                    val completedTasks  = it.map { list -> list.tasks }
-                                        .flatten()
-                                        .filter { taskEntity -> taskEntity.state == Constants.TaskStates.COMPLETED.stateID }
-                                        .count()
-                                    sendAction(ProjectsContract.Action.NotEmptyList(_projects, allTasks, completedTasks))
+                                    projectsWithTasks.tasks.maxByOrNull { projectsWithTasks.createdTimestamp }!!.updatedTimestamp
+                                    //TODO(Противно использовать !!, подумать еще на досуге )
                                 }
-                                false -> sendAction(ProjectsContract.Action.EmptyList)
+                                false -> projectsWithTasks.createdTimestamp
                             }
-                        }
-                    }
 
-                    is ResultWrapper.Error -> {
-                        sendAction(ProjectsContract.Action.Error)
+                            val formattedDate = Constants.userFormatProjects.format(Date(timestamp))
+
+                            val completedTasks = projectsWithTasks.tasks
+                                .filter { taskEntity -> taskEntity.state == completedStateID }
+                                .count()
+
+                            val progressTasks = projectsWithTasks.tasks
+                                .filter { taskEntity -> taskEntity.state == inProgressStateID }
+                                .count()
+
+                            val thoughtTasks = projectsWithTasks.tasks
+                                .filter { taskEntity -> taskEntity.state == inThoughtStateID }
+                                .count()
+
+                            val countTasksByState = arrayOf(
+                                completedTasks,
+                                progressTasks,
+                                thoughtTasks
+                            )
+
+                            val project = Project(
+                                        projectsWithTasks.id,
+                                        projectsWithTasks.name,
+                                        projectsWithTasks.type,
+                                        formattedDate,
+                                        countTasksByState
+                            )
+                            _projects.add(project)
+                        }
+                        val allTasks  = it.map { list -> list.tasks }
+                            .flatten()
+                            .count()
+
+                        val completedTasks  = it.map { list -> list.tasks }
+                            .flatten()
+                            .filter { taskEntity -> taskEntity.state == completedStateID }
+                            .count()
+                        sendAction(ProjectsContract.Action.NotEmptyList(_projects, allTasks, completedTasks))
                     }
+                    false -> sendAction(ProjectsContract.Action.EmptyList)
                 }
+            }
         }
     }
 
@@ -175,63 +173,49 @@ class ProjectsViewModel @Inject constructor(
     }
 
     private fun updateProject(name: String, type: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            when(val updateResult = interactor.updateProjectById(
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendViewEffect(ProjectsContract.ViewEffect.FailureEdit)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val updateResult = interactor.updateProjectById(
                 _projects[positionProjectForDeleteOrEdit].id,
                 name,
                 type
-            )) {
-                is ResultWrapper.Success-> {
-                    val effect = when(updateResult.data > 0) {
-                        true -> ProjectsContract.ViewEffect.SuccessEdit
-                        false -> ProjectsContract.ViewEffect.FailureEdit
-                    }
-                    sendViewEffect(effect)
-                }
-
-                is ResultWrapper.Error
-                -> sendViewEffect(ProjectsContract.ViewEffect.FailureEdit)
+            )
+            val effect = when(updateResult > 0) {
+                true -> ProjectsContract.ViewEffect.SuccessEdit
+                false -> ProjectsContract.ViewEffect.FailureEdit
             }
-
+            sendViewEffect(effect)
         }
     }
 
     private fun deleteProject() {
-        viewModelScope.launch(Dispatchers.IO) {
-            when(val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)) {
-                is ResultWrapper.Success -> {
-                    val effect = when(deleteResult.data > 0) {
-                        true -> ProjectsContract.ViewEffect.SuccessDelete
-                        false -> ProjectsContract.ViewEffect.FailureDelete
-                    }
-                    sendViewEffect(effect)
-                }
-
-                is ResultWrapper.Error
-                -> {
-                    Log.d("ProjectsViewModel", "E: ${deleteResult.exception}")
-                    sendViewEffect(ProjectsContract.ViewEffect.FailureDelete)
-                }
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendViewEffect(ProjectsContract.ViewEffect.FailureDelete)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val deleteResult = interactor.deleteProjectById(_projects[positionProjectForDeleteOrEdit].id)
+            val effect = when(deleteResult > 0) {
+                true -> ProjectsContract.ViewEffect.SuccessDelete
+                false -> ProjectsContract.ViewEffect.FailureDelete
             }
-
+            sendViewEffect(effect)
         }
     }
 
     private fun addProject(name: String, type: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendViewEffect(ProjectsContract.ViewEffect.FailureAddDialog)
+        }
+        viewModelScope.launch(exceptionHandler) {
             val project = ProjectEntity(name, type, System.currentTimeMillis())
-            when(val insertResult = interactor.insertProject(project)) {
-                is ResultWrapper.Success -> {
-                    val effect = when(insertResult.data > 0) {
-                        true -> ProjectsContract.ViewEffect.SuccessAddDialog
-                        false -> ProjectsContract.ViewEffect.FailureAddDialog
-                    }
-                    sendViewEffect(effect)
-                }
-
-                is ResultWrapper.Error
-                -> sendViewEffect(ProjectsContract.ViewEffect.FailureAddDialog)
+            val insertResult = interactor.insertProject(project)
+            val effect = when(insertResult > 0) {
+                true -> ProjectsContract.ViewEffect.SuccessAddDialog
+                false -> ProjectsContract.ViewEffect.FailureAddDialog
             }
+            sendViewEffect(effect)
         }
     }
 
@@ -251,5 +235,4 @@ class ProjectsViewModel @Inject constructor(
             _projects[position].type
         ))
     }
-
 }
