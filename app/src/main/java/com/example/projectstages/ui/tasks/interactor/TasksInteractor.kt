@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface TasksInteractor {
 
-    suspend fun getTasks(projectID: Long) : ResultWrapper<Flow<List<TaskEntity>>>
+    suspend fun getTasks(projectID: Long) : Flow<List<TaskEntity>>
 }

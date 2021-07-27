@@ -1,7 +1,5 @@
 package com.example.projectstages.ui.tasks.viewmodel
 
-import android.app.Person
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.projectstages.base.*
 import com.example.projectstages.base.viewmodel.*
@@ -11,6 +9,7 @@ import com.example.projectstages.ui.tasks.model.Task
 import com.example.projectstages.utils.Constants
 import com.example.projectstages.utils.ResultWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -33,6 +32,40 @@ class TasksViewModel @Inject constructor(
     private var projectName: String = ""
 
     init {
+        projectId = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_ID, 0L).value ?: 0L
+        projectName = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_NAME, "").value ?: ""
+        fetchTasks(projectId, projectName)
+    }
+
+    private fun fetchTasks(projectId: Long, projectName: String) {
+        val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+            sendAction(TasksContract.Action.Error)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val tasks = tasksInteractor.getTasks(projectId)
+            tasks.collectLatest { tasksList ->
+                when(tasksList.isNotEmpty()) {
+                    true -> {
+                        this@TasksViewModel._tasks.clear()
+                        tasksList.forEach { taskEntity ->
+                            val task = Task(
+                                taskEntity.id,
+                                taskEntity.description,
+                                Constants.userFormatTasks.format(Date(taskEntity.updatedTimestamp)),
+                                taskEntity.state
+                            )
+                            _tasks.add(task)
+                        }
+                        _tasks = _tasks.sortedWith(compareBy<Task> {it.state}.thenBy { it.date }).toMutableList() as ArrayList<Task>
+                        sendAction(TasksContract.Action.NotEmptyList(_tasks, projectName))
+                    }
+                    false -> sendAction(TasksContract.Action.EmptyList)
+                }
+            }
+        }
+    }
+    /*
+    private fun fetchTasks() {
         projectId = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_ID, 0L).value ?: 0L
         projectName = savedStateHandle.getLiveData(TasksFragment.TAG_FOR_PROJECT_NAME, "").value ?: ""
         viewModelScope.launch {
@@ -63,6 +96,7 @@ class TasksViewModel @Inject constructor(
             }
         }
     }
+    */
 
     override fun processViewEvent(viewEvent: TasksContract.ViewEvent) {
         when(viewEvent) {
