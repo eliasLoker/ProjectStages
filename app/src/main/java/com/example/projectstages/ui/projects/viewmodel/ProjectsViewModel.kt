@@ -21,8 +21,7 @@ import kotlin.collections.ArrayList
 @HiltViewModel
 class ProjectsViewModel @Inject constructor(
     private val interactor: ProjectsInteractor
-) :
-    BaseViewModel<
+) : BaseViewModel<
             ProjectsContract.ViewState,
             ProjectsContract.Action,
             ProjectsContract.ViewEffect,
