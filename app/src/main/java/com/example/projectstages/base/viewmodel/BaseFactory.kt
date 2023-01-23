@@ -5,5 +5,5 @@ import androidx.lifecycle.ViewModelProvider
 
 abstract class BaseFactory : ViewModelProvider.NewInstanceFactory() {
 
-    abstract override fun <T : ViewModel?> create(modelClass: Class<T>): T
+    abstract override fun <T : ViewModel> create(modelClass: Class<T>): T
 }

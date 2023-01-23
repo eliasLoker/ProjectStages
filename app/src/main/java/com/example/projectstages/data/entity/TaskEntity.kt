@@ -2,7 +2,6 @@ package com.example.projectstages.data.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
@@ -13,7 +12,7 @@ import androidx.room.PrimaryKey
             entity = ProjectEntity::class,
             parentColumns = ["id"],
             childColumns = ["projectId"],
-            onDelete = CASCADE,
+            onDelete = ForeignKey.CASCADE,
         )
     ],
 indices = [Index("projectId", "description",  unique = true)]

@@ -10,7 +10,8 @@
         android:supportsRtl="true"
         android:name=".app.App"
         android:theme="@style/Theme.ProjectStages">
-        <activity android:name=".ui.main.MainActivity">
+        <activity android:name=".ui.main.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

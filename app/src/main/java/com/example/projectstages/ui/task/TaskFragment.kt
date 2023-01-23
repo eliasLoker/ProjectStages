@@ -104,6 +104,14 @@ class TaskFragment(
 
             is TaskContract.ViewEffect.ShowDeleteDialog
             -> showDeleteDialog()
+
+            is TaskContract.ViewEffect.FailureAdd,
+            TaskContract.ViewEffect.FailureDelete, TaskContract.ViewEffect.FailureUpdate -> {
+                /*
+                nothing
+                */
+                //TODO("check this place")
+            }
         }
     }
 
