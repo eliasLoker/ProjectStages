@@ -54,18 +54,10 @@ object Dependencies {
     fun getBaseDependencies() : Array<DependencyData> {
         val dependenciesMap = getDependencies()
         return arrayOf(
-            dependenciesMap[androidXCore]!!,
-            dependenciesMap[appCompat]!!,
             dependenciesMap[material]!!,
-            dependenciesMap[stdLib]!!,
             dependenciesMap[lifecycleRuntime]!!,
             dependenciesMap[lifecycleViewModel]!!,
-            dependenciesMap[jUnit]!!,
-            dependenciesMap[jUnitExt]!!,
-            dependenciesMap[espressoCore]!!,
-            dependenciesMap[coroutinesCore]!!,
             dependenciesMap[coroutinesAndroid]!!,
-            dependenciesMap[roomRuntime]!!,
         )
     }
 
@@ -73,92 +65,92 @@ object Dependencies {
         return mapOf(
             //CORE
             androidXCore to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.core:core-ktx:1.9.0"
+                dependency      = "androidx.core:core-ktx:1.9.0",
+                dependencyType  = DependencyType.Implementation
             ),
             appCompat to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.appcompat:appcompat:1.6.0"
+                dependency      = "androidx.appcompat:appcompat:1.6.0",
+                dependencyType  = DependencyType.Implementation
             ),
             material to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "com.google.android.material:material:1.7.0"
+                dependency      = "com.google.android.material:material:1.7.0",
+                dependencyType  = DependencyType.Implementation
             ),
             constraintLayout to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency = "androidx.constraintlayout:constraintlayout:2.1.4"
+                dependency      = "androidx.constraintlayout:constraintlayout:2.1.4",
+                dependencyType  = DependencyType.Implementation
             ),
 
             stdLib to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+                dependency      = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
+                dependencyType  = DependencyType.Implementation
             ),
             lifecycleRuntime to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+                dependency      = "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1",
+                dependencyType  = DependencyType.Implementation
             ),
             lifecycleViewModel to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+                dependency      = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1",
+                dependencyType  = DependencyType.Implementation
             ),
             navigation to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
+                dependency      = "androidx.navigation:navigation-fragment-ktx:$navigationVersion",
+                dependencyType  = DependencyType.Implementation
             ),
 
             //TEST
             jUnit to DependencyData(
-                dependencyType  = DependencyType.TestImplementation,
-                dependency      = "junit:junit:4.13.2"
+                dependency      = "junit:junit:4.13.2",
+                dependencyType  = DependencyType.TestImplementation
             ),
             jUnitExt to DependencyData(
-                dependencyType  = DependencyType.AndroidTestImplementation,
-                dependency      = "androidx.test.ext:junit:1.1.5"
+                dependency      = "androidx.test.ext:junit:1.1.5",
+                dependencyType  = DependencyType.AndroidTestImplementation
             ),
             espressoCore to DependencyData(
-                dependencyType  = DependencyType.AndroidTestImplementation,
-                dependency      = "androidx.test.espresso:espresso-core:3.5.1"
+                dependency      = "androidx.test.espresso:espresso-core:3.5.1",
+                dependencyType  = DependencyType.AndroidTestImplementation
             ),
 
             //COROUTINES
             coroutinesCore to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+                dependency      = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines",
+                dependencyType  = DependencyType.Implementation
             ),
             coroutinesAndroid to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
+                dependency      = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines",
+                dependencyType  = DependencyType.Implementation
             ),
 
             //ROOM
             roomRuntime to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.room:room-runtime:$roomVersion"
+                dependency      = "androidx.room:room-runtime:$roomVersion",
+                dependencyType  = DependencyType.Implementation
             ),
             roomKtx to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "androidx.room:room-ktx:$roomVersion"
+                dependency      = "androidx.room:room-ktx:$roomVersion",
+                dependencyType  = DependencyType.Implementation
             ),
             roomCompiler to DependencyData(
-                dependencyType  = DependencyType.Kapt,
-                dependency      = "androidx.room:room-compiler:$roomVersion"
+                dependency      = "androidx.room:room-compiler:$roomVersion",
+                dependencyType  = DependencyType.Kapt
             ),
 
             //DAGGER HILT
             daggerHiltCore to DependencyData(
-                dependencyType  = DependencyType.Implementation,
-                dependency      = "com.google.dagger:hilt-android:$daggerHiltVersion"
+                dependency      = "com.google.dagger:hilt-android:$daggerHiltVersion",
+                dependencyType  = DependencyType.Implementation
             ),
             daggerHiltCompiler to DependencyData(
-                dependencyType  = DependencyType.Kapt,
-                dependency      = "com.google.dagger:hilt-compiler:$daggerHiltVersion"
+                dependency      = "com.google.dagger:hilt-compiler:$daggerHiltVersion",
+                dependencyType  = DependencyType.Kapt
             ),
         )
     }
 
     data class DependencyData(
-        val dependencyType: DependencyType,
-        val dependency: String
+        val dependency: String,
+        val dependencyType: DependencyType
     )
 
     sealed class DependencyType {
