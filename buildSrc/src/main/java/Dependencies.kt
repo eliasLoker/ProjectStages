@@ -16,27 +16,39 @@ object Dependencies {
     private const val jUnitExtVersion                      = "1.1.5"
     private const val espressoCoreVersion                  = "3.5.1"
 
-    private const val androidXCore          = "androidXcore"
-    private const val appCompat             = "appCompat"
-    private const val material              = "material"
-    private const val constraintLayout      = "constraintLayout"
+    private const val composeUIVersion              = GlobalDependencies.composeUIVersion
+    private const val composeActivityVersion               = "1.3.1" // 161
+    private const val composeMaterialVersion               = "1.3.1"
 
-    private const val stdLib                = "stdLib"
-    private const val lifecycleRuntime      = "lifecycleRuntime"
-    private const val lifecycleViewModel    = "lifecycleViewModel"
-    private const val navigation            = "navigation"
+    private const val androidXCore              = "androidXcore"
+    private const val appCompat                 = "appCompat"
+    private const val material                  = "material"
+    private const val constraintLayout          = "constraintLayout"
 
-    private const val jUnit                 = "jUnit"
-    private const val jUnitExt              = "jUnitExt"
-    private const val espressoCore          = "espressoCore"
+    private const val stdLib                    = "stdLib"
+    private const val lifecycleRuntime          = "lifecycleRuntime"
+    private const val lifecycleViewModel        = "lifecycleViewModel"
+    private const val navigation                = "navigation"
 
-    private const val coroutinesCore        = "coroutinesCore"
-    private const val coroutinesAndroid     = "coroutinesAndroid"
-    private const val roomRuntime           = "roomRuntime"
-    private const val roomKtx               = "roomKtx"
-    private const val roomCompiler          = "roomCompiler"
-    private const val daggerHiltCore        = "daggerHiltCore"
-    private const val daggerHiltCompiler    = "daggerHiltCompiler"
+    private const val jUnit                     = "jUnit"
+    private const val jUnitExt                  = "jUnitExt"
+    private const val espressoCore              = "espressoCore"
+    private const val composeUITestJUnit        = "composeUITestJUnit"
+    private const val composeUITestManifest     = "composeUITestManifest"
+
+    private const val coroutinesCore            = "coroutinesCore"
+    private const val coroutinesAndroid         = "coroutinesAndroid"
+    private const val roomRuntime               = "roomRuntime"
+    private const val roomKtx                   = "roomKtx"
+    private const val roomCompiler              = "roomCompiler"
+    private const val daggerHiltCore            = "daggerHiltCore"
+    private const val daggerHiltCompiler        = "daggerHiltCompiler"
+
+    private const val composeActivity           = "activityCompose"
+    private const val composeUI                 = "composeUI"
+    private const val composeUIToolingPreview   = "composeUIToolingPreview"
+    private const val composeMaterial           = "composeMaterial"
+    private const val composeUITooling          = "composeUITooling"
 
     fun getAppDependencies() : Array<DependencyData> {
         val dependenciesMap = getDependencies()
@@ -57,6 +69,13 @@ object Dependencies {
             dependenciesMap[coroutinesAndroid]!!,
             dependenciesMap[daggerHiltCore]!!,
             dependenciesMap[daggerHiltCompiler]!!,
+            dependenciesMap[composeActivity]!!,
+            dependenciesMap[composeUI]!!,
+            dependenciesMap[composeUIToolingPreview]!!,
+            dependenciesMap[composeMaterial]!!,
+            dependenciesMap[composeUITestJUnit]!!,
+            dependenciesMap[composeUITooling]!!,
+            dependenciesMap[composeUITestManifest]!!,
         )
     }
 
@@ -120,6 +139,14 @@ object Dependencies {
                 dependency      = "androidx.test.espresso:espresso-core:$espressoCoreVersion",
                 dependencyType  = DependencyType.AndroidTestImplementation
             ),
+            composeUITestJUnit to DependencyData(
+                dependency      = "androidx.compose.ui:ui-test-junit4:$composeUIVersion",
+                dependencyType  = DependencyType.AndroidTestImplementation
+            ),
+            composeUITestManifest to DependencyData(
+                dependency      = "androidx.compose.ui:ui-test-manifest:$composeUIVersion",
+                dependencyType  = DependencyType.DebugImplementation
+            ),
 
             //COROUTINES
             coroutinesCore to DependencyData(
@@ -154,18 +181,41 @@ object Dependencies {
                 dependency      = "com.google.dagger:hilt-compiler:$daggerHiltVersion",
                 dependencyType  = DependencyType.Kapt
             ),
+
+            //Compose
+            composeActivity to DependencyData(
+                dependency      = "androidx.activity:activity-compose:$composeActivityVersion",
+                dependencyType  = DependencyType.Implementation
+            ),
+            composeUI to DependencyData(
+                dependency      = "androidx.compose.ui:ui:$composeUI",
+                dependencyType  = DependencyType.Implementation
+            ),
+            composeUIToolingPreview to DependencyData(
+                dependency      = "androidx.compose.ui:ui-tooling-preview:$composeUIVersion",
+                dependencyType  = DependencyType.Implementation
+            ),
+            composeMaterial to DependencyData(
+                dependency      = "androidx.compose.material:material:$composeMaterialVersion",
+                dependencyType  = DependencyType.Implementation
+            ),
+            composeUITooling to DependencyData(
+                dependency      = "androidx.compose.ui:ui-tooling:$composeUIVersion",
+                dependencyType  = DependencyType.DebugImplementation
+            ),
         )
     }
 
     data class DependencyData(
-        val dependency:     String,
-        val dependencyType: DependencyType
+        val dependency      : String,
+        val dependencyType  : DependencyType
     )
 
     sealed class DependencyType {
         object Implementation               : DependencyType()
         object TestImplementation           : DependencyType()
         object AndroidTestImplementation    : DependencyType()
+        object DebugImplementation          : DependencyType()
         object Kapt                         : DependencyType()
     }
 }

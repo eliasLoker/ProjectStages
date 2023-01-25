@@ -18,6 +18,9 @@ android {
         versionName = AppConfig.versionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -33,13 +36,25 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
+//    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+//        kotlinOptions {
+//            jvmTarget = "1.8"
+//        }
+//    }
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.0-alpha02"
+    }
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -53,6 +68,7 @@ dependencies {
             is Dependencies.DependencyType.TestImplementation -> testImplementation(it.dependency)
             is Dependencies.DependencyType.AndroidTestImplementation -> androidTestImplementation(it.dependency)
             is Dependencies.DependencyType.Kapt -> kapt(it.dependency)
+            is Dependencies.DependencyType.DebugImplementation -> debugImplementation(it.dependency)
         }
     }
 }

@@ -43,7 +43,7 @@ dependencies {
             is Dependencies.DependencyType.Implementation -> implementation(it.dependency)
             is Dependencies.DependencyType.TestImplementation -> testImplementation(it.dependency)
             is Dependencies.DependencyType.AndroidTestImplementation -> androidTestImplementation(it.dependency)
-            else -> {
+            is Dependencies.DependencyType.Kapt, Dependencies.DependencyType.DebugImplementation -> {
                 /*
                 do nothing
                 */

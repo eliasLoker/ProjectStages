@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.example.projectstages.R
 import com.example.projectstages.databinding.ActivityMainBinding
+import com.example.projectstages.ui.task.TaskComposeActivity
 import com.example.projectstages.ui.task.TaskFragment
 import com.example.projectstages.ui.tasks.TasksFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,8 +66,10 @@ class MainActivity : AppCompatActivity(), ProjectsNavigationListener, TasksNavig
     }
 
     override fun goToAddTask(projectID: Long) {
-        val bundle = TaskFragment.getBundleForCreateTask(projectID)
-        navController.navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
+//        val bundle = TaskFragment.getBundleForCreateTask(projectID)
+//        navController.navigate(R.id.action_tasksFragment_to_taskFragment, bundle)
+        val intent = TaskComposeActivity.getIntent(this, 77L)
+        startActivity(intent)
     }
 
     override fun goToBack() {
